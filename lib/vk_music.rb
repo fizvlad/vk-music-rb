@@ -1,0 +1,5 @@
+require_relative 'vk_music/constants.rb'
+require_relative 'vk_music/exceptions.rb'
+require_relative 'vk_music/audio.rb'
+require_relative 'vk_music/playlist.rb'
+require_relative 'vk_music/client.rb'

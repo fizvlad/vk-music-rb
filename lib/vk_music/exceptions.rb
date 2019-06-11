@@ -1,0 +1,5 @@
+module VkMusic
+
+  # TODO
+  
+end
