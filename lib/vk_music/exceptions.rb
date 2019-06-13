@@ -1,5 +1,7 @@
 module VkMusic
 
-  # TODO
+  class LoginError < RuntimeError
+    # Unable to login
+  end
   
 end

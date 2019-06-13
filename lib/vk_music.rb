@@ -1,3 +1,4 @@
+require_relative 'vk_music/utility.rb'
 require_relative 'vk_music/constants.rb'
 require_relative 'vk_music/exceptions.rb'
 require_relative 'vk_music/audio.rb'
