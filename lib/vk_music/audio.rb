@@ -1,10 +1,5 @@
 module VkMusic
 
-  def self.unmask_link(link, client_id)
-    # TODO
-    return link
-  end
-
   class Audio
     # Attributes
     attr_reader :id, :owner_id, :artist, :title, :duration, :url, :url_encoded
@@ -32,15 +27,17 @@ module VkMusic
     end
     
     def self.from_node(node, client_id)
-      puts node
+      url_encoded = node.at_css("input").attribute("value").to_s
+      id_array = node.attribute("data-id").to_s.split("_")
+      
       new({
-        :id => node.attribute("data-id").to_s,
-        :owner_id => "", # TODO
+        :id => id_array[1],
+        :owner_id => id_array[0],
         :artist => node.at_css(".ai_artist").text.strip,
         :title => node.at_css(".ai_title").text.strip,
         :duration => node.at_css(".ai_dur").attribute("data-dur").to_s.to_i,
-        :url_encoded => node.at_css("input").attribute("value").to_s,
-        :url => VkMusic.unmask_link(@url_encoded, client_id),
+        :url_encoded => url_encoded,
+        :url => VkMusic.unmask_link(url_encoded, client_id),
       })
     end
   

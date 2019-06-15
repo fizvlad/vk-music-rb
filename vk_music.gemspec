@@ -13,4 +13,5 @@ Gem::Specification.new do |s|
   s.license        = "MIT"
   
   s.add_runtime_dependency 'mechanize'
+  s.add_runtime_dependency 'duktape'
 end
