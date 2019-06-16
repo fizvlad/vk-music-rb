@@ -1,7 +1,7 @@
 module VkMusic
 
   class Audio
-    # Attributes
+  
     attr_reader :id, :owner_id, :artist, :title, :duration, :url, :url_encoded
     
     def to_s
@@ -14,7 +14,6 @@ module VkMusic
       raise ArgumentError, "artist is not provided", caller unless options.has_key?(:artist)
       raise ArgumentError, "title is not provided", caller unless options.has_key?(:title)
       raise ArgumentError, "duration is not provided", caller unless options.has_key?(:duration)
-      raise ArgumentError, "url is not provided", caller unless options.has_key?(:url)
       
       # Setting up attributes
       @id          = options[:id].to_s
@@ -28,6 +27,7 @@ module VkMusic
     
     def self.from_node(node, client_id)
       url_encoded = node.at_css("input").attribute("value").to_s
+      url_encoded = nil if url_encoded == "https://m.vk.com/mp3/audio_api_unavailable.mp3"
       id_array = node.attribute("data-id").to_s.split("_")
       
       new({
@@ -37,7 +37,7 @@ module VkMusic
         :title => node.at_css(".ai_title").text.strip,
         :duration => node.at_css(".ai_dur").attribute("data-dur").to_s.to_i,
         :url_encoded => url_encoded,
-        :url => VkMusic.unmask_link(url_encoded, client_id),
+        :url => url_encoded ? VkMusic.unmask_link(url_encoded, client_id) : "",
       })
     end
   
