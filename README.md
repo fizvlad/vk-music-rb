@@ -11,12 +11,17 @@
 
 ## Installation
 
-You can build gem with following command:
+Simpliest way to install gem:
+``
+gem install vk_music
+``
+
+Alternatively, you can build gem from sources with following command:
 ``
 gem build vk_music.gemspec
 ``
 
-Install gem with
+... and install it:
 ``
 gem install vk_music-0.0.1.gem
 ``
