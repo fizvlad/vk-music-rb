@@ -70,7 +70,7 @@ module VkMusic
     # Loading pages
     def load_page(url)
       uri = URI(url) if url.class != URI      
-      @agent.get(url)
+      @agent.get(uri)
     end
     def load_playlist_page(options)
       uri = URI(VK_URL[:audios])
