@@ -6,12 +6,12 @@ Gem::Specification.new do |s|
   s.email          = "fizvlad@mail.ru"
   s.homepage       = "https://github.com/fizvlad/vk-music-rb"
   s.platform       = Gem::Platform::RUBY
-  s.required_ruby_version = '>=2.5.1'
+  s.required_ruby_version = ">=2.5.1"
   s.files          = Dir[ "lib/**/**", "test/**/**", "LICENSE", "Rakefile", "README", "vk_music.gemspec" ]
   s.test_files     = Dir[ "test/test*.rb" ]
   s.has_rdoc       = false
   s.license        = "MIT"
   
-  s.add_runtime_dependency 'mechanize'
-  s.add_runtime_dependency 'duktape'
+  s.add_runtime_dependency "mechanize", "~>2.7"
+  s.add_runtime_dependency "duktape",   "~>2.3"
 end
