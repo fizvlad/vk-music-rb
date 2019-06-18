@@ -1,6 +1,23 @@
+require "io/console"
+
 desc "Build gem file"
 task :build do
-  `gem build vk_music.gemfile`
+  puts `gem build vk_music.gemspec`
 end
 
-# TODO: Test task
+desc "Run tests"
+task :test do
+  puts "Running tests require login credetionals"
+  
+  print "Login:    "
+  username = STDIN.gets.chomp
+  
+  print "Password: "
+  password = STDIN.noecho(&:gets).chomp
+  puts
+  
+  Dir[ "test/test*.rb" ].each do |file|
+    puts "\n\nRunning #{file}:"
+    puts `ruby #{file} #{username} #{password}`
+  end
+end
