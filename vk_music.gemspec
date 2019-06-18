@@ -15,4 +15,5 @@ Gem::Specification.new do |s|
   
   s.add_runtime_dependency "mechanize", "~>2.7"
   s.add_runtime_dependency "duktape",   "~>2.3"
+  s.add_runtime_dependency "json",      "~>2.0"
 end

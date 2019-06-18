@@ -1,4 +1,5 @@
 require "mechanize"
+require "json"
 
 module VkMusic
 
@@ -22,7 +23,7 @@ module VkMusic
     
     def find_audio(query)
       uri = URI(VK_URL[:audios])
-      uri.query = URI.encode_www_form("act" => "search", "q" => query.to_s)
+      uri.query = URI.encode_www_form({ "act" => "search", "q" => query.to_s })
       load_audios_from(uri)
     end
     
@@ -66,16 +67,56 @@ module VkMusic
       })
     end
     
+    def get_audios(id)
+      data = load_playlist_json_section(id: id, playlist_id: -1, offset: -1 * AUDIO_MAXIMUM_COUNT)[3][0]
+      
+      full_data_list = data["list"]
+      
+      # TODO: currently this method loads up to 2000 audio
+      
+      list = full_data_list.map do |audio_data|
+        url_encoded = audio_data[2]
+      
+        Audio.new({
+          :id => audio_data[0],
+          :owner_id => audio_data[1],
+          :artist => audio_data[4],
+          :title => audio_data[3],
+          :duration => audio_data[5],
+          :url_encoded => url_encoded,
+          :url => url_encoded ? VkMusic.unmask_link(url_encoded, @id) : "",
+        })
+      end
+      
+      Playlist.new(list, {
+        :id => data["id"],
+        :owner_id => data["owner_id"],
+        :access_hash => data["access_hash"],
+        :title => data["title"],
+        :subtitle => data["subtitle"],
+      })
+    end
+    
     private
     # Loading pages
     def load_page(url)
       uri = URI(url) if url.class != URI      
       @agent.get(uri)
     end
+    def load_json(url)
+      page = load_page(url)
+      JSON.parse(page.body.strip)
+    end
+    
     def load_playlist_page(options)
       uri = URI(VK_URL[:audios])
-      uri.query = URI.encode_www_form("act" => "audio_playlist#{options[:owner_id]}_#{options[:id]}", "access_hash" => options[:access_hash].to_s, "offset" => options[:offset].to_i)
+      uri.query = URI.encode_www_form({ "act" => "audio_playlist#{options[:owner_id]}_#{options[:id]}", "access_hash" => options[:access_hash].to_s, "offset" => options[:offset].to_i })
       load_page(uri)
+    end
+    def load_playlist_json_section(options)
+      uri = URI(VK_URL[:audios])
+      uri.query = URI.encode_www_form({ "act" => "load_section", "owner_id" => options[:id], "playlist_id" => options[:playlist_id], "type" => "playlist", "offset" => options[:offset].to_i })
+      load_json(uri)
     end
     
     
