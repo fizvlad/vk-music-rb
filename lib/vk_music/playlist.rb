@@ -21,6 +21,10 @@ module VkMusic
     def [](index)
       @list[index]
     end
+    
+    def empty?
+      @list.empty?
+    end
   
     def initialize(list, options = {})
       # Arguments check

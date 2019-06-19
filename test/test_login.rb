@@ -4,9 +4,15 @@ require_relative "../lib/vk_music.rb"
 class TestVkMusic < MiniTest::Test
 
   def test_bad_data
-    assert_raises(VkMusic::LoginError) {
+    assert_raises(VkMusic::LoginError) do
       client = VkMusic::Client.new(username: "login", password: "password")
-    }
+    end
+  end
+  
+  def test_empty_data
+    assert_raises(VkMusic::LoginError) do
+      client = VkMusic::Client.new(username: "", password: "")
+    end
   end
   
   def test_good_data
