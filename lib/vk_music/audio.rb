@@ -37,7 +37,22 @@ module VkMusic
         :title => node.at_css(".ai_title").text.strip,
         :duration => node.at_css(".ai_dur").attribute("data-dur").to_s.to_i,
         :url_encoded => url_encoded,
-        :url => url_encoded ? VkMusic.unmask_link(url_encoded, client_id) : "",
+        :url => url_encoded ? VkMusic.unmask_link(url_encoded, client_id) : nil,
+      })
+    end
+    
+    def self.from_data_array(data, client_id)
+      url_encoded = data[2]
+      url_encoded = nil if url_encoded == ""
+      
+      new({
+        :id => data[0],
+        :owner_id => data[1],
+        :artist => data[4],
+        :title => data[3],
+        :duration => data[5],
+        :url_encoded => url_encoded,
+        :url => url_encoded ? VkMusic.unmask_link(url_encoded, client_id) : nil,
       })
     end
   
