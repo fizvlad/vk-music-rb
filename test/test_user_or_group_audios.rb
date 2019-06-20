@@ -3,7 +3,7 @@ require_relative "../lib/vk_music.rb"
 
 begin
   CLIENT = VkMusic::Client.new(username: ARGV[0], password: ARGV[1])
-rescue VkMusic::LoginError => error
+rescue VkMusic::LoginError
   puts "Unable to login! Please check provided credetionals"
   exit
 end
@@ -20,13 +20,13 @@ class TestVkMusic < MiniTest::Test
 
   def test_incorrect_id
     assert_raises(VkMusic::AudiosParseError) do
-      pl = CLIENT.get_audios("42424242424242424242424242")
+      CLIENT.get_audios("42424242424242424242424242")
     end
   end
   
   def test_user_with_locked_audios
     assert_raises(VkMusic::AudiosParseError) do
-      pl = CLIENT.get_audios("152719703")
+      CLIENT.get_audios("152719703")
     end
   end
   

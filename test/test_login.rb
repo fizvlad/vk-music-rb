@@ -5,20 +5,20 @@ class TestVkMusic < MiniTest::Test
 
   def test_bad_data
     assert_raises(VkMusic::LoginError) do
-      client = VkMusic::Client.new(username: "login", password: "password")
+      VkMusic::Client.new(username: "login", password: "password")
     end
   end
   
   def test_empty_data
     assert_raises(VkMusic::LoginError) do
-      client = VkMusic::Client.new(username: "", password: "")
+      VkMusic::Client.new(username: "", password: "")
     end
   end
   
   def test_good_data
     begin
       client = VkMusic::Client.new(username: ARGV[0], password: ARGV[1])
-    rescue VkMusic::LoginError => error
+    rescue VkMusic::LoginError
       puts "Unable to login! Please check provided credetionals"
     end
     refute_nil(client, "Client not defined")

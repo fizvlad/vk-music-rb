@@ -3,7 +3,7 @@ require_relative "../lib/vk_music.rb"
 
 begin
   CLIENT = VkMusic::Client.new(username: ARGV[0], password: ARGV[1])
-rescue VkMusic::LoginError => error
+rescue VkMusic::LoginError
   puts "Unable to login! Please check provided credetionals"
   exit
 end

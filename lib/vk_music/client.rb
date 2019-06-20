@@ -46,7 +46,7 @@ module VkMusic
           playlist_size = 0
         end
       rescue Exception => error
-        raise PlaylistParseError, "unable to parse playlist page. Redirected to #{first_page.uri.to_s}", caller
+        raise PlaylistParseError, "unable to parse playlist page. Redirected to #{first_page.uri.to_s}. Error: #{error.message}", caller
       end
       # Now we can be sure we are on correct page
       
