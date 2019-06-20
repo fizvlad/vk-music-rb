@@ -22,9 +22,6 @@ module VkMusic
   # Playlist
   PLAYLIST_URL_REGEX = /.*audio_playlist(-?[\d]+)_([\d]+)(?:(?:(?:&access_hash=)|\/|%2F)([\da-z]+))?/
   
-  # Audio
-  AUDIO_MAXIMUM_COUNT = 50000 # This variable is used when getting playlists and user audios
-  
   
   # QUESTION: Should I move ALL the constants (string, regex etc) here? It would make code more flexible, but seems like overkill
   
