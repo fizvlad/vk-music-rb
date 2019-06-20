@@ -18,6 +18,6 @@ task :test do
   
   Dir[ "test/test*.rb" ].each do |file|
     puts "\n\nRunning #{file}:"
-    puts `ruby #{file} #{username} #{password}`
+    puts `ruby -w #{file} #{username} #{password}`
   end
 end
