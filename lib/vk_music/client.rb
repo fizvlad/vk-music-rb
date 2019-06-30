@@ -28,13 +28,13 @@ module VkMusic
     end
     
     def get_playlist(url, up_to = nil)
-      url, owner_id, id, access_hash = url.match(PLAYLIST_URL_REGEX).to_a
-
-      # Load first page and get info
-      first_page = load_playlist_page(owner_id: owner_id, id: id, access_hash: access_hash, offset: 0)
-      
-      # Trying to parse out essential data
       begin
+        url, owner_id, id, access_hash = url.match(PLAYLIST_URL_REGEX).to_a
+      
+        # Load first page and get info
+        first_page = load_playlist_page(owner_id: owner_id, id: id, access_hash: access_hash, offset: 0)
+        
+        # Parse out essential data
         title = first_page.at_css(".audioPlaylist__title").text.strip
         subtitle = first_page.at_css(".audioPlaylist__subtitle").text.strip
         
@@ -46,7 +46,7 @@ module VkMusic
           playlist_size = 0
         end
       rescue Exception => error
-        raise PlaylistParseError, "unable to parse playlist page. Redirected to #{first_page.uri.to_s}. Error: #{error.message}", caller
+        raise PlaylistParseError, "unable to parse playlist page. Error: #{error.message}", caller
       end
       # Now we can be sure we are on correct page
       

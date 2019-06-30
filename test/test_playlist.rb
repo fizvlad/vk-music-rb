@@ -49,4 +49,10 @@ class TestVkMusic < MiniTest::Test
     refute_empty(pl[-1].url, "Audio must have download url")
   end
   
+  def test_bad_url
+    assert_raises(VkMusic::PlaylistParseError) do
+      CLIENT.get_playlist("ae")
+    end
+  end
+  
 end
