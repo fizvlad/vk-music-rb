@@ -28,6 +28,7 @@ module VkMusic
     end
     
     def get_playlist(url, up_to = nil)
+      # NOTICE: it is possible to use same type of requests as in get_audios method
       begin
         url, owner_id, id, access_hash = url.match(PLAYLIST_URL_REGEX).to_a
       
@@ -77,6 +78,8 @@ module VkMusic
     def get_audios(id, up_to = nil)
       Warning.warn("Current implementation of method VkMusic::Client#get_audios is only able to load first 100 audios from user page.\n") if (up_to && up_to > 100)
       # NOTICE: this method is only able to load first 100 audios
+      # NOTICE: it is possible to download 50 audios per request on "https://m.vk.com/audios#{owner_id}?offset=#{offset}", so it will cost A LOT to download all of audios (up to 200 requests).
+      # NOTICE: it is possible to load up to 2000 audios **without url** if offset is negative
       
       # Trying to parse out audios
       begin
@@ -87,7 +90,7 @@ module VkMusic
         raise AudiosSectionParseError, "unable to load or parse audios section: #{error.message}", caller
       end
       
-      #total_count = first_data["totalCount"] # NOTICE: not used due to restrictions dexcribed above
+      #total_count = first_data["totalCount"] # NOTICE: not used due to restrictions described above
       total_count = first_data_audios.length
       up_to = total_count if (up_to.nil? || up_to < 0 || up_to > total_count)
       list = first_data_audios[0, up_to]      
