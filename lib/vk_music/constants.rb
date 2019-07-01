@@ -19,6 +19,8 @@ module VkMusic
     :password => "pass",
   }
   
+  VK_URL_REGEX = /(?:https?:\/\/)?(?:m\.|www\.)?vk\.com\/(.+)/
+  
   # Playlist
   PLAYLIST_URL_REGEX = /.*audio_playlist(-?[\d]+)_([\d]+)(?:(?:(?:&access_hash=)|\/|%2F)([\da-z]+))?/
   
