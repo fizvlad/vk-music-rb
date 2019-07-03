@@ -30,7 +30,7 @@ module VkMusic
     def get_playlist(url, up_to = nil)
       # NOTICE: it is possible to use same type of requests as in get_audios method
       begin
-        url, owner_id, id, access_hash = url.match(PLAYLIST_URL_REGEX).to_a
+        url, owner_id, id, access_hash = url.to_s.match(PLAYLIST_URL_REGEX).to_a
       
         # Load first page and get info
         first_page = load_playlist_page(owner_id: owner_id, id: id, access_hash: access_hash, offset: 0)
@@ -75,11 +75,14 @@ module VkMusic
       })
     end
     
-    def get_audios(id, up_to = nil)
+    def get_audios(obj, up_to = nil)
       Warning.warn("Current implementation of method VkMusic::Client#get_audios is only able to load first 100 audios from user page.\n") if (up_to && up_to > 100)
       # NOTICE: this method is only able to load first 100 audios
       # NOTICE: it is possible to download 50 audios per request on "https://m.vk.com/audios#{owner_id}?offset=#{offset}", so it will cost A LOT to download all of audios (up to 200 requests).
       # NOTICE: it is possible to load up to 2000 audios **without url** if offset is negative
+      
+      # Firstly, we need to get numeric id
+      id = get_id(obj.to_s)      
       
       # Trying to parse out audios
       begin
@@ -105,7 +108,38 @@ module VkMusic
       })
     end
     
+    def get_id(str)
+      case str
+        when VK_URL_REGEX
+          path = str.match(VK_URL_REGEX)[1]
+          get_id(path) # Recursive call
+        when VK_ID_REGEX
+          str
+        when VK_PREFIXED_ID_REGEX
+          id = str.match(/\d+/).to_s # Just numbers. Sign needed
+          id = "-#{id}" unless str.start_with?("id")
+          id
+        when VK_CUSTOM_ID_REGEX
+          begin
+            page = load_page("#{VK_URL[:home]}/#{str}")
+          rescue Exception => error
+            raise IdParseError, "unable to load page by id \"#{str}\". Error: #{error.message}"
+          end
+          
+          unless page.at_css(".PageBlock .owner_panel")
+            # Ensure this isn't some random vk page
+            raise IdParseError, "page #{str} doesn't seem to be a group or user page"
+          end
+          
+          id = page.link_with(href: VK_HREF_ID_CONTAINING_REGEX).href.slice(/-?\d+/) # Numbers with sign
+          id
+      else
+        raise IdParseError, "unable to convert \"#{str}\" into id"
+      end
+    end
+    
     private
+    
     # Loading pages
     def load_page(url)
       uri = URI(url) if url.class != URI      
@@ -153,6 +187,7 @@ module VkMusic
     end
     
     
+    # Login
     def login(username, password)
       # Loading login page
       homepage = load_page(VK_URL[:home])
@@ -168,7 +203,7 @@ module VkMusic
       # Parsing information about this profile
       profile = load_page(VK_URL[:profile])      
       @name = profile.title
-      @id = profile.link_with(href: /audios/).href.slice(/\d+/)
+      @id = profile.link_with(href: VK_HREF_ID_CONTAINING_REGEX).href.slice(/\d+/)
     end
     
     def unmask_link(link)

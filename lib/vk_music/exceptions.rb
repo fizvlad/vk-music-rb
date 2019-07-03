@@ -16,4 +16,8 @@ module VkMusic
     # Unable to load or parse audios section
   end
   
+  class IdParseError < AudiosParseError
+    # Unable to convert string to id
+  end
+  
 end

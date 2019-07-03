@@ -59,4 +59,9 @@ class TestVkMusic < MiniTest::Test
     assert_empty(pl, "This group got no audios")
   end
   
+  def test_group_by_custom_id
+    pl = CLIENT.get_audios("mashup")
+    refute_empty(pl, "This group got audios")
+  end
+  
 end
