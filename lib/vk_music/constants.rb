@@ -25,7 +25,7 @@ module VkMusic
   VK_CUSTOM_ID_REGEX = /^\w+$/
   VK_URL_REGEX = /(?:https?:\/\/)?(?:m\.|www\.)?vk\.com\/(\w+)/
   
-  VK_HREF_ID_CONTAINING_REGEX = /(?:audios|photo|write|owner_id=)-?\d+/
+  VK_HREF_ID_CONTAINING_REGEX = /(?:audios|photo|write|owner_id=|friends\?id=)-?\d+/
   
   # Playlist
   PLAYLIST_URL_REGEX = /.*audio_playlist(-?[\d]+)_([\d]+)(?:(?:(?:&access_hash=)|\/|%2F)([\da-z]+))?/

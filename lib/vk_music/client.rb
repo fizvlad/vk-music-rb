@@ -76,7 +76,9 @@ module VkMusic
     end
     
     def get_audios(obj, up_to = nil)
-      Warning.warn("Current implementation of method VkMusic::Client#get_audios is only able to load first 100 audios from user page.\n") if (up_to && up_to > 100)
+      if up_to && up_to > 100 && defined?(Warning.warn)
+        Warning.warn("Current implementation of method VkMusic::Client#get_audios is only able to load first 100 audios from user page.\n")
+      end
       # NOTICE: this method is only able to load first 100 audios
       # NOTICE: it is possible to download 50 audios per request on "https://m.vk.com/audios#{owner_id}?offset=#{offset}", so it will cost A LOT to download all of audios (up to 200 requests).
       # NOTICE: it is possible to load up to 2000 audios **without url** if offset is negative
