@@ -9,10 +9,11 @@ module VkMusic
     
     def self.guess_request_type(str)
       # Guess what type of request is this. Returns Symbol: :find, :playlist, :audios
-      if str.match? PLAYLIST_URL_REGEX
-        :playlist
-      elsif str.match? VK_URL_REGEX
-        :audios
+      case str
+        when PLAYLIST_URL_REGEX
+          :playlist
+        when VK_URL_REGEX
+          :audios
       else
         :find
       end
