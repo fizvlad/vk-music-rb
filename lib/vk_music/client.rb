@@ -105,8 +105,8 @@ module VkMusic
         :id => first_data["id"],
         :owner_id => first_data["owner_id"],
         :access_hash => first_data["access_hash"],
-        :title => first_data["title"],
-        :subtitle => first_data["subtitle"],
+        :title => CGI.unescapeHTML(first_data["title"].to_s),
+        :subtitle => CGI.unescapeHTML(first_data["subtitle"].to_s),
       })
     end
     

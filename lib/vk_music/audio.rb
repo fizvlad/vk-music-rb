@@ -1,3 +1,5 @@
+require "cgi"
+
 module VkMusic
 
   class Audio
@@ -48,8 +50,8 @@ module VkMusic
       new({
         :id => data[0],
         :owner_id => data[1],
-        :artist => data[4],
-        :title => data[3],
+        :artist => CGI.unescapeHTML(data[4]),
+        :title => CGI.unescapeHTML(data[3]),
         :duration => data[5],
         :url_encoded => url_encoded,
         :url => url_encoded ? VkMusic.unmask_link(url_encoded, client_id) : nil,
