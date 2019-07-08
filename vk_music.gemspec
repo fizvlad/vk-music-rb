@@ -2,7 +2,7 @@ Gem::Specification.new do |s|
   s.name           = "vk_music"
   s.summary        = "Provides interface to work with VK music via HTTP requests"
   s.description    = "Library to work with audios on popular Russian social network vk.com. VK disabled their public API for audios, so it is now necessary to use parsers instead."
-  s.version        = "1.0.0"
+  s.version        = "1.0.1"
   s.author         = "Kuznetsov Vladislav"
   s.email          = "fizvlad@mail.ru"
   s.homepage       = "https://github.com/fizvlad/vk-music-rb"
