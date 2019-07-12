@@ -17,6 +17,11 @@ class TestVkMusic < MiniTest::Test
     assert_instance_of(VkMusic::Audio, pl[0], "Results must be of class Audio")
     refute_empty(pl[0].url, "Audio must have download url")
   end
+  
+  def test_user_by_audios_url
+    pl = CLIENT.get_audios("https://m.vk.com/audios8024985")
+    refute_empty(pl, "This user got audios")
+  end
 
   def test_incorrect_id
     assert_raises(VkMusic::AudiosParseError) do
@@ -61,6 +66,11 @@ class TestVkMusic < MiniTest::Test
   
   def test_group_by_custom_id
     pl = CLIENT.get_audios("mashup")
+    refute_empty(pl, "This group got audios")
+  end
+  
+  def test_group_by_audios_url
+    pl = CLIENT.get_audios("https://m.vk.com/audios-39786657")
     refute_empty(pl, "This group got audios")
   end
   

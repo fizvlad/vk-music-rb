@@ -117,6 +117,8 @@ module VkMusic
           get_id(path) # Recursive call
         when VK_ID_REGEX
           str
+        when VK_AUDIOS_REGEX
+          str.match(/-?\d+/).to_s # Numbers with sigh
         when VK_PREFIXED_ID_REGEX
           id = str.match(/\d+/).to_s # Just numbers. Sign needed
           id = "-#{id}" unless str.start_with?("id")

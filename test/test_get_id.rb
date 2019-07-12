@@ -35,6 +35,11 @@ class TestVkMusic < MiniTest::Test
     assert_equal("51842614", id, "Ids don't match")
   end
   
+  def test_user_audios
+    id = CLIENT.get_id("https://vk.com/audios51842614")
+    assert_equal("51842614", id, "Ids don't match")
+  end
+  
   
   def test_group_link_with_id
     id = CLIENT.get_id("https://vk.com/public39786657")
@@ -58,6 +63,11 @@ class TestVkMusic < MiniTest::Test
   
   def test_group_id_with_prefix
     id = CLIENT.get_id("public39786657")
+    assert_equal("-39786657", id, "Ids don't match")
+  end
+  
+  def test_group_audios
+    id = CLIENT.get_id("https://vk.com/audios-39786657")
     assert_equal("-39786657", id, "Ids don't match")
   end
   

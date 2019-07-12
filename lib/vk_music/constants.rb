@@ -21,9 +21,10 @@ module VkMusic
   
   
   VK_ID_REGEX = /^-?\d+$/
+  VK_AUDIOS_REGEX = /^audios-?\d+$/
   VK_PREFIXED_ID_REGEX = /^(?:id|club|group|public|event)\d+$/ # TODO: Rework. This one is REALLY dirty. Not quite sure every page can return correct id with this regex
   VK_CUSTOM_ID_REGEX = /^\w+$/
-  VK_URL_REGEX = /(?:https?:\/\/)?(?:m\.|www\.)?vk\.com\/(\w+)/
+  VK_URL_REGEX = /(?:https?:\/\/)?(?:m\.|www\.)?vk\.com\/([\w\-]+)/
   
   VK_HREF_ID_CONTAINING_REGEX = /(?:audios|photo|write|owner_id=|friends\?id=)-?\d+/
   
