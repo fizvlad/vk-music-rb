@@ -6,7 +6,7 @@
 ## Dependencies
 
 * [mechanize](https://github.com/sparklemotion/mechanize "mechanize") (interaction with website)
-* [duktape](https://github.com/judofyr/duktape.rb "duktape") (JS interpreter)
+* [execjs](https://github.com/rails/execjs "execjs") (JS interpreter)
 
 
 ## Installation
