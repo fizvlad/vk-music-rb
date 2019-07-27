@@ -4,7 +4,7 @@ module VkMusic
 
   class Audio
   
-    attr_reader :id, :owner_id, :artist, :title, :duration, :url, :url_encoded
+    attr_reader :id, :owner_id, :secret_1, :secret_2, :artist, :title, :duration, :url, :url_encoded
     
     def to_s
       "#{@artist} - #{@title} [#{Utility.format_seconds(@duration)}]"
@@ -20,6 +20,8 @@ module VkMusic
       # Setting up attributes
       @id          = options[:id].to_s
       @owner_id    = options[:owner_id].to_s
+      @secret_1    = options[:secret_1].to_s
+      @secret_2    = options[:secret_2].to_s
       @artist      = options[:artist].to_s
       @title       = options[:title].to_s
       @duration    = options[:duration].to_i
@@ -47,9 +49,13 @@ module VkMusic
       url_encoded = data[2]
       url_encoded = nil if url_encoded == ""
       
+      secrets = data[13].split(/\/+/)
+
       new({
         :id => data[0],
         :owner_id => data[1],
+        :secret_1 => secrets[1],
+        :secret_2 => secrets[2],
         :artist => CGI.unescapeHTML(data[4]),
         :title => CGI.unescapeHTML(data[3]),
         :duration => data[5],

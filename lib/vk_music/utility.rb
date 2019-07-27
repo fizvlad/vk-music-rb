@@ -1,3 +1,5 @@
+require "cgi"
+
 module VkMusic
 
   module Utility
@@ -17,6 +19,20 @@ module VkMusic
       else
         :find
       end
+    end
+
+    def self.hash_to_params(hash = {})
+      qs = ""
+      hash.each_key do |key|
+        qs << "&" unless qs.empty?
+        case hash[key]
+          when Array
+            qs << CGI.escape(key.to_s) << "=" << hash[key].map { |value| CGI.escape(value.to_s) }.join(",")
+          else
+            qs << CGI.escape(key.to_s) << "=" << CGI.escape(hash[key].to_s)
+        end
+      end
+      qs
     end
     
   end

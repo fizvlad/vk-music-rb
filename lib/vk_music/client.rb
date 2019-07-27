@@ -23,7 +23,7 @@ module VkMusic
     
     def find_audio(query)
       uri = URI(VK_URL[:audios])
-      uri.query = URI.encode_www_form({ "act" => "search", "q" => query.to_s })
+      uri.query = Utility.hash_to_params({ "act" => "search", "q" => query.to_s })
       load_audios_from_page(uri)
     end
     
@@ -90,7 +90,7 @@ module VkMusic
       begin
         first_json = load_playlist_json_section(id: id.to_s, playlist_id: -1, offset: 0)
         first_data = first_json["data"][0]
-        first_data_audios = load_audios_from_data(first_data)
+        first_data_audios = load_audios_from_data(first_data["list"])
       rescue Exception => error
         raise AudiosSectionParseError, "unable to load or parse audios section: #{error.message}", caller
       end
@@ -109,7 +109,30 @@ module VkMusic
         :subtitle => CGI.unescapeHTML(first_data["subtitle"].to_s),
       })
     end
+
+    def get_audios_by_id(*arr)
+      arr.map! do |el| 
+        case el
+          when Array
+            el.join("_")
+          when Audio
+            "#{el.owner_id}_#{el.id}_#{el.secret_1}_#{el.secret_2}"
+          else
+            el.to_s
+        end
+      end
+      json = load_audios_json_by_id(arr)
+      result = load_audios_from_data(json["data"][0].to_a)
+      raise ReloadAudiosParseError.new("Result size don't match: excepected #{arr.size}, got #{result.size}") if result.size != arr.size
+
+      result
+    end
     
+    def get_audios_from_post(url)
+      # TODO
+    end
+
+
     def get_id(str)
       case str
         when VK_URL_REGEX
@@ -141,7 +164,8 @@ module VkMusic
         raise IdParseError, "unable to convert \"#{str}\" into id"
       end
     end
-    
+
+
     private
     
     # Loading pages
@@ -156,7 +180,7 @@ module VkMusic
     
     def load_playlist_page(options)
       uri = URI(VK_URL[:audios])
-      uri.query = URI.encode_www_form({
+      uri.query = Utility.hash_to_params({
         "act" => "audio_playlist#{options[:owner_id]}_#{options[:id]}",
         "access_hash" => options[:access_hash].to_s,
         "offset" => options[:offset].to_i
@@ -165,12 +189,26 @@ module VkMusic
     end
     def load_playlist_json_section(options)
       uri = URI(VK_URL[:audios])
-      uri.query = URI.encode_www_form({
+      uri.query = Utility.hash_to_params({
         "act" => "load_section",
         "owner_id" => options[:id],
         "playlist_id" => options[:playlist_id],
         "type" => "playlist",
         "offset" => options[:offset].to_i,
+        "utf8" => true
+      })
+      begin
+        load_json(uri)
+      rescue Exception => error
+        raise AudiosSectionParseError, "unable to load or parse audios section: #{error.message}", caller
+      end
+    end
+
+    def load_audios_json_by_id(ids)
+      uri = URI(VK_URL[:audios])
+      uri.query = Utility.hash_to_params({
+        "act" => "reload_audio",
+        "ids" => ids,
         "utf8" => true
       })
       begin
@@ -187,7 +225,7 @@ module VkMusic
       page.css(".audio_item.ai_has_btn").map { |elem| Audio.from_node(elem, @id) }
     end 
     def load_audios_from_data(data)
-      data["list"].map { |audio_data| Audio.from_data_array(audio_data, @id) }
+      data.map { |audio_data| Audio.from_data_array(audio_data, @id) }
     end
     
     
