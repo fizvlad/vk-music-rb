@@ -27,7 +27,7 @@ task :test do
   print "Path to SSL certificate (leave empty if there is no troubles with SSL): "
   ssl_cert_path = STDIN.gets.chomp
   puts
-  ENV["SSL_CERT_FILE"] = ssl_cert_path
+  ENV["SSL_CERT_FILE"] = ssl_cert_path unless ssl_cert_path.empty?
   
   Dir[ "test/test*.rb" ].each do |file|
     puts "\n\nRunning #{file}:"
