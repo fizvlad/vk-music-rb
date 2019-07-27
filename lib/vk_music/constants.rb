@@ -30,6 +30,9 @@ module VkMusic
   
   # Playlist
   PLAYLIST_URL_REGEX = /.*audio_playlist(-?[\d]+)_([\d]+)(?:(?:(?:&access_hash=)|\/|%2F)([\da-z]+))?/
+
+  # Post
+  POST_URL_REGEX = /.*wall(-?[\d]+)_([\d]+)/
   
   
   # QUESTION: Should I move ALL the constants (string, regex etc) here? It would make code more flexible, but seems like overkill
