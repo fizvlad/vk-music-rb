@@ -5,9 +5,26 @@ module VkMusic
   class Audio
   
     attr_reader :id, :owner_id, :secret_1, :secret_2, :artist, :title, :duration, :url, :url_encoded
+
+    def update_url(options)
+      raise ArgumentError, "options hash must be provided", caller unless options.class == Hash
+      if !options[:url].to_s.empty?
+        @url_encoded = ""
+        @url = options[:url].to_s
+      elsif !options[:url].to_s.empty? && options[:client_id]
+        @url_encoded = options[:url_encoded].to_s
+        @url = VkMusic.unmask_link(options[:url_encoded], options[:client_id])
+      else
+        raise ArgumentError, "You should either provide :url or :url_encoded and :client_id", caller
+      end
+    end
     
     def to_s
       "#{@artist} - #{@title} [#{Utility.format_seconds(@duration)}]"
+    end
+
+    def pp
+      "#{to_s} (Got decoded URL: #{@url ? "yes" : "no"}, able to get URL from VK: #{@id && @owner_id && @secret_1 && @secret_2 ? "yes" : "no"})"
     end
   
     def initialize(options)
