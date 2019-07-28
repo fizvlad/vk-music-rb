@@ -1,27 +1,27 @@
 module VkMusic
 
-  class LoginError < RuntimeError
-    # Unable to login
-  end
-  
-  class PlaylistParseError < RuntimeError
-    # Unable to find playlist or got permission error
-  end
-  
-  class AudiosParseError < RuntimeError
-    # Unable to find user/group or got permission error
-  end
-  
-  class AudiosSectionParseError < AudiosParseError
-    # Unable to load or parse audios section
-  end
+  # General class for all the errors
+  class VkMusicError < RuntimeError; end
 
-  class ReloadAudiosParseError < AudiosParseError
-    # Unable to load or parse all of audios by ids
-  end
+  # Failed to login
+  class LoginError < VkMusicError; end
   
-  class IdParseError < AudiosParseError
-    # Unable to convert string to id
-  end
+  # Unable to parse audios from somewhere
+  class AudiosParseError < VkMusicError; end
+
+  # Unable to find playlist or got permission error
+  class PlaylistParseError < AudiosParseError; end
+
+  # Unable to load or parse audios section from json
+  class AudiosSectionParseError < AudiosParseError; end
+
+  # Unable to load or parse all of audios by ids
+  class ReloadAudiosParseError < AudiosParseError; end
+  
+  # Unable to convert string to id
+  class IdParseError < AudiosParseError; end
+    
+  # Unable to parse audios from post
+  class PostParseError < AudiosParseError; end
   
 end
