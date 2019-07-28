@@ -14,6 +14,8 @@ module VkMusic
       case str
         when PLAYLIST_URL_REGEX
           :playlist
+        when POST_URL_REGEX
+          :post
         when VK_URL_REGEX
           :audios
       else
@@ -33,6 +35,14 @@ module VkMusic
         end
       end
       qs
+    end
+
+    def self.warn(*args)
+      if defined?(Warning.warn)
+        Warning.warn(*args, "\n")
+      else
+        STDERR.puts "Warning:", *args
+      end
     end
     
   end
