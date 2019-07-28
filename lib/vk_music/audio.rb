@@ -66,13 +66,13 @@ module VkMusic
       url_encoded = data[2]
       url_encoded = nil if url_encoded == ""
       
-      secrets = data[13].split(/\/+/)
+      secrets = data[13].split("/")
 
       new({
         :id => data[0],
         :owner_id => data[1],
-        :secret_1 => secrets[1],
-        :secret_2 => secrets[2],
+        :secret_1 => secrets[3],
+        :secret_2 => secrets[5],
         :artist => CGI.unescapeHTML(data[4]),
         :title => CGI.unescapeHTML(data[3]),
         :duration => data[5],
