@@ -11,7 +11,7 @@ end
 class TestVkMusic < MiniTest::Test
 
   def test_single_audio
-    audios = CLIENT.get_audios_from_post("https://vk.com/wall-72589944_2992")
+    audios = CLIENT.get_audios_from_post("https://vk.com/wall-184089233_6")
     assert_instance_of(Array, audios, "Result must be of class Array")
     assert_equal(1, audios.length, "This post got 1 attached audio")
     assert_instance_of(VkMusic::Audio, audios[0], "Array must consist of class Audio")
@@ -19,7 +19,7 @@ class TestVkMusic < MiniTest::Test
   end
   
   def test_no_audio
-    audios = CLIENT.get_audios_from_post("https://vk.com/wall-72589944_3065")
+    audios = CLIENT.get_audios_from_post("https://vk.com/wall-184089233_2")
     assert_empty(audios, "This post got no attached audio")
   end
   
@@ -29,19 +29,29 @@ class TestVkMusic < MiniTest::Test
   end
   
   def test_playlist
-    audios = CLIENT.get_audios_from_post("https://vk.com/wall-72589944_3065")
+    audios = CLIENT.get_audios_from_post("vk.com/wall-184089233_4")
     assert_empty(audios, "This post got attached playlist but those audios must not be parsed")
   end
   
   def test_comments_with_audios
     audios = CLIENT.get_audios_from_post("https://m.vk.com/wall-39786657_189247")
-    assert_empty(audios, "This post got comments with audios but those audios must not be parsed")
+    assert_equal(1, audios.length, "This post got comments with audios but those audios must not be parsed")
+  end
+
+  def test_repost_with_no_audios
+    audios = CLIENT.get_audios_from_post("https://vk.com/wall-184936953_1")
+    assert_empty(audios, "This post got no attached audios")
+  end
+
+  def test_repost_with_audios
+    audios = CLIENT.get_audios_from_post("https://vk.com/wall-184936953_2")
+    assert_equal(1, audios.length, "This repost got 1 attached audio")
+    refute_empty(audios[0].url, "Audio must have download url")
   end
   
-  def test_repost_with_audios
-    audios = CLIENT.get_audios_from_post("https://vk.com/wall-72589944_2287")
-    assert_equal(5, audios.length, "This repost got 5 attached audio")
-    refute_empty(audios[0].url, "Audio must have download url")
+  def test_repost_with_playlist
+    audios = CLIENT.get_audios_from_post("https://vk.com/wall-184936953_3")
+    assert_empty(audios, "This post got no attached audios")
   end
   
   def test_bad_url
@@ -50,9 +60,15 @@ class TestVkMusic < MiniTest::Test
     end
   end
   
-  def test_nonexistent_post
+  def test_nonexistent_post_1
     assert_raises(VkMusic::PostParseError) do
-      CLIENT.get_audios_from_post("https://m.vk.com/wall-4790861_-10526")
+      CLIENT.get_audios_from_post("https://m.vk.com/wall-4790861_1052600000")
+    end
+  end
+
+  def test_nonexistent_post_2
+    assert_raises(VkMusic::PostParseError) do
+      CLIENT.get_audios_from_post("https://m.vk.com/wall-4790861_-1")
     end
   end
   
