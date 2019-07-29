@@ -39,7 +39,7 @@ module VkMusic
 
     def self.warn(*args)
       if defined?(Warning.warn)
-        Warning.warn(*args, "\n")
+        Warning.warn args.join("\n")
       else
         STDERR.puts "Warning:", *args
       end
