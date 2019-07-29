@@ -12,6 +12,7 @@ module VkMusic
     :audios => "https://m.vk.com/audio",
     :login  => "https://m.vk.com/login",
     :login_action => "https://login.vk.com",
+    :wall => "https://m.vk.com/wall"
   }
   
   VK_LOGIN_FORM_NAMES = {
@@ -29,10 +30,10 @@ module VkMusic
   VK_HREF_ID_CONTAINING_REGEX = /(?:audios|photo|write|owner_id=|friends\?id=)-?\d+/
   
   # Playlist
-  PLAYLIST_URL_REGEX = /.*audio_playlist(-?[\d]+)_([\d]+)(?:(?:(?:&access_hash=)|\/|%2F)([\da-z]+))?/
+  PLAYLIST_URL_REGEX = /.*audio_playlist(-?\d+)_(\d+)(?:(?:(?:&access_hash=)|\/|%2F)([\da-z]+))?/
 
   # Post
-  POST_URL_REGEX = /.*wall(-?[\d]+)_([\d]+)/
+  POST_URL_REGEX = /.*wall(-?\d+)_(\d+)/
   
   
   # QUESTION: Should I move ALL the constants (string, regex etc) here? It would make code more flexible, but seems like overkill

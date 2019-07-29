@@ -17,6 +17,10 @@ module VkMusic
     def pp
       "#{to_s}:\n#{@list.map(&:to_s).join("\n")}"
     end
+
+    def to_a
+      @list.dup
+    end
     
     def each(&block)
       @list.each(&block)

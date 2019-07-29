@@ -76,8 +76,8 @@ module VkMusic
     end
     
     def get_audios(obj, up_to = nil)
-      if up_to && up_to > 100 && defined?(Warning.warn)
-        Warning.warn("Current implementation of method VkMusic::Client#get_audios is only able to load first 100 audios from user page.\n")
+      if up_to && up_to > 100
+        Utility.warn("Current implementation of method VkMusic::Client#get_audios is only able to load first 100 audios from user page.")
       end
       # NOTICE: this method is only able to load first 100 audios
       # NOTICE: it is possible to download 50 audios per request on "https://m.vk.com/audios#{owner_id}?offset=#{offset}", so it will cost A LOT to download all of audios (up to 200 requests).
@@ -88,7 +88,7 @@ module VkMusic
       
       # Trying to parse out audios
       begin
-        first_json = load_playlist_json_section(id: id.to_s, playlist_id: -1, offset: 0)
+        first_json = load_playlist_json_section(id.to_s, -1, 0)
         first_data = first_json["data"][0]
         first_data_audios = load_audios_from_data(first_data["list"])
       rescue Exception => error
@@ -96,9 +96,12 @@ module VkMusic
       end
       
       #total_count = first_data["totalCount"] # NOTICE: not used due to restrictions described above
-      total_count = first_data_audios.length
+      total_count = first_data_audios.length # Using this instead
+
+      # TODO: Loading rest
+
       up_to = total_count if (up_to.nil? || up_to < 0 || up_to > total_count)
-      list = first_data_audios[0, up_to]      
+      list = first_data_audios.first(up_to)
       
       # It turns out user audios are just playlist with id -1
       Playlist.new(list, {
@@ -111,6 +114,11 @@ module VkMusic
     end
 
     def get_audios_by_id(*arr)
+      if arr.size > 10
+        Utility.warn("Current implementation of method VkMusic::Client#get_audios_by_id is only able to handle first 10 audios.")
+        arr = arr.first(10)
+      end
+
       arr.map! do |el| 
         case el
           when Array
@@ -123,13 +131,39 @@ module VkMusic
       end
       json = load_audios_json_by_id(arr)
       result = load_audios_from_data(json["data"][0].to_a)
-      raise ReloadAudiosParseError.new("Result size don't match: excepected #{arr.size}, got #{result.size}") if result.size != arr.size
+      raise ReloadAudiosParseError, "Result size don't match: excepected #{arr.size}, got #{result.size}", caller if result.size != arr.size
 
       result
     end
+
+    def get_audios_from_wall(owner_id, post_id, up_to = nil)
+      begin
+        json = load_audios_json_from_wall(owner_id, post_id)
+        data = json["data"][0]
+        no_url_audios = load_audios_from_data(data["list"])
+      rescue Exception => error
+        raise WallParseError, "Failed to parse wall from #{@owner_id}_#{post_id}. Error: #{error.message}", caller
+      end
+
+      up_to = no_url_audios.size if (up_to.nil? || up_to < 0 || up_to > no_url_audios.size)
+      no_url_audios = no_url_audios.first(up_to) 
+
+      list = get_audios_by_id(*no_url_audios)
+
+      Playlist.new(list, {
+        :id => data["id"],
+        :owner_id => data["owner_id"],
+        :access_hash => data["access_hash"],
+        :title => CGI.unescapeHTML(data["title"].to_s),
+        :subtitle => CGI.unescapeHTML(data["subtitle"].to_s),
+      })
+    end
     
     def get_audios_from_post(url)
-      # TODO
+      url, owner_id, post_id = url.match(POST_URL_REGEX).to_a
+
+      amount = get_amount_of_audios_in_post(owner_id, post_id)
+      get_audios_from_wall(owner_id, post_id, amount).to_a
     end
 
 
@@ -165,6 +199,17 @@ module VkMusic
       end
     end
 
+    def get_amount_of_audios_in_post(owner_id, post_id)
+      begin
+        page = load_page("#{VK_URL[:wall]}#{owner_id}_#{post_id}")
+        result = page.css(".wi_body > .pi_medias .medias_audio").size
+      rescue Exception => error
+        raise PostParseError, "Unable to get amount of audios in post #{owner_id}_#{post_id}. Error: #{error.message}", caller
+      end
+      raise PostParseError, "Post not found: #{owner_id}_#{post_id}", caller if result == 0 && !page.css(".service_msg_error").empty?
+      result
+    end
+
 
     private
     
@@ -187,14 +232,14 @@ module VkMusic
       })
       load_page(uri)
     end
-    def load_playlist_json_section(options)
+    def load_playlist_json_section(owner_id, playlist_id, offset = 0)
       uri = URI(VK_URL[:audios])
       uri.query = Utility.hash_to_params({
         "act" => "load_section",
-        "owner_id" => options[:id],
-        "playlist_id" => options[:playlist_id],
+        "owner_id" => owner_id,
+        "playlist_id" => playlist_id,
         "type" => "playlist",
-        "offset" => options[:offset].to_i,
+        "offset" => offset,
         "utf8" => true
       })
       begin
@@ -209,6 +254,23 @@ module VkMusic
       uri.query = Utility.hash_to_params({
         "act" => "reload_audio",
         "ids" => ids,
+        "utf8" => true
+      })
+      begin
+        load_json(uri)
+      rescue Exception => error
+        raise AudiosSectionParseError, "unable to load or parse audios section: #{error.message}", caller
+      end
+    end
+
+    def load_audios_json_from_wall(owner_id, post_id)
+      uri = URI(VK_URL[:audios])
+      uri.query = Utility.hash_to_params({
+        "act" => "load_section",
+        "owner_id" => owner_id,
+        "post_id" => post_id,
+        "type" => "wall",
+        "wall_type" => "own",
         "utf8" => true
       })
       begin

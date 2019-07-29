@@ -20,6 +20,9 @@ module VkMusic
   
   # Unable to convert string to id
   class IdParseError < AudiosParseError; end
+
+  # Unable to parse audios from wall
+  class WallParseError < AudiosParseError; end
     
   # Unable to parse audios from post
   class PostParseError < AudiosParseError; end
