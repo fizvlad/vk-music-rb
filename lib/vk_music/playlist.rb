@@ -11,7 +11,15 @@ module VkMusic
     alias size length
     
     def to_s
-      "#{@subtitle} - #{@title} (#{self.length} аудиозаписей)"
+      (@subtitle.empty? ? "" : "#{@subtitle} - ") + "#{@title} (#{self.length} аудиозаписей)"
+    end
+
+    def pp
+      "#{to_s}:\n#{@list.map(&:to_s).join("\n")}"
+    end
+
+    def to_a
+      @list.dup
     end
     
     def each(&block)
