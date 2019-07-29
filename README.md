@@ -65,3 +65,9 @@ You can set how many audios you actually need as well:
 ```ruby
 user_playlist = client.get_audios("8024985", 10)
 ```
+
+### Audios from post
+You can load up to 10 audios attached to some post. Those audios will be returned as array:
+```ruby
+audios = client.get_audios_from_post("https://vk.com/wall-4790861_5453")
+```
