@@ -2,10 +2,38 @@ require "cgi"
 
 module VkMusic
 
+  # VK audio.
   class Audio
   
-    attr_reader :id, :owner_id, :secret_1, :secret_2, :artist, :title, :duration, :url, :url_encoded
+    # Id of audio.
+    attr_reader :id
+    # Id of audio owner.
+    attr_reader :owner_id
+    # Parts of secret hash which used when using +act=reload_audio+
+    attr_reader :secret_1, :secret_2
+    # Artist.
+    attr_reader :artist
+    # Title.
+    attr_reader :title
+    # Duration.
+    attr_reader :duration
+    # Download URL.
+    attr_reader :url
+    # Encoded URL.
+    attr_reader :url_encoded
 
+    # Update audio URLs.
+    #
+    # If +:url+ is provided - just save it.
+    # If +:url_encoded+ and +:client_id+ provided - unmask link first.
+    #
+    # ===== Parameters:
+    # * [+options+] (+Hash+)
+    #
+    # ===== Options:
+    # * +:url+
+    # * +:url_encoded+
+    # * +:client_id+
     def update_url(options)
       raise ArgumentError, "options hash must be provided", caller unless options.class == Hash
       if !options[:url].to_s.empty?
@@ -13,20 +41,37 @@ module VkMusic
         @url = options[:url].to_s
       elsif !options[:url].to_s.empty? && options[:client_id]
         @url_encoded = options[:url_encoded].to_s
-        @url = VkMusic.unmask_link(options[:url_encoded], options[:client_id])
+        @url = VkMusic::LinkDecoder.unmask_link(options[:url_encoded], options[:client_id])
       else
         raise ArgumentError, "You should either provide :url or :url_encoded and :client_id", caller
       end
     end
     
+    # Returns string with information about audio.
     def to_s
       "#{@artist} - #{@title} [#{Utility.format_seconds(@duration)}]"
     end
 
+    # Returns extended information about audio.
     def pp
       "#{to_s} (Got decoded URL: #{@url ? "yes" : "no"}, able to get URL from VK: #{@id && @owner_id && @secret_1 && @secret_2 ? "yes" : "no"})"
     end
   
+    # Initialize new audio.
+    #
+    # ===== Parameters:
+    # * [+options+] (+Hash+)
+    #
+    # ===== Options:
+    # * +:id+
+    # * +:owner_id+
+    # * +:secret_1+
+    # * +:secret_2+
+    # * +:artist+
+    # * +:title+
+    # * +:duration+
+    # * +:url_encoded+
+    # * +:url+
     def initialize(options)
       # Arguments check
       raise ArgumentError, "options hash must be provided", caller unless options.class == Hash
@@ -46,6 +91,11 @@ module VkMusic
       @url         = options[:url].to_s
     end
     
+    # Initialize new audio from Nokogiri HTML node.
+    #
+    # ===== Parameters:
+    # * [+node+] (+Nokogiri::XML::Node+)
+    # * [+client_id+] (+Integer+)
     def self.from_node(node, client_id)
       url_encoded = node.at_css("input").attribute("value").to_s
       url_encoded = nil if url_encoded == "https://m.vk.com/mp3/audio_api_unavailable.mp3"
@@ -58,10 +108,15 @@ module VkMusic
         :title => node.at_css(".ai_title").text.strip,
         :duration => node.at_css(".ai_dur").attribute("data-dur").to_s.to_i,
         :url_encoded => url_encoded,
-        :url => url_encoded ? VkMusic.unmask_link(url_encoded, client_id) : nil,
+        :url => url_encoded ? VkMusic::LinkDecoder.unmask_link(url_encoded, client_id) : nil,
       })
     end
     
+    # Initialize new audio from data array.
+    #
+    # ===== Parameters:
+    # * [+data+] (+Array+)
+    # * [+client_id+] (+Integer+)
     def self.from_data_array(data, client_id)
       url_encoded = data[2]
       url_encoded = nil if url_encoded == ""
@@ -77,7 +132,7 @@ module VkMusic
         :title => CGI.unescapeHTML(data[3]),
         :duration => data[5],
         :url_encoded => url_encoded,
-        :url => url_encoded ? VkMusic.unmask_link(url_encoded, client_id) : nil,
+        :url => url_encoded ? VkMusic::LinkDecoder.unmask_link(url_encoded, client_id) : nil,
       })
     end
   
