@@ -274,6 +274,7 @@ module VkMusic
     #
     # @param owner_id [Integer] ID of post owner.
     # @param post_id [Integer] ID of post on wall.
+    #
     # @return [Integer]
     def get_amount_of_audios_in_post(owner_id, post_id)
       begin

@@ -2,38 +2,53 @@ require "cgi"
 
 module VkMusic
 
-  # VK audio.
+  ##
+  # Class representing VK audio.
   class Audio
   
-    # Id of audio.
+    ##
+    # @return [Integer] ID of audio.
     attr_reader :id
-    # Id of audio owner.
+
+    ##
+    # @return [Integer] ID of audio owner.
     attr_reader :owner_id
-    # Parts of secret hash which used when using +act=reload_audio+
+    
+    ##
+    # @return [String] part of secret hash which used when using +act=reload_audio+.
     attr_reader :secret_1, :secret_2
-    # Artist.
+    
+    ##
+    # @return [String]
     attr_reader :artist
-    # Title.
+    
+    ##
+    # @return [String]
     attr_reader :title
-    # Duration.
+
+    ##
+    # @return [Integer] duration of track in seconds.
     attr_reader :duration
-    # Download URL.
+
+    ##
+    # @return [String] decoded download URL.
     attr_reader :url
-    # Encoded URL.
+
+    ##
+    # @return [String] encoded download URL.
     attr_reader :url_encoded
 
+    ##
     # Update audio URLs.
     #
-    # If +:url+ is provided - just save it.
-    # If +:url_encoded+ and +:client_id+ provided - unmask link first.
+    # If +:url+ is provided - just saving it.
+    # If +:url_encoded+ and +:client_id+ provided - unmasking link first.
     #
-    # ===== Parameters:
-    # * [+options+] (+Hash+)
+    # @option options [String] :url decoded download URL.
+    # @option options [String] :url_encoded decoded download URL.
+    # @option options [String] :client_id decoded download URL.
     #
-    # ===== Options:
-    # * +:url+
-    # * +:url_encoded+
-    # * +:client_id+
+    # @return [String] decoded URL.
     def update_url(options)
       raise ArgumentError, "options hash must be provided", caller unless options.class == Hash
       if !options[:url].to_s.empty?
@@ -47,31 +62,30 @@ module VkMusic
       end
     end
     
-    # Returns string with information about audio.
+    ##
+    # @return [String] information about audio.
     def to_s
       "#{@artist} - #{@title} [#{Utility.format_seconds(@duration)}]"
     end
 
-    # Returns extended information about audio.
+    ##
+    # @return [String] extended information about audio.
     def pp
       "#{to_s} (Got decoded URL: #{@url ? "yes" : "no"}, able to get URL from VK: #{@id && @owner_id && @secret_1 && @secret_2 ? "yes" : "no"})"
     end
   
+    ##
     # Initialize new audio.
     #
-    # ===== Parameters:
-    # * [+options+] (+Hash+)
-    #
-    # ===== Options:
-    # * +:id+
-    # * +:owner_id+
-    # * +:secret_1+
-    # * +:secret_2+
-    # * +:artist+
-    # * +:title+
-    # * +:duration+
-    # * +:url_encoded+
-    # * +:url+
+    # @option options [Integer] :id
+    # @option options [Integer] :owner_id
+    # @option options [String] :secret_1
+    # @option options [String] :secret_2
+    # @option options [String] :artist *required*
+    # @option options [String] :title *required*
+    # @option options [Integer] :duration *required*
+    # @option options [String] :url_encoded
+    # @option options [String] :url
     def initialize(options)
       # Arguments check
       raise ArgumentError, "options hash must be provided", caller unless options.class == Hash
@@ -91,11 +105,13 @@ module VkMusic
       @url         = options[:url].to_s
     end
     
+    ##
     # Initialize new audio from Nokogiri HTML node.
     #
-    # ===== Parameters:
-    # * [+node+] (+Nokogiri::XML::Node+)
-    # * [+client_id+] (+Integer+)
+    # @param node [Nokogiri::XML::Node] node, which match following CSS selector: +.audio_item.ai_has_btn+
+    # @param client_id [Integer]
+    #
+    # @return [Audio]
     def self.from_node(node, client_id)
       url_encoded = node.at_css("input").attribute("value").to_s
       url_encoded = nil if url_encoded == "https://m.vk.com/mp3/audio_api_unavailable.mp3"
@@ -112,11 +128,13 @@ module VkMusic
       })
     end
     
-    # Initialize new audio from data array.
+    ##
+    # Initialize new audio from VK data array.
     #
-    # ===== Parameters:
-    # * [+data+] (+Array+)
-    # * [+client_id+] (+Integer+)
+    # @param data [Array]
+    # @param client_id [Integer]
+    #
+    # @return [Audio]
     def self.from_data_array(data, client_id)
       url_encoded = data[2]
       url_encoded = nil if url_encoded == ""
