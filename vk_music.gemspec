@@ -16,5 +16,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "net-http-persistent", "2.9.4" # Required for mechanize. Future versions cause error.
   s.add_runtime_dependency "execjs",    "~>2.7"
   s.add_runtime_dependency "json",      "~>2.0"
-  s.add_runtime_dependency "rake",      "~>12.3"
+
+  s.add_development_dependency "rake", "~>12.3"
+  s.add_development_dependency "yard", "~>0.9"
 end

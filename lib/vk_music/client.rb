@@ -1,20 +1,31 @@
 require "mechanize"
 require "json"
 
+##
+# Main module.
 module VkMusic
 
+  ##
   # Main class with all the interface.
+  # To start working with VK audios firstly create new client with +Client.new+.
   class Client
   
-    # ID of user
+    ##
+    # @return [Integer] ID of user.
     attr_reader :id
-    # Name of user
+
+    ##
+    # @return [String] name of user.
     attr_reader :name
     
-    # Mechanize agent
-    @agent = nil
+    @agent = nil # Mechanize agent
   
-    def initialize(options)
+    ##
+    # Create new client and login.
+    #
+    # @option options [String] :username usually telephone number or email.
+    # @option options [String] :password
+    def initialize(options = {})
       # Arguments check
       raise ArgumentError, "options hash must be provided", caller unless options.class == Hash
       raise ArgumentError, "username is not provided", caller unless options.has_key?(:username)
@@ -25,29 +36,33 @@ module VkMusic
       login(options[:username], options[:password])
     end
     
-    # Find Audio.
+    ##
+    # Search for audio.
     #
-    # ===== Parameters:
-    # * [+query+] (+String+) - string to search for.
+    # @param query [String] string to search for.
     #
-    # ===== Returns:
-    # * (+Array+) - array of Audio.
+    # @return [Array<Audio>] array with audios matching given string. Possibly empty.
     def find_audio(query)
       uri = URI(Constants::VK_URL[:audios])
       uri.query = Utility.hash_to_params({ "act" => "search", "q" => query.to_s })
+
       load_audios_from_page(uri)
     end
     
-    # Get Playlist.
+    ##
+    # Get playlist.
     #
-    # ===== Parameters:
-    # * [+url+] (+String+) - url to playlist.
-    # * [+up_to+] (+Integer+) - maximum amount of Audio to load.
+    # @note this method sends additional request for every 100 audios in playlist,
+    #   use +up_to+ to set maximum amount of audios to load.
     #
-    # ===== Returns:
-    # * (+Playlist+)
+    # @todo implement loading of audios without URL using +load_section+ requests.
+    #
+    # @param url [String] URL to playlist.
+    # @param up_to [Integer]
+    #
+    # @return [Playlist] playlist iwht audios. Possibly empty.
+    #   Possibly contains audios without download URL.
     def get_playlist(url, up_to = nil)
-      # NOTICE: it is possible to use same type of requests as in get_audios method
       begin
         url, owner_id, id, access_hash = url.to_s.match(Constants::PLAYLIST_URL_REGEX).to_a
       
@@ -94,21 +109,22 @@ module VkMusic
       })
     end
     
+    ##
     # Get user or group audios.
     #
-    # ===== Parameters:
-    # * [+url+] (+String+) - URL to user or group.
-    # * [+up_to+] (+Integer+) - maximum amount of Audio to load.
+    # @note currently this method is only able to download first 100 audios.
     #
-    # ===== Returns:
-    # * (+Playlist+)
+    # @todo implement loading of audios without URL using +load_section+ requests.
+    #
+    # @param url [String] URL to user or group page.
+    # @param up_to [Integer]
+    #
+    # @return [Playlist] playlist with user or group audios. Possibly empty.
+    #   Possibly contains audios without download URL.
     def get_audios(url, up_to = nil)
       if up_to && up_to > 100
         Utility.warn("Current implementation of method VkMusic::Client#get_audios is only able to load first 100 audios from user page.")
       end
-      # NOTICE: this method is only able to load first 100 audios
-      # NOTICE: it is possible to download 50 audios per request on "https://m.vk.com/audios#{owner_id}?offset=#{offset}", so it will cost A LOT to download all of audios (up to 200 requests).
-      # NOTICE: it is possible to load up to 2000 audios **without url** if offset is negative
       
       # Firstly, we need to get numeric id
       id = get_id(url.to_s)      
@@ -122,10 +138,8 @@ module VkMusic
         raise Exceptions::AudiosSectionParseError, "unable to load or parse audios section: #{error.message}", caller
       end
       
-      #total_count = first_data["totalCount"] # NOTICE: not used due to restrictions described above
+      #total_count = first_data["totalCount"] # Not used due to restrictions described above
       total_count = first_data_audios.length # Using this instead
-
-      # TODO: Loading rest
 
       up_to = total_count if (up_to.nil? || up_to < 0 || up_to > total_count)
       list = first_data_audios.first(up_to)
@@ -140,17 +154,18 @@ module VkMusic
       })
     end
 
-    # Get audios by their ids and secrets.
+    ##
+    # Get audios with download URLs by their IDs and secrets.
     #
-    # ===== Parameters:
-    # * [+arr+] (+Array+) - Array of objects, which can have different types: Audio or Array[owner_id, id, secret_1, secret_2].
+    # @note this method is only able to get downlaod links for up to 10 audios.
     #
-    # ===== Returns:
-    # * (+Array+) - array of audios with decoded URLs.
-    def get_audios_by_id(*arr)
-      if arr.size > 10
+    # @param args [Audio, Array<(owner_id, id, secret_1, secret_2)>]
+    #
+    # @return [Array<Audio>] array of audios with download URLs.
+    def get_audios_by_id(*args)
+      if args.size > 10
         Utility.warn("Current implementation of method VkMusic::Client#get_audios_by_id is only able to handle first 10 audios.")
-        arr = arr.first(10)
+        args = args.first(10)
       end
 
       arr.map! do |el| 
@@ -170,15 +185,16 @@ module VkMusic
       result
     end
 
+    ##
     # Get audios on wall of user or group starting with given post.
     #
-    # ===== Parameters:
-    # * [+owner_id+] (+Integer+)
-    # * [+post_id+] (+Integer+)
-    # * [+up_to+] (+Integer+) - maximum amount of Audio to load.
+    # @note this method will return only 10 first audios.
     #
-    # ===== Returns:
-    # * (+Array+) - array of audios with URLs.
+    # @param owner_id [Integer] ID of user or group.
+    # @param post_id [Integer] ID of post.
+    # @param up_to [Integer] maximum amount of audios to return.
+    #
+    # @return [Playlist] playlist of audios with download URLs. 
     def get_audios_from_wall(owner_id, post_id, up_to = nil)
       begin
         json = load_audios_json_from_wall(owner_id, post_id)
@@ -202,13 +218,12 @@ module VkMusic
       })
     end
     
+    ##
     # Get audios attached to post.
     #
-    # ===== Parameters:
-    # * [+url+] (+String+)
+    # @param url [String] URL to post.
     #
-    # ===== Returns:
-    # * (+Array+) - array of audios with URLs.
+    # @return [Array<Audio>] audios with download URLs.
     def get_audios_from_post(url)
       url, owner_id, post_id = url.match(Constants::POST_URL_REGEX).to_a
 
@@ -216,13 +231,12 @@ module VkMusic
       get_audios_from_wall(owner_id, post_id, amount).to_a
     end
 
-    # Get user or group id.
+    ##
+    # Get user or group id. Sends one request if custom id provided
     #
-    # ===== Parameters:
-    # * [+str+] (+String+) - link, id with prefix or custom id.
+    # @param str [String] link, id with prefix or custom id.
     #
-    # ===== Returns:
-    # * (+Integer+)
+    # @return [Integer]
     def get_id(str)
       case str
         when Constants::VK_URL_REGEX
@@ -255,14 +269,13 @@ module VkMusic
       end
     end
 
+    ##
     # Get amount of audios attached to specified post.
     #
-    # ===== Parameters:
-    # * [+owner_id+] (+Integer+)
-    # * [+post_id+] (+Integer+)
+    # @param owner_id [Integer] ID of post owner.
+    # @param post_id [Integer] ID of post on wall.
     #
-    # ===== Returns:
-    # * (+Integer+)
+    # @return [Integer]
     def get_amount_of_audios_in_post(owner_id, post_id)
       begin
         page = load_page("#{Constants::VK_URL[:wall]}#{owner_id}_#{post_id}")
@@ -371,7 +384,7 @@ module VkMusic
       # Parsing information about this profile
       profile = load_page(Constants::VK_URL[:profile])      
       @name = profile.title
-      @id = profile.link_with(href: Constants::VK_HREF_ID_CONTAINING_REGEX).href.slice(/\d+/)
+      @id = profile.link_with(href: Constants::VK_HREF_ID_CONTAINING_REGEX).href.slice(/\d+/).to_i
     end
     
     def unmask_link(link)

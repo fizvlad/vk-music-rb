@@ -1,76 +1,88 @@
 module VkMusic
 
-  # VK playlist. Extended with Enumerable.
+  ##
+  # VK playlist.
   class Playlist
     include Enumerable
     
-    # Playlist id.
+    ##
+    # @return [Integer] playlist ID.
     attr_reader :id
-    # Owner of playlist.
+
+    ##
+    # @return [Integer] owner of playlist ID.
     attr_reader :owner_id
-    # Access hash which should be part of link for some playlists.
+
+    ##
+    # @return [String] access hash which should be part of link for some playlists.
     attr_reader :access_hash
-    # Playlist title.
+
+    ##
+    # @return [String] playlist title.
     attr_reader :title
-    # Playlist subtitle. May be empty.
+
+    ##
+    # @return [String] playlist subtitle. May be empty.
     attr_reader :subtitle
     
-    # Return string describing playlist in Russian.
+    ##
+    # @return [String] playlist description in Russian.
     def to_s
       (@subtitle.empty? ? "" : "#{@subtitle} - ") + "#{@title} (#{self.length} аудиозаписей)"
     end
 
-    # Same to +to_s+, but also outputs list of audios.
+    ##
+    # @return [String] Same to {#to_s}, but also outputs list of audios.
     def pp
       "#{to_s}:\n#{@list.map(&:to_s).join("\n")}"
     end
 
-    # Returns audios array.
+    ##
+    # @return [Array<Audio>] Returns duplicate of array of playlist audios.
     def to_a
       @list.dup
     end
     
-    # :nodoc:
+    ##
+    # @see Array#each
     def each(&block)
       @list.each(&block)
     end
 
-    # :stopdoc:
+    ##
+    # @see Array#length
     def length
       @list.length
     end
     alias size length
 
+    ##
+    # @see Array#empty?
     def empty?
       @list.empty?
     end
-    # :startdoc:
     
-    # Access to audios from playlist.
+    ##
+    # Access audios from playlist.
     #
-    # ===== Parameters:
-    # * [+index+] (+Integer+) - index of audio (starting from 0).
-    #
-    # ===== Returns:
-    # * (+Audio+, +nil+) - audio or +nil+ if out of range.
+    # @param index [Integer] index of audio (starting from 0).
+    # 
+    # @return [Audio, nil] audio or +nil+ if out of range.
     def [](index)
       @list[index]
     end
   
+    ##
     # Initialize new playlist.
     #
-    # ===== Parameters:
-    # * [+list+] (+Array+) - list of audios in album.
-    # * [+options+] (+Hash+)
+    # @param list [Array] list of audios in playlist.
     #
-    # ===== Options:
-    # * [+:id+]
-    # * [+:owner_id+]
-    # * [+:access_hash+]
-    # * [+:title+]
-    # * [+:subtitle+]
+    # @option options [Integer] :id
+    # @option options [Integer] :owner_id
+    # @option options [String] :access_hash
+    # @option options [String] :title
+    # @option options [String] :subtitle
     def initialize(list, options = {})
-      # Arguments check
       raise ArgumentError, "array of audios must be provided", caller unless list.class == Array
       
       # Saving list

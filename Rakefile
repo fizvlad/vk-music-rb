@@ -1,3 +1,8 @@
+desc "Create documentation"
+task :doc do
+  puts `yardoc`
+end
+
 desc "Build gem file"
 task :build do
   puts `gem build vk_music.gemspec`
