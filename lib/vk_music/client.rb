@@ -2,6 +2,14 @@ require "mechanize"
 require "json"
 
 ##
+# @!macro [new] options_hash_param
+#   @param options [Hash] hash with options.
+#
+# @!macro [new] playlist_return
+#   @return [Playlist] playlist with audios. Possibly empty.
+#     Possibly contains audios without download URL.
+
+##
 # Main module.
 module VkMusic
 
@@ -11,63 +19,544 @@ module VkMusic
   class Client
   
     ##
-    # @return [Integer] ID of user.
+    # @return [Integer] ID of client.
     attr_reader :id
 
     ##
-    # @return [String] name of user.
+    # @return [String] name of client.
     attr_reader :name
     
     @agent = nil # Mechanize agent
-  
+
     ##
     # Create new client and login.
+    #
+    # @macro options_hash_param
     #
     # @option options [String] :username usually telephone number or email.
     # @option options [String] :password
     def initialize(options = {})
       # Arguments check
-      raise ArgumentError, "options hash must be provided", caller unless options.class == Hash
-      raise ArgumentError, "username is not provided", caller unless options.has_key?(:username)
-      raise ArgumentError, "password is not provided", caller unless options.has_key?(:password)
+      raise ArgumentError, "Options hash must be provided", caller unless options.class == Hash
+      raise ArgumentError, "Username is not provided", caller unless options.has_key?(:username)
+      raise ArgumentError, "Password is not provided", caller unless options.has_key?(:password)
       
       # Setting up client
       @agent = Mechanize.new
       login(options[:username], options[:password])
     end
+
+    ##
+    #@!group Loading audios
     
     ##
     # Search for audio.
     #
-    # @param query [String] string to search for.
+    # @note some audios might be removed from search.
+    #
+    # @todo search in group audios.
+    #
+    # @overload find(query)
+    #   @param query [String] string to search for.
+    #
+    # @overload find(options)
+    #   @macro options_hash_param
+    #   @option options [String] :query string to search for.
     #
     # @return [Array<Audio>] array with audios matching given string. Possibly empty.
-    def find_audio(query)
-      uri = URI(Constants::VK_URL[:audios])
+    #   Possibly contains audios without download URL.
+    def find(arg)
+      begin
+        case arg
+          when String
+            query = arg
+          when Hash
+            query = arg[:query].to_s
+          else
+            raise
+        end
+      rescue
+        raise ArgumentError, "Bad arguments", caller
+      end
+
+      uri = URI(Constants::URL::VK[:audios])
       uri.query = Utility.hash_to_params({ "act" => "search", "q" => query.to_s })
 
-      load_audios_from_page(uri)
+      audios__from_page(uri)
+    end
+    alias search find
+    
+    ##
+    # @!macro [new] pl__options
+    #   @option options [Integer] :up_to (MAXIMUM_PLAYLIST_SIZE) maximum amount of audios to load.
+    #     If 0, no audios would be loaded (Just information about playlist).
+    #     If less than 0, will load whole playlist.
+    #   @option options [Boolean] :with_url (true) makes all the audios have download URLs,
+    #     but every 100 audios will cost one more request. You can reduce amount of requests using option +up_to+.
+    #     Otherwise audio download URL would be accessable only with {Client#from_id}.
+    #     Main advantage of disabling URLs is the fact that 2000 audios will be loaded per request,
+    #     which is 20 times more effecient.
+    #
+    # Get VK playlist.
+    #
+    # @overload playlist(url, options)
+    #   @param url [String] URL to playlist.
+    #   @macro options_hash_param
+    #   @macro pl__options
+    #
+    # @overload playlist(options)
+    #   Use options +owner_id+, +playlist_id+ and +access_hash+ instead of URL.
+    #   @macro options_hash_param
+    #   @option options [Integer] :owner_id playlist owner ID.
+    #   @option options [Integer] :playlist_id ID of the playlist.
+    #   @option options [String] :access_hash access hash to playlist. Might not exist.
+    #   @macro pl__options
+    #
+    # @macro playlist_return 
+    def playlist(*args)
+      begin
+        case
+          when (args.size == 1 && String === args[0]) ||
+               (args.size == 2 && String === args[0] && Hash === args[1])
+            options = args[1] || {}
+            owner_id, playlist_id, access_hash = args[0].to_s.match(Constants::Regex::VK_PLAYLIST_URL_POSTFIX).captures
+          when args.size == 1 && Hash === args[0]
+            options = args[0]
+            owner_id, playlist_id, access_hash = options[:owner_id].to_i, options[:playlist_id].to_i, options[:access_hash].to_s
+          else
+            raise
+        end
+      rescue
+        raise ArgumentError, "Bad arguments", caller
+      end
+      
+      options[:up_to]    ||= Constants::MAXIMUM_PLAYLIST_SIZE
+      options[:with_url] = true if options[:with_url].nil?
+
+      if options[:with_url]
+        playlist__web(owner_id, playlist_id, access_hash, options)
+      else
+        playlist__json(owner_id, playlist_id, access_hash, options)
+      end
     end
     
     ##
-    # Get playlist.
+    # @!macro [new] ua__options
+    #   @option options [Integer] :up_to (MAXIMUM_PLAYLIST_SIZE) maximum amount of audios to load.
+    #     If 0, no audios would be loaded (Just information about playlist).
+    #     If less than 0, will load whole playlist.
     #
-    # @note this method sends additional request for every 100 audios in playlist,
-    #   use +up_to+ to set maximum amount of audios to load.
+    # Get user or group audios.
     #
-    # @todo implement loading of audios without URL using +load_section+ requests.
+    # @note currently this method is only able to load 100 audios with download URL.
     #
-    # @param url [String] URL to playlist.
-    # @param up_to [Integer]
+    # @overload audios(url, options)
+    #   @param url [String] URL to user/group page or audios.
+    #   @macro options_hash_param
+    #   @macro ua__options
     #
-    # @return [Playlist] playlist iwht audios. Possibly empty.
-    #   Possibly contains audios without download URL.
-    def get_playlist(url, up_to = nil)
+    # @overload audios(options)
+    #   @macro options_hash_param
+    #   @option options [Integer] :owner_id numerical ID of owner.
+    #   @macro ua__options
+    #
+    # @macro playlist_return
+    def audios(*args)
       begin
-        url, owner_id, id, access_hash = url.to_s.match(Constants::PLAYLIST_URL_REGEX).to_a
+        case
+          when (args.size == 1 && String === args[0] ) ||
+               (args.size == 2 && String === args[0] && Hash === args[1])
+            owner_id = page_id(args[0].to_s)
+            options = args[1] || {}
+          when args.size == 1 && Hash === args[0]
+            owner_id = args[0][:owner_id].to_i
+            options = args[0]
+          else
+            raise
+        end
+      rescue
+        raise ArgumentError, "Bad arguments", caller
+      end
+
+      options[:up_to]    ||= Constants::MAXIMUM_PLAYLIST_SIZE
+
+      playlist__json(owner_id, -1, nil, options)
+    end
+
+    ##
+    # @!macro [new] wall__up_to_option
+    #   @option up_to [Integer] :up_to (10) maximum amount of audios to load from wall.
+    #   
+    # @!macro [new] wall__with_url_option
+    #   @option options [Boolean] :with_url (true) automatically use {Client#from_id} to get download URLs.
+    #
+    # Get audios on wall of user or group starting with given post.
+    #
+    # @note this method is only able to load up to 91 audios from wall.
+    #
+    # @overload wall(url, options)
+    #   Load last audios from wall.
+    #   @param url [String] URL to user/group page.
+    #   @macro options_hash_param
+    #   @macro wall__up_to_option
+    #   @macro wall__with_url_option
+    #
+    # @overload wall(options)
+    #   Load audios starting from some exact post.
+    #   @macro options_hash_param
+    #   @option options [Integer] :owner_id numerical ID of wall owner.
+    #   @option options [Integer] :post_id numerical ID of post.
+    #   @macro wall__up_to_option
+    #   @macro wall__with_url_option
+    #
+    # @return [Array<Audio>] array of audios from wall. Possibly empty.
+    def wall(*args)
+      begin
+        case
+          when (args.size == 1 && args[0].class == String) ||
+               (args.size == 2 && args[0].class == String && args[1].class == Hash)
+            url = args[0].to_s
+            owner_id = page_id(url)
+            post_id = last_post_id(owner_id)
+            options = args[1] || {}
+            return [] if post_id.nil?
+          when args.length == 1 && Hash === args[0]
+            options = args[0]
+            owner_id = options[:owner_id].to_i
+            post_id = options[:post_id].to_i
+          else
+            raise
+        end
+      rescue Exceptions::ParseError => error
+        raise Exceptions::ParseError, "Unable to get last post id. Error: #{error.message}", caller
+      rescue
+        raise ArgumentError, "Bad arguments", caller
+      end
+
+      options[:up_to] ||= 10
+      options[:with_url] = true if options[:with_url].nil?
+
+      wall__json(owner_id, post_id, options)
+    end
+
+    ##
+    # Get audios attached to post.
+    #
+    # @overload post(url)
+    #   @param url [String] URL to post.
+    #
+    # @overload post(options)
+    #   @macro options_hash_param
+    #   @option options [Integer] :owner_id numerical ID of wall owner.
+    #   @option options [Integer] :post_id numerical ID of post.
+    #
+    # @return [Array<Audio>] audios with download URLs.
+    def post(arg)
+      begin
+        case arg
+          when String
+            owner_id, post_id = arg.match(Constants::Regex::VK_WALL_URL_POSTFIX).captures
+          when Hash
+            options = arg
+            owner_id = options[:owner_id].to_i
+            post_id = options[:post_id].to_i
+          else
+            raise
+        end
+      rescue
+        raise ArgumentError, "Bad arguments", caller
+      end
+
+      amount = attached_audios_amount(owner_id: owner_id, post_id: post_id)
+      wall(owner_id: owner_id, post_id: post_id, up_to: amount)
+    end
+
+    ##
+    # Get audios with download URLs by their IDs and secrets.
+    #
+    # @note warning: audios must not match.
+    #
+    # @todo workaround for not unique audios in request
+    #
+    # @param args [Array<Audio, Array<(owner_id, audio_id, secret_1, secret_2)>, "#{owner_id}_#{id}_#{secret_1}_#{secret_2}">]
+    #
+    # @return [Array<Audio>] array of audios with download URLs.
+    def from_id(args)
+      begin
+        args.map! do |el| 
+          case el
+            when Array
+              el.join("_")
+            when Audio
+              "#{el.owner_id}_#{el.id}_#{el.secret_1}_#{el.secret_2}"
+            when String
+              el # Do not change
+            else
+              raise
+          end
+        end
+      rescue
+        raise ArgumentError, "Bad arguments", caller
+      end
       
+      result = []
+      args.each_slice(10) do |subarray|
+        json = load__json__audios_by_id(subarray)
+        subresult = audios__from_data(json["data"][0].to_a)
+        raise Exceptions::ParseError, "Result size don't match: excepected #{subarray.size}, got #{subresult.size}", caller if subresult.size != subarray.size
+        result.concat(subresult)
+      end
+      result
+    end
+
+    ##
+    # @!endgroup
+
+    ##
+    # @!group Other
+
+    ##
+    # Get user or group ID. Sends one request if custom ID provided
+    #
+    # @param str [String] link, ID with/without prefix or custom ID.
+    #
+    # @return [Integer] page ID.
+    def page_id(str)
+      raise ArgumentError, "Bad arguments", caller unless str.class == String
+
+      case str
+        when Constants::Regex::VK_URL
+          path = str.match(Constants::Regex::VK_URL)[1]
+          id = page_id(path) # Recursive call
+        when Constants::Regex::VK_ID_STR
+          id = str.to_i
+        when Constants::Regex::VK_AUDIOS_URL_POSTFIX
+          id = str.match(/-?\d+/).to_s.to_i # Numbers with sign
+        when Constants::Regex::VK_PREFIXED_ID_STR
+          id = str.match(/\d+/).to_s.to_i # Just numbers. Sign needed
+          id *= -1 unless str.start_with?("id")
+        when Constants::Regex::VK_CUSTOM_ID
+          url = "#{Constants::URL::VK[:home]}/#{str}"
+          begin
+            page = load__page(url)
+          rescue Exceptions::RequestError => error
+            raise Exceptions::ParseError, "Failed request: #{error.message}", caller
+          end          
+          
+          raise Exceptions::ParseError, "Page #{str} doesn't seem to be a group or user page", caller unless page.at_css(".PageBlock .owner_panel")
+          
+          begin
+            id = page.link_with(href: Constants::Regex::VK_HREF_ID_CONTAINING).href.slice(Constants::Regex::VK_ID).to_i # Numbers with sign
+          rescue Exception => error
+            raise Exceptions::ParseError, "Unable to get user or group ID. Custom ID: #{str}. Error: #{error.message}", caller
+          end
+      else
+        raise Exceptions::ParseError, "Unable to convert \"#{str}\" into ID", caller
+      end
+      id
+    end
+
+    ##
+    # Get ID of last post.
+    #
+    # @note requesting for "vk.com/id0" will raise ArgumentError.
+    #   Use +client.last_post_id(owner_id: client.id)+ to get last post of client.
+    #
+    # @overload last_post_id(url)
+    #   @param url [String] URL to wall owner.
+    #
+    # @overload last_post_id(owner_id)
+    #   @param owner_id [Integer] numerical ID of wall owner.
+    #
+    # @return [Integer, nil] ID of last post or +nil+ if there are no posts.
+    def last_post_id(arg)
+      begin
+        case arg
+          when String
+            path = arg.match(Constants::Regex::VK_URL)[1]
+          when Integer
+            owner_id = arg
+            path = "#{owner_id < 0 ? "club" : "id"}#{owner_id.abs}"
+          else
+            raise
+        end
+      rescue
+        raise ArgumentError, "Bad arguments", caller
+      end
+      raise ArgumentError, "Requesting this method for id0 is forbidden", caller if path == "id0"
+
+      url = "#{Constants::URL::VK[:home]}/#{path}"
+
+      begin
+        page = load__page(url)
+      rescue Exceptions::RequestError => error
+        raise Exceptions::ParseError, "Failed request: #{error.message}", caller
+      end
+
+      # Ensure this isn't some random vk page
+      raise Exceptions::ParseError, "Page at #{url} doesn't seem to be a group or user page", caller unless page.at_css(".PageBlock .owner_panel")
+
+      begin
+        posts = page.css(".wall_posts > .wall_item .post__anchor")
+        posts_ids = posts.map do |post|
+          post ? post.attribute("name").to_s.match(Constants::Regex::VK_POST_URL_POSTFIX)[2].to_i : 0
+        end
+        # To avoid checking id of pinned post need to take maximum id.
+        return posts_ids.max
+      rescue Exception => error
+        raise Exceptions::ParseError, "Unable to get last post on #{url}. Error: #{error.message}", caller
+      end
+    end
+
+    ##
+    # Get amount of audios attached to specified post.
+    #
+    # @overload attached_audios_amount(url)
+    #   @param url [String] URL to post.
+    #
+    # @overload attached_audios_amount(options)
+    #   @macro options_hash_param
+    #   @option options [Integer] :owner_id numerical ID of wall owner.
+    #   @option options [Integer] :post_id numerical ID of post.
+    #
+    # @return [Integer] amount of audios.
+    def attached_audios_amount(arg)
+      begin
+        case arg
+          when String
+            owner_id, post_id = arg.match(Constants::Regex::VK_WALL_URL_POSTFIX).captures
+          when Hash
+            options = arg
+            owner_id = options[:owner_id].to_i
+            post_id = options[:post_id].to_i
+          else
+            raise
+        end
+      rescue
+        raise ArgumentError, "Bad arguments", caller
+      end
+
+      url = "#{Constants::URL::VK[:wall]}#{owner_id}_#{post_id}"
+      begin
+        page = load__page(url)
+      rescue Exceptions::RequestError => error
+        raise Exceptions::ParseError, "Failed request: #{error.message}", caller
+      end
+
+      raise Exceptions::ParseError, "Post not found: #{owner_id}_#{post_id}", caller unless page.css(".service_msg_error").empty?
+      begin
+        result = page.css(".wi_body > .pi_medias .medias_audio").size
+      rescue Exception => error
+        raise Exceptions::ParseError, "Unable to get amount of audios in post #{owner_id}_#{post_id}. Error: #{error.message}", caller
+      end
+      result
+    end
+
+    ##
+    # @!endgroup
+
+    private
+
+    # Load page by URL. And return Mechanize::Page.
+    def load__page(url)
+      uri = URI(url) if url.class != URI
+      Utility.debug("Loading #{uri}")
+      begin
+        @agent.get(uri)
+      rescue Exception => error
+        raise Exceptions::RequestError, error.message, caller
+      end
+    end
+
+    # Load JSON by URL. And return JSON object.
+    def load__json(url)
+      page = load__page(url)
+      begin
+        JSON.parse(page.body.strip)
+      rescue Exception => error
+        raise Exceptions::ParseError, error.message, caller
+      end
+    end
+
+
+    # Load playlist web page.
+    def load__page__playlist(owner_id, playlist_id, access_hash, options)
+      uri = URI(Constants::URL::VK[:audios])
+      uri.query = Utility.hash_to_params({
+        "act" => "audio_playlist#{owner_id.to_i}_#{playlist_id.to_i}",
+        "access_hash" => access_hash.to_s,
+        "offset" => options[:offset].to_i
+      })
+      load__page(uri)
+    end
+
+    # Load JSON playlist part with +load_section+ request.
+    def load__json__playlist_section(owner_id, playlist_id, access_hash, options)
+      uri = URI(Constants::URL::VK[:audios])
+      uri.query = Utility.hash_to_params({
+        "act" => "load_section",
+        "owner_id" => owner_id.to_i,
+        "playlist_id" => playlist_id.to_i,
+        "access_hash" => access_hash.to_s,
+        "type" => "playlist",
+        "offset" => options[:offset].to_i,
+        "utf8" => true
+      })
+      load__json(uri)
+    end
+
+
+    # Load JSON audios with +reload_audio+ request.
+    def load__json__audios_by_id(ids)
+      uri = URI(Constants::URL::VK[:audios])
+      uri.query = Utility.hash_to_params({
+        "act" => "reload_audio",
+        "ids" => ids.to_a,
+        "utf8" => true
+      })
+      load__json(uri)
+    end
+
+    # Load JSON audios with +load_section+ from wall.
+    def load__json__audios_wall(owner_id, post_id)
+      uri = URI(Constants::URL::VK[:audios])
+      uri.query = Utility.hash_to_params({
+        "act" => "load_section",
+        "owner_id" => owner_id,
+        "post_id" => post_id,
+        "type" => "wall",
+        "wall_type" => "own",
+        "utf8" => true
+      })
+      load__json(uri)
+    end
+
+
+    # Loading audios from web page.
+    def audios__from_page(obj)
+      page = obj.class == Mechanize::Page ? obj : load__page(obj)
+      begin
+        page.css(".audio_item.ai_has_btn").map { |elem| Audio.from_node(elem, @id) }
+      rescue Exception => error
+        raise Exceptions::ParseError, error.message, caller
+      end
+    end 
+
+    # Load audios from JSON data.
+    def audios__from_data(data)
+      begin
+        data.map { |audio_data| Audio.from_data(audio_data, @id) }
+      rescue Exception => error
+        raise Exceptions::ParseError, error.message, caller
+      end
+    end
+
+
+    # Load playlist through web page requests.
+    def playlist__web(owner_id, playlist_id, access_hash, options)
+      begin
         # Load first page and get info
-        first_page = load_playlist_page(owner_id: owner_id, id: id, access_hash: access_hash, offset: 0)
+        first_page = load__page__playlist(owner_id, playlist_id, access_hash, offset: 0)
         
         # Parse out essential data
         title = first_page.at_css(".audioPlaylist__title").text.strip
@@ -81,23 +570,18 @@ module VkMusic
           playlist_size = 0
         end
       rescue Exception => error
-        raise Exceptions::PlaylistParseError, "unable to parse playlist page. Error: #{error.message}", caller
+        raise Exceptions::ParseError, error.message, caller
       end
       # Now we can be sure we are on correct page
       
-      first_page_audios = load_audios_from_page(first_page)
+      first_page_audios = audios__from_page(first_page)
       
       # Check whether need to make additional requests
-      up_to = playlist_size if (up_to.nil? || up_to < 0 || up_to > playlist_size)
-      if first_page_audios.length >= up_to
-        list = first_page_audios[0, up_to]
-      else        
-        list = first_page_audios
-        loop do
-          playlist_page = load_playlist_page(owner_id: owner_id, id: id, access_hash: access_hash, offset: list.length)
-          list.concat(load_audios_from_page(playlist_page)[0, up_to - list.length])
-          break if list.length == up_to
-        end        
+      options[:up_to] = playlist_size if (options[:up_to] < 0 || options[:up_to] > playlist_size)
+      list = first_page_audios[0, options[:up_to]]
+      while list.length < options[:up_to] do
+        playlist_page = load__page__playlist(owner_id, playlist_id, access_hash, offset: list.length)
+        list.concat(audios__from_page(playlist_page)[0, options[:up_to] - list.length])
       end
       
       Playlist.new(list, {
@@ -108,43 +592,33 @@ module VkMusic
         :subtitle => subtitle,
       })
     end
-    
-    ##
-    # Get user or group audios.
-    #
-    # @note currently this method is only able to download first 100 audios.
-    #
-    # @todo implement loading of audios without URL using +load_section+ requests.
-    #
-    # @param url [String] URL to user or group page.
-    # @param up_to [Integer]
-    #
-    # @return [Playlist] playlist with user or group audios. Possibly empty.
-    #   Possibly contains audios without download URL.
-    def get_audios(url, up_to = nil)
-      if up_to && up_to > 100
-        Utility.warn("Current implementation of method VkMusic::Client#get_audios is only able to load first 100 audios from user page.")
+
+    # Load playlist through JSON requests.
+    def playlist__json(owner_id, playlist_id, access_hash, options)
+      if options[:up_to] < 0 || options[:up_to] > 100
+        Utility.warn("Current implementation of this method is not able to return more than 100 first audios with URL.")
       end
-      
-      # Firstly, we need to get numeric id
-      id = get_id(url.to_s)      
-      
+
       # Trying to parse out audios
       begin
-        first_json = load_playlist_json_section(id.to_s, -1, 0)
+        first_json = load__json__playlist_section(owner_id, playlist_id, access_hash, offset: 0)
         first_data = first_json["data"][0]
-        first_data_audios = load_audios_from_data(first_data["list"])
+        first_data_audios = audios__from_data(first_data["list"])
       rescue Exception => error
-        raise Exceptions::AudiosSectionParseError, "unable to load or parse audios section: #{error.message}", caller
+        raise Exceptions::ParseError, error.message, caller
       end
       
-      #total_count = first_data["totalCount"] # Not used due to restrictions described above
-      total_count = first_data_audios.length # Using this instead
-
-      up_to = total_count if (up_to.nil? || up_to < 0 || up_to > total_count)
-      list = first_data_audios.first(up_to)
+      total_count = first_data["totalCount"]
+      options[:up_to] = total_count if (options[:up_to] < 0 || options[:up_to] > total_count)
+      list = first_data_audios[0, options[:up_to]]
+      while list.length < options[:up_to] do
+        json = load__json__playlist_section(owner_id, playlist_id, access_hash,
+          offset: list.length
+        )
+        audios = audios__from_data(json["data"][0]["list"])
+        list.concat(audios[0, options[:up_to] - list.length])
+      end
       
-      # It turns out user audios are just playlist with id -1
       Playlist.new(list, {
         :id => first_data["id"],
         :owner_id => first_data["owner_id"],
@@ -154,239 +628,45 @@ module VkMusic
       })
     end
 
-    ##
-    # Get audios with download URLs by their IDs and secrets.
-    #
-    # @note this method is only able to get downlaod links for up to 10 audios.
-    #
-    # @param args [Audio, Array<(owner_id, id, secret_1, secret_2)>]
-    #
-    # @return [Array<Audio>] array of audios with download URLs.
-    def get_audios_by_id(*args)
-      if args.size > 10
-        Utility.warn("Current implementation of method VkMusic::Client#get_audios_by_id is only able to handle first 10 audios.")
-        args = args.first(10)
+    # Load audios from wall using JSON request.
+    def wall__json(owner_id, post_id, options)
+      if options[:up_to] < 0 || options[:up_to] > 91
+        options[:up_to] = 91
+        Utility.warn("Current implementation of this method is not able to return more than 91 audios from wall.")
       end
 
-      arr.map! do |el| 
-        case el
-          when Array
-            el.join("_")
-          when Audio
-            "#{el.owner_id}_#{el.id}_#{el.secret_1}_#{el.secret_2}"
-          else
-            el.to_s
-        end
-      end
-      json = load_audios_json_by_id(arr)
-      result = load_audios_from_data(json["data"][0].to_a)
-      raise Exceptions::ReloadAudiosParseError, "Result size don't match: excepected #{arr.size}, got #{result.size}", caller if result.size != arr.size
-
-      result
-    end
-
-    ##
-    # Get audios on wall of user or group starting with given post.
-    #
-    # @note this method will return only 10 first audios.
-    #
-    # @param owner_id [Integer] ID of user or group.
-    # @param post_id [Integer] ID of post.
-    # @param up_to [Integer] maximum amount of audios to return.
-    #
-    # @return [Playlist] playlist of audios with download URLs. 
-    def get_audios_from_wall(owner_id, post_id, up_to = nil)
       begin
-        json = load_audios_json_from_wall(owner_id, post_id)
+        json = load__json__audios_wall(owner_id, post_id)
         data = json["data"][0]
-        no_url_audios = load_audios_from_data(data["list"])
+        audios = audios__from_data(data["list"])[0, options[:up_to]]
       rescue Exception => error
-        raise Exceptions::WallParseError, "Failed to parse wall from #{@owner_id}_#{post_id}. Error: #{error.message}", caller
+        raise Exceptions::ParseError, error.message, caller
       end
-
-      up_to = no_url_audios.size if (up_to.nil? || up_to < 0 || up_to > no_url_audios.size)
-      no_url_audios = no_url_audios.first(up_to) 
-
-      list = get_audios_by_id(*no_url_audios)
-
-      Playlist.new(list, {
-        :id => data["id"],
-        :owner_id => data["owner_id"],
-        :access_hash => data["access_hash"],
-        :title => CGI.unescapeHTML(data["title"].to_s),
-        :subtitle => CGI.unescapeHTML(data["subtitle"].to_s),
-      })
-    end
-    
-    ##
-    # Get audios attached to post.
-    #
-    # @param url [String] URL to post.
-    #
-    # @return [Array<Audio>] audios with download URLs.
-    def get_audios_from_post(url)
-      url, owner_id, post_id = url.match(Constants::POST_URL_REGEX).to_a
-
-      amount = get_amount_of_audios_in_post(owner_id, post_id)
-      get_audios_from_wall(owner_id, post_id, amount).to_a
-    end
-
-    ##
-    # Get user or group id. Sends one request if custom id provided
-    #
-    # @param str [String] link, id with prefix or custom id.
-    #
-    # @return [Integer]
-    def get_id(str)
-      case str
-        when Constants::VK_URL_REGEX
-          path = str.match(Constants::VK_URL_REGEX)[1]
-          get_id(path) # Recursive call
-        when Constants::VK_ID_REGEX
-          str
-        when Constants::VK_AUDIOS_REGEX
-          str.match(/-?\d+/).to_s # Numbers with sigh
-        when Constants::VK_PREFIXED_ID_REGEX
-          id = str.match(/\d+/).to_s # Just numbers. Sign needed
-          id = "-#{id}" unless str.start_with?("id")
-          id
-        when Constants::VK_CUSTOM_ID_REGEX
-          begin
-            page = load_page("#{Constants::VK_URL[:home]}/#{str}")
-          rescue Exception => error
-            raise Exceptions::IdParseError, "unable to load page by id \"#{str}\". Error: #{error.message}"
-          end
-          
-          unless page.at_css(".PageBlock .owner_panel")
-            # Ensure this isn't some random vk page
-            raise Exceptions::IdParseError, "page #{str} doesn't seem to be a group or user page"
-          end
-          
-          id = page.link_with(href: Constants::VK_HREF_ID_CONTAINING_REGEX).href.slice(/-?\d+/) # Numbers with sign
-          id
-      else
-        raise Exceptions::IdParseError, "unable to convert \"#{str}\" into id"
-      end
-    end
-
-    ##
-    # Get amount of audios attached to specified post.
-    #
-    # @param owner_id [Integer] ID of post owner.
-    # @param post_id [Integer] ID of post on wall.
-    #
-    # @return [Integer]
-    def get_amount_of_audios_in_post(owner_id, post_id)
-      begin
-        page = load_page("#{Constants::VK_URL[:wall]}#{owner_id}_#{post_id}")
-        result = page.css(".wi_body > .pi_medias .medias_audio").size
-      rescue Exception => error
-        raise Exceptions::PostParseError, "Unable to get amount of audios in post #{owner_id}_#{post_id}. Error: #{error.message}", caller
-      end
-      raise Exceptions::PostParseError, "Post not found: #{owner_id}_#{post_id}", caller if result == 0 && !page.css(".service_msg_error").empty?
-      result
+      options[:with_url] ? from_id(audios) : audios
     end
 
 
-    private
-    
-    # Loading pages
-    def load_page(url)
-      uri = URI(url) if url.class != URI      
-      @agent.get(uri)
-    end
-    def load_json(url)
-      page = load_page(url)
-      JSON.parse(page.body.strip)
-    end
-    
-    def load_playlist_page(options)
-      uri = URI(Constants::VK_URL[:audios])
-      uri.query = Utility.hash_to_params({
-        "act" => "audio_playlist#{options[:owner_id]}_#{options[:id]}",
-        "access_hash" => options[:access_hash].to_s,
-        "offset" => options[:offset].to_i
-      })
-      load_page(uri)
-    end
-    def load_playlist_json_section(owner_id, playlist_id, offset = 0)
-      uri = URI(Constants::VK_URL[:audios])
-      uri.query = Utility.hash_to_params({
-        "act" => "load_section",
-        "owner_id" => owner_id,
-        "playlist_id" => playlist_id,
-        "type" => "playlist",
-        "offset" => offset,
-        "utf8" => true
-      })
-      begin
-        load_json(uri)
-      rescue Exception => error
-        raise Exceptions::AudiosSectionParseError, "unable to load or parse audios section: #{error.message}", caller
-      end
-    end
-
-    def load_audios_json_by_id(ids)
-      uri = URI(Constants::VK_URL[:audios])
-      uri.query = Utility.hash_to_params({
-        "act" => "reload_audio",
-        "ids" => ids,
-        "utf8" => true
-      })
-      begin
-        load_json(uri)
-      rescue Exception => error
-        raise Exceptions::AudiosSectionParseError, "unable to load or parse audios section: #{error.message}", caller
-      end
-    end
-
-    def load_audios_json_from_wall(owner_id, post_id)
-      uri = URI(Constants::VK_URL[:audios])
-      uri.query = Utility.hash_to_params({
-        "act" => "load_section",
-        "owner_id" => owner_id,
-        "post_id" => post_id,
-        "type" => "wall",
-        "wall_type" => "own",
-        "utf8" => true
-      })
-      begin
-        load_json(uri)
-      rescue Exception => error
-        raise Exceptions::AudiosSectionParseError, "unable to load or parse audios section: #{error.message}", caller
-      end
-    end
-    
-    
-    # Loading audios
-    def load_audios_from_page(obj)
-      page = obj.class == Mechanize::Page ? obj : load_page(obj)
-      page.css(".audio_item.ai_has_btn").map { |elem| Audio.from_node(elem, @id) }
-    end 
-    def load_audios_from_data(data)
-      data.map { |audio_data| Audio.from_data_array(audio_data, @id) }
-    end
-    
-    
     # Login
     def login(username, password)
+      Utility.debug("Logging in.")
       # Loading login page
-      homepage = load_page(Constants::VK_URL[:home])
+      homepage = load__page(Constants::URL::VK[:home])
       # Submitting login form
-      login_form = homepage.forms.find { |form| form.action.start_with?(Constants::VK_URL[:login_action]) }
+      login_form = homepage.forms.find { |form| form.action.start_with?(Constants::URL::VK[:login_action]) }
       login_form[Constants::VK_LOGIN_FORM_NAMES[:username]] = username.to_s
       login_form[Constants::VK_LOGIN_FORM_NAMES[:password]] = password.to_s
       after_login = @agent.submit(login_form)
 
       # Checking whether logged in
-      raise Exceptions::LoginError, "unable to login. Redirected to #{after_login.uri.to_s}", caller unless after_login.uri.to_s == Constants::VK_URL[:feed]
+      raise Exceptions::LoginError, "Unable to login. Redirected to #{after_login.uri.to_s}", caller unless after_login.uri.to_s == Constants::URL::VK[:feed]
       
       # Parsing information about this profile
-      profile = load_page(Constants::VK_URL[:profile])      
-      @name = profile.title
-      @id = profile.link_with(href: Constants::VK_HREF_ID_CONTAINING_REGEX).href.slice(/\d+/).to_i
+      profile = load__page(Constants::URL::VK[:profile])      
+      @name = profile.title.to_s
+      @id = profile.link_with(href: Constants::Regex::VK_HREF_ID_CONTAINING).href.slice(/\d+/).to_i
     end
     
+    # Shortcut
     def unmask_link(link)
       VkMusic::LinkDecoder.unmask_link(link, @id)
     end

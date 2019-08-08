@@ -13,32 +13,17 @@ module VkMusic
     class LoginError < VkMusicError; end
 
     ##
-    # Unable to parse audios from somewhere.
-    class AudiosParseError < VkMusicError; end
+    # Failed to get request. _Only_ thron when Mechanize failed to load page
+    class RequestError < VkMusicError; end
 
     ##
-    # Unable to find playlist or got permission error.
-    class PlaylistParseError < AudiosParseError; end
+    # Parse error. Request is OK, but something went wrong while parsing reply.
+    #   It might be missing playlist/post as well.
+    class ParseError < VkMusicError; end
 
     ##
-    # Unable to load or parse audios section from json.
-    class AudiosSectionParseError < AudiosParseError; end
-
-    ##
-    # Unable to load or parse all of audios by ids.
-    class ReloadAudiosParseError < AudiosParseError; end
-
-    ##
-    # Unable to convert string to id.
-    class IdParseError < AudiosParseError; end
-
-    ##
-    # Unable to parse audios from wall.
-    class WallParseError < AudiosParseError; end
-
-    ##
-    # Unable to parse audios from post.
-    class PostParseError < AudiosParseError; end
+    # Unable to login.
+    class LoginError < VkMusicError; end
     
   end
 

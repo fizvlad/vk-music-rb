@@ -1,4 +1,5 @@
 require "cgi"
+require "logger"
 
 module VkMusic
 
@@ -32,11 +33,11 @@ module VkMusic
     def self.guess_request_type(str)
       # Guess what type of request is this. Returns Symbol: :find, :playlist, :audios
       case str
-        when Constants::PLAYLIST_URL_REGEX
+        when Constants::Regex::VK_PLAYLIST_URL_POSTFIX
           :playlist
-        when Constants::POST_URL_REGEX
+        when Constants::Regex::VK_WALL_URL_POSTFIX, Constants::Regex::VK_POST_URL_POSTFIX
           :post
-        when Constants::VK_URL_REGEX
+        when Constants::Regex::VK_URL
           :audios
       else
         :find
@@ -64,12 +65,47 @@ module VkMusic
     end
 
     ##
+    # Utility loggers
+    @@loggers = {
+      debug: Logger.new(STDOUT),
+      warn: Logger.new(STDERR)
+    }
+    @@loggers[:debug].level = Logger::DEBUG
+    @@loggers[:warn].level = Logger::WARN
+
+    ##
     # Send warning.
     def self.warn(*args)
-      if defined?(Warning.warn)
-        Warning.warn args.join("\n")
-      else
-        STDERR.puts "Warning:", *args
+      @@loggers[:warn].warn(args.join("\n"))
+    end
+
+    ##
+    # Send debug message.
+    def self.debug(*args)
+      @@loggers[:debug].debug(args.join("\n")) if $DEBUG
+    end
+
+    ##
+    # Function to turn values into given class unless nil provided
+    #
+    # Supported types:
+    # * +String+
+    # * +Integer+
+    #
+    # @param new_class [Class] class to transform to.
+    # @param obj [Object] object to check.
+    #
+    # @return object transformed to given class or +nil+ if object was +nil+ already.
+    def self.unless_nil_to(new_class, obj)
+      case
+        when obj.nil?
+          nil
+        when String <= new_class
+          obj.to_s
+        when Integer <= new_class
+          obj.to_i
+        else
+          raise ArgumentError, "Bad arguments", caller
       end
     end
     

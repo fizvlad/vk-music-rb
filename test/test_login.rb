@@ -22,7 +22,7 @@ class TestVkMusic < MiniTest::Test
       puts "Unable to login! Please check provided credetionals"
     end
     refute_nil(client, "Client not defined")
-    refute_nil(client.name, "User name undefined")
+    refute_empty(client.name, "User name undefined")
     refute_nil(client.id, "User id undefined")
   end
   

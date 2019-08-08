@@ -6,15 +6,15 @@ module VkMusic
     include Enumerable
     
     ##
-    # @return [Integer] playlist ID.
+    # @return [Integer, nil] playlist ID.
     attr_reader :id
 
     ##
-    # @return [Integer] owner of playlist ID.
+    # @return [Integer, nil] owner of playlist ID.
     attr_reader :owner_id
 
     ##
-    # @return [String] access hash which should be part of link for some playlists.
+    # @return [String, nil] access hash which should be part of link for some playlists.
     attr_reader :access_hash
 
     ##
@@ -22,19 +22,19 @@ module VkMusic
     attr_reader :title
 
     ##
-    # @return [String] playlist subtitle. May be empty.
+    # @return [String, nil] playlist subtitle. May be empty.
     attr_reader :subtitle
     
     ##
     # @return [String] playlist description in Russian.
     def to_s
-      (@subtitle.empty? ? "" : "#{@subtitle} - ") + "#{@title} (#{self.length} аудиозаписей)"
+      (@subtitle ? "#{@subtitle} - " : "") + "#{@title} (#{self.length} аудиозаписей)"
     end
 
     ##
     # @return [String] Same to {#to_s}, but also outputs list of audios.
     def pp
-      "#{to_s}:\n#{@list.map(&:to_s).join("\n")}"
+      "#{to_s}:\n#{@list.map(&:pp).join("\n")}"
     end
 
     ##
@@ -83,17 +83,16 @@ module VkMusic
     # @option options [String] :title
     # @option options [String] :subtitle
     def initialize(list, options = {})
-      raise ArgumentError, "array of audios must be provided", caller unless list.class == Array
-      
+      raise ArgumentError, "Bad arguments", caller unless list.class == Array      
       # Saving list
       @list = list.dup
       
       # Setting up attributes
-      @id          = options[:id].to_s
-      @owner_id    = options[:owner_id].to_s
-      @access_hash = options[:access_hash].to_s
+      @id          = Utility.unless_nil_to Integer, options[:id]
+      @owner_id    = Utility.unless_nil_to Integer, options[:owner_id]
+      @access_hash = Utility.unless_nil_to String, options[:access_hash]
       @title       = options[:title].to_s
-      @subtitle    = options[:subtitle].to_s
+      @subtitle    = Utility.unless_nil_to String, options[:subtitle]
     end
   
   end
