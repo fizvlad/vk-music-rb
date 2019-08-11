@@ -24,7 +24,8 @@ module VkMusic
         login: "https://m.vk.com/login",
         login_action: "https://login.vk.com",
         wall: "https://m.vk.com/wall",
-        audio_unavailable: "https://m.vk.com/mp3/audio_api_unavailable.mp3"
+        audio_unavailable: "https://m.vk.com/mp3/audio_api_unavailable.mp3",
+        profile_audios: "https://m.vk.com/audios",
       }
 
     end

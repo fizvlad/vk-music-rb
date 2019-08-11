@@ -50,28 +50,44 @@ module VkMusic
     #@!group Loading audios
     
     ##
-    # Search for audio.
+    # @!macro [new] find__options
+    #   @option options [Symbol] :type (:audio) what to search for (you can find available values for this option above).
+    #   @option options [Integer, nil] :owner_id ID of group or user.
+    #     Search will be done in audios of this profile. +nil or 0 for global search
+    #
+    # Search for audio or playlist.
     #
     # @note some audios might be removed from search.
     #
-    # @todo search in group audios.
+    # Possible values of +type+ option:
+    # * +:audio+ - search for audios. Returns up to 50 audios.
+    # * +:playlist_empty+ - search for playlists. Returns up to 6 playlists *without* audios. 
+    # * +:playlist+ - search for playlists.
+    #   Returns up to 6 playlists (all of audios in those playlists will have no download URL).
+    #   Require a lot of additional requests. Consider using +:playlist_empty+ option instead.
     #
-    # @overload find(query)
+    # @overload find(query, options)
     #   @param query [String] string to search for.
+    #   @macro options_hash_param
+    #   @macro find__options
     #
     # @overload find(options)
     #   @macro options_hash_param
     #   @option options [String] :query string to search for.
+    #   @macro find__options
     #
-    # @return [Array<Audio>] array with audios matching given string. Possibly empty.
+    # @return [Array<Audio>, Array<Playlist>] array with audios matching given string. Possibly empty.
     #   Possibly contains audios without download URL.
-    def find(arg)
+    def find(*args)
       begin
-        case arg
-          when String
-            query = arg
-          when Hash
-            query = arg[:query].to_s
+        case
+          when (args.size == 1 && String === args[0]) ||
+               (args.size == 2 && String === args[0] && Hash === args[1])
+            options = args[1] || {}
+            query = args[0]
+          when args.size == 1 && Hash === args[0]
+            options = args[0]
+            query = options[:query].to_s
           else
             raise
         end
@@ -79,10 +95,27 @@ module VkMusic
         raise ArgumentError, "Bad arguments", caller
       end
 
-      uri = URI(Constants::URL::VK[:audios])
-      uri.query = Utility.hash_to_params({ "act" => "search", "q" => query.to_s })
+      options[:type] ||= :audio
+      options[:owner_id] = options[:owner_id].to_i
 
-      audios__from_page(uri)
+      if options[:owner_id].zero?
+        # Global search
+        uri = URI(Constants::URL::VK[:audios])
+      else
+        uri = URI("#{Constants::URL::VK[:profile_audios]}#{options[:owner_id]}")
+      end
+
+      case options[:type]
+        when :audio
+          uri.query = Utility.hash_to_params({ "act" => "search", "q" => query })
+          audios__from_page(uri)
+        when :playlist
+          # TODO
+        when :playlist_empty
+          # TODO
+        else
+          raise ArgumentError, "Bad :type", caller
+      end
     end
     alias search find
     
@@ -130,7 +163,7 @@ module VkMusic
         raise ArgumentError, "Bad arguments", caller
       end
       
-      options[:up_to]    ||= Constants::MAXIMUM_PLAYLIST_SIZE
+      options[:up_to] ||= Constants::MAXIMUM_PLAYLIST_SIZE
       options[:with_url] = true if options[:with_url].nil?
 
       if options[:with_url]
