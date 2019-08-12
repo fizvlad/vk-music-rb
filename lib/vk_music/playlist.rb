@@ -32,7 +32,9 @@ module VkMusic
     ##
     # @return [String] playlist description in Russian.
     def to_s
-      (@subtitle ? "#{@subtitle} - " : "") + "#{@title} (#{self.length} аудиозаписей)"
+      (@subtitle && !@subtitle.empty? ? "#{@subtitle} - " : "") +
+      @title +
+      (@real_size ? "(#{self.length} из #{@real_size} аудиозаписей загружено)" : " (#{self.length} аудиозаписей)")
     end
 
     ##
