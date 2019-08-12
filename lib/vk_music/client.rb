@@ -52,19 +52,16 @@ module VkMusic
     ##
     # @!macro [new] find__options
     #   @option options [Symbol] :type (:audio) what to search for (you can find available values for this option above).
-    #   @option options [Integer, nil] :owner_id ID of group or user.
-    #     Search will be done in audios of this profile. +nil or 0 for global search
     #
     # Search for audio or playlist.
     #
     # @note some audios might be removed from search.
+    # @note when searching in group or user audios lot of them might be missing.
     #
     # Possible values of +type+ option:
     # * +:audio+ - search for audios. Returns up to 50 audios.
-    # * +:playlist_empty+ - search for playlists. Returns up to 6 playlists *without* audios. 
-    # * +:playlist+ - search for playlists.
-    #   Returns up to 6 playlists (all of audios in those playlists will have no download URL).
-    #   Require a lot of additional requests. Consider using +:playlist_empty+ option instead.
+    # * +:playlist+ - search for playlists. Returns up to 6 playlists *without* audios (Loaded with +up_to: 0+ option). 
+    #   You can get all the audios of selected playlist calling {Client#playlist} method with gained info.
     #
     # @overload find(query, options)
     #   @param query [String] string to search for.
@@ -76,8 +73,8 @@ module VkMusic
     #   @option options [String] :query string to search for.
     #   @macro find__options
     #
-    # @return [Array<Audio>, Array<Playlist>] array with audios matching given string. Possibly empty.
-    #   Possibly contains audios without download URL.
+    # @return [Array<Audio>, Array<Playlist>] array with audios or playlists matching given string. 
+    #   Possibly empty. Possibly contains audios or playlists without download URL.
     def find(*args)
       begin
         case
@@ -96,25 +93,19 @@ module VkMusic
       end
 
       options[:type] ||= :audio
-      options[:owner_id] = options[:owner_id].to_i
-
-      if options[:owner_id].zero?
-        # Global search
-        uri = URI(Constants::URL::VK[:audios])
-      else
-        uri = URI("#{Constants::URL::VK[:profile_audios]}#{options[:owner_id]}")
-      end
+      
+      uri = URI(Constants::URL::VK[:audios])
 
       case options[:type]
         when :audio
           uri.query = Utility.hash_to_params({ "act" => "search", "q" => query })
           audios__from_page(uri)
         when :playlist
-          # TODO
-        when :playlist_empty
-          # TODO
+          uri.query = Utility.hash_to_params({ "q" => query })
+          urls = playlist_urls__from_page(uri)
+          urls.map { |url| playlist(url, up_to: 0, with_url: false) }
         else
-          raise ArgumentError, "Bad :type", caller
+          raise ArgumentError, "Bad :type option", caller
       end
     end
     alias search find
@@ -383,8 +374,8 @@ module VkMusic
           rescue Exception => error
             raise Exceptions::ParseError, "Unable to get user or group ID. Custom ID: #{str}. Error: #{error.message}", caller
           end
-      else
-        raise Exceptions::ParseError, "Unable to convert \"#{str}\" into ID", caller
+        else
+          raise Exceptions::ParseError, "Unable to convert \"#{str}\" into ID", caller
       end
       id
     end
@@ -598,9 +589,9 @@ module VkMusic
         footer_node = first_page.at_css(".audioPlaylist__footer")
         if footer_node
           footer_match = footer_node.text.strip.match(/^\d+/)
-          playlist_size = footer_match ? footer_match[0].to_i : 0
+          real_size = footer_match ? footer_match[0].to_i : 0
         else
-          playlist_size = 0
+          real_size = 0
         end
       rescue Exception => error
         raise Exceptions::ParseError, error.message, caller
@@ -610,7 +601,7 @@ module VkMusic
       first_page_audios = audios__from_page(first_page)
       
       # Check whether need to make additional requests
-      options[:up_to] = playlist_size if (options[:up_to] < 0 || options[:up_to] > playlist_size)
+      options[:up_to] = real_size if (options[:up_to] < 0 || options[:up_to] > real_size)
       list = first_page_audios[0, options[:up_to]]
       while list.length < options[:up_to] do
         playlist_page = load__page__playlist(owner_id, playlist_id, access_hash, offset: list.length)
@@ -623,6 +614,7 @@ module VkMusic
         :access_hash => access_hash,
         :title => title,
         :subtitle => subtitle,
+        :real_size => real_size
       })
     end
 
@@ -641,8 +633,8 @@ module VkMusic
         raise Exceptions::ParseError, error.message, caller
       end
       
-      total_count = first_data["totalCount"]
-      options[:up_to] = total_count if (options[:up_to] < 0 || options[:up_to] > total_count)
+      real_size = first_data["totalCount"]
+      options[:up_to] = real_size if (options[:up_to] < 0 || options[:up_to] > real_size)
       list = first_data_audios[0, options[:up_to]]
       while list.length < options[:up_to] do
         json = load__json__playlist_section(owner_id, playlist_id, access_hash,
@@ -658,7 +650,18 @@ module VkMusic
         :access_hash => first_data["access_hash"],
         :title => CGI.unescapeHTML(first_data["title"].to_s),
         :subtitle => CGI.unescapeHTML(first_data["subtitle"].to_s),
+        :real_size => real_size
       })
+    end
+
+    # Found playlist onsearch page
+    def playlist_urls__from_page(obj)
+      page = obj.class == Mechanize::Page ? obj : load__page(obj)
+      begin
+        page.css(".AudioPlaylistSlider .al_playlist").map { |elem| elem.attribute("href").to_s }
+      rescue Exception => error
+        raise Exceptions::ParseError, error.message, caller
+      end
     end
 
     # Load audios from wall using JSON request.
