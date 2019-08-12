@@ -55,8 +55,9 @@ module VkMusic
     #
     # Search for audio or playlist.
     #
-    # @note some audios might be removed from search.
-    # @note when searching in group or user audios lot of them might be missing.
+    # @note some audios and playlists might be removed from search.
+    #
+    # @todo search in group audios.
     #
     # Possible values of +type+ option:
     # * +:audio+ - search for audios. Returns up to 50 audios.
