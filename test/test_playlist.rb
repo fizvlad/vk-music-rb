@@ -18,6 +18,12 @@ class TestVkMusic < MiniTest::Test
     refute_empty(pl[-1].url, "Audio must have download url")
   end
 
+  def test_big_url
+    pl = CLIENT.playlist("https://m.vk.com/audio?act=audio_playlist256492540_83617715&from=search_owned_playlist&access_hash=b8d408241bcfb60583&back_url=%2Faudios-39786657%3Fq%3Dmashup%26tab%3Downed&back_hash=76ef9186ac6f248a27")
+    refute_empty(pl, "This playlist must not be empty")
+    assert_instance_of(VkMusic::Audio, pl[0], "Playlist members must be of class Audio")
+  end
+
   def test_playlist_small_with_options
     pl = CLIENT.playlist(owner_id: -37661843, playlist_id: 1, access_hash: "0e420c32c8b69e6637", with_url: false)
     refute_empty(pl, "This playlist must not be empty")

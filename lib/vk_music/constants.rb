@@ -24,7 +24,8 @@ module VkMusic
         login: "https://m.vk.com/login",
         login_action: "https://login.vk.com",
         wall: "https://m.vk.com/wall",
-        audio_unavailable: "https://m.vk.com/mp3/audio_api_unavailable.mp3"
+        audio_unavailable: "https://m.vk.com/mp3/audio_api_unavailable.mp3",
+        profile_audios: "https://m.vk.com/audios",
       }
 
     end
@@ -63,7 +64,7 @@ module VkMusic
       
       ##
       # Playlist URL regular expression.
-      VK_PLAYLIST_URL_POSTFIX = /.*audio_playlist(-?\d+)_(\d+)(?:(?:(?:&access_hash=)|\/|%2F)([\da-z]+))?/
+      VK_PLAYLIST_URL_POSTFIX = /.*audio_playlist(-?\d+)_(\d+)(?:(?:(?:.*(?=&access_hash=)&access_hash=)|\/|%2F)([\da-z]+))?/
 
       ##
       # Post URL regular expression #1.

@@ -39,8 +39,8 @@ module VkMusic
           :post
         when Constants::Regex::VK_URL
           :audios
-      else
-        :find
+        else
+          :find
       end
     end
 
