@@ -24,6 +24,10 @@ module VkMusic
     ##
     # @return [String, nil] playlist subtitle. May be empty.
     attr_reader :subtitle
+
+    ##
+    # @return [Integer, nil] real size of playlist or +nil+ if unknown.
+    attr_reader :real_size
     
     ##
     # @return [String] playlist description in Russian.
@@ -77,11 +81,12 @@ module VkMusic
     #
     # @param list [Array] list of audios in playlist.
     #
-    # @option options [Integer] :id
-    # @option options [Integer] :owner_id
-    # @option options [String] :access_hash
+    # @option options [Integer, nil] :id
+    # @option options [Integer, nil] :owner_id
+    # @option options [String, nil] :access_hash
     # @option options [String] :title
-    # @option options [String] :subtitle
+    # @option options [String, nil] :subtitle
+    # @option options [Integer, nil] :real_size
     def initialize(list, options = {})
       raise ArgumentError, "Bad arguments", caller unless list.class == Array      
       # Saving list
@@ -93,6 +98,7 @@ module VkMusic
       @access_hash = Utility.unless_nil_to String, options[:access_hash]
       @title       = options[:title].to_s
       @subtitle    = Utility.unless_nil_to String, options[:subtitle]
+      @real_size   = Utility.unless_nil_to Integer, options[:real_size]
     end
   
   end
