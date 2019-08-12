@@ -36,20 +36,19 @@ class TestVkMusic < MiniTest::Test
 
   def test_find_bad_arg
     assert_raises(ArgumentError) do
-      CLIENT.search("Good music", query: "or not")
+      CLIENT.search("Good music", "or not")
     end
   end
 
   def test_find_playlist
-    results = CLIENT.find("Jazz", type: :playlist)
-    puts results # DEBUG
-    refute_empty(results, "There must be some playlists with jazz")
+    results = CLIENT.find("OST", type: :playlist)
+    refute_empty(results, "There must be lot of playlists")
     assert_empty(results[0], "Album must be empty")
     refute_equal(0, results[0].real_size, "Album must actually have some audios")
   end
 
   def test_find_unexisting_playlist
-    results = CLIENT.find("I'm pretty sure no one ever would name a playlist like this 282E8EE", type: :playlist)
+    results = CLIENT.find("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", type: :playlist)
     assert_empty(results, "There must be no results for such query")
   end
   

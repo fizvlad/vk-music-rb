@@ -93,7 +93,7 @@ module VkMusic
       end
 
       options[:type] ||= :audio
-      
+
       uri = URI(Constants::URL::VK[:audios])
 
       case options[:type]
@@ -101,7 +101,7 @@ module VkMusic
           uri.query = Utility.hash_to_params({ "act" => "search", "q" => query })
           audios__from_page(uri)
         when :playlist
-          uri.query = Utility.hash_to_params({ "q" => query })
+          uri.query = Utility.hash_to_params({ "q" => query, "tab" => "global" })
           urls = playlist_urls__from_page(uri)
           urls.map { |url| playlist(url, up_to: 0, with_url: false) }
         else
@@ -654,11 +654,11 @@ module VkMusic
       })
     end
 
-    # Found playlist onsearch page
+    # Found playlist on *global* search page
     def playlist_urls__from_page(obj)
       page = obj.class == Mechanize::Page ? obj : load__page(obj)
       begin
-        page.css(".AudioPlaylistSlider .al_playlist").map { |elem| elem.attribute("href").to_s }
+        page.css(".AudioSerp__foundGlobal .AudioPlaylistSlider .al_playlist").map { |elem| elem.attribute("href").to_s }
       rescue Exception => error
         raise Exceptions::ParseError, error.message, caller
       end
