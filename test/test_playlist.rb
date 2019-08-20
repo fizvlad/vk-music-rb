@@ -10,8 +10,16 @@ end
 
 class TestVkMusic < MiniTest::Test
 
-  def test_playlist_small
+  def test_playlist_small_1
     pl = CLIENT.playlist("https://vk.com/audio?z=audio_playlist-37661843_1/0e420c32c8b69e6637")
+    refute_empty(pl, "This playlist must not be empty")
+    assert_instance_of(VkMusic::Audio, pl[0], "Playlist members must be of class Audio")
+    refute_empty(pl[0].url, "Audio must have download url")
+    refute_empty(pl[-1].url, "Audio must have download url")
+  end
+
+  def test_playlist_small_2
+    pl = CLIENT.playlist("https://vk.com/music/album/-121725065_1")
     refute_empty(pl, "This playlist must not be empty")
     assert_instance_of(VkMusic::Audio, pl[0], "Playlist members must be of class Audio")
     refute_empty(pl[0].url, "Audio must have download url")
@@ -63,8 +71,8 @@ class TestVkMusic < MiniTest::Test
   end
   
   def test_playlist_with_upper_limit
-    pl = CLIENT.playlist("https://vk.com/audio?z=audio_playlist121570739_7", up_to: 113)
-    assert_equal(113, pl.length, "Size of result must match given limit") # This playlist got more audios
+    pl = CLIENT.playlist("https://vk.com/audio?z=audio_playlist-66223223_77503494", up_to: 105, with_url: true)
+    assert_equal(105, pl.length, "Size of result must match given limit") # This playlist got more audios
     refute_empty(pl[0].url, "Audio must have download url")
     refute_empty(pl[-1].url, "Audio must have download url")
   end
