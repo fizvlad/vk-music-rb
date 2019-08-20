@@ -64,7 +64,7 @@ module VkMusic
       
       ##
       # Playlist URL regular expression.
-      VK_PLAYLIST_URL_POSTFIX = /.*(?:audio_playlist|album\/)(-?\d+)_(\d+)(?:(?:(?:.*(?=&access_hash=)&access_hash=)|\/|%2F)([\da-z]+))?/
+      VK_PLAYLIST_URL_POSTFIX = /.*(?:audio_playlist|album\/)(-?\d+)_(\d+)(?:(?:(?:.*(?=&access_hash=)&access_hash=)|\/|%2F|_)([\da-z]+))?/
 
       ##
       # Post URL regular expression #1.
