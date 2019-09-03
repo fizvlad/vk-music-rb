@@ -56,6 +56,10 @@ module VkMusic
     attr_reader :url_encoded
 
     ##
+    # @return [Integer, nil] user ID which should be use for decoding.
+    attr_reader :client_id
+
+    ##
     # @return [Boolean] whether decoded URL is already cached.
     def url_cached?
       !!(@url)
