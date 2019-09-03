@@ -310,7 +310,7 @@ module VkMusic
     # @return [Array<Audio>] array of audios with download URLs.
     def from_id(args)
       begin
-        args.map! do |el| 
+        args_formatted = args.map do |el| 
           case el
             when Array
               el.join("_")
@@ -327,7 +327,7 @@ module VkMusic
       end
       
       result = []
-      args.each_slice(10) do |subarray|
+      args_formatted.each_slice(10) do |subarray|
         json = load__json__audios_by_id(subarray)
         subresult = audios__from_data(json["data"][0].to_a)
         raise Exceptions::ParseError, "Result size don't match: excepected #{subarray.size}, got #{subresult.size}", caller if subresult.size != subarray.size

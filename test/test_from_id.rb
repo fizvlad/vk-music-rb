@@ -57,5 +57,13 @@ class TestVkMusic < MiniTest::Test
       ])
     end
   end
+
+  def test_initial_array_not_changed
+    init = [
+      ["2000023175", "456242595", "addd832f78d7c61b6d", "b6b14f49280d4d55f0"]
+    ]
+    CLIENT.from_id(init)
+    assert_instance_of(Array, init[0], "Function must not change initial array")
+  end
   
 end
