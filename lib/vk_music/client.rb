@@ -219,6 +219,8 @@ module VkMusic
     #
     # @note this method is only able to load up to 91 audios from wall.
     #
+    # @todo this method breaks when club got fixed post with attached audios.
+    #
     # @overload wall(url, options)
     #   Load last audios from wall.
     #   @param url [String] URL to user/group page.
