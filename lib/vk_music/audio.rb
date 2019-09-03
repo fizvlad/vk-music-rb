@@ -159,7 +159,7 @@ module VkMusic
     # @return [Audio]
     def self.from_node(node, client_id)
       url_encoded = node.at_css("input").attribute("value").to_s
-      url_encoded = nil if url_encoded == Constants::URL::VK[:audio_unavailable]
+      url_encoded = nil if url_encoded == Constants::URL::VK[:audio_unavailable] || url_encoded.empty?
       id_array = node.attribute("data-id").to_s.split("_")
       
       new({
@@ -168,7 +168,7 @@ module VkMusic
         :artist => node.at_css(".ai_artist").text.strip,
         :title => node.at_css(".ai_title").text.strip,
         :duration => node.at_css(".ai_dur").attribute("data-dur").to_s.to_i,
-        :url_encoded => url_encoded.to_s,
+        :url_encoded => url_encoded,
         :url => nil,
         :client_id => client_id
       })
@@ -183,6 +183,7 @@ module VkMusic
     # @return [Audio]
     def self.from_data(data, client_id)
       url_encoded = data[2].to_s
+      url_encoded = nil if url_encoded.empty?
       
       secrets = data[13].to_s.split("/")
 
