@@ -1,5 +1,3 @@
-require "execjs"
-
 module VkMusic
 
   ##

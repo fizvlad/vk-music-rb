@@ -1,5 +1,4 @@
-require "minitest/autorun"
-require_relative "../lib/vk_music.rb"
+require_relative "helper"
 
 class TestVkMusic < MiniTest::Test
 

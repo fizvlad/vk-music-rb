@@ -1,5 +1,3 @@
-require "cgi"
-
 ##
 # @!macro [new] options_hash_param
 #   @param options [Hash] hash with options.
@@ -60,6 +58,13 @@ module VkMusic
     attr_reader :client_id
 
     ##
+    # @return [String, nil] full ID of audio or +nil+ if some of components are missing.
+    def full_id
+      return nil unless @owner_id && @id && @secret_1 && @secret_2
+      "#{@owner_id}_#{@id}_#{@secret_1}_#{@secret_2}"
+    end
+
+    ##
     # @return [Boolean] whether decoded URL is already cached.
     def url_cached?
       !!(@url)
@@ -86,7 +91,15 @@ module VkMusic
     ##
     # @return [String] extended information about audio.
     def pp
-      "#{to_s} (Able to get decoded URL: #{url_available? ? "yes" : "no"}, able to get URL from VK: #{url_accessable? ? "yes" : "no"})"
+      "#{to_s} (#{
+        if url_available?
+          "Able to get decoded URL right away"
+        elsif url_accessable?
+          "Able to retrieve URL with request"
+        else
+          "URL not accessable"
+        end
+      })"
     end
 
     ##
@@ -146,8 +159,8 @@ module VkMusic
       @owner_id    = Utility.unless_nil_to Integer, options[:owner_id]
       @secret_1    = Utility.unless_nil_to String, options[:secret_1]
       @secret_2    = Utility.unless_nil_to String, options[:secret_2]
-      @artist      = options[:artist].to_s
-      @title       = options[:title].to_s
+      @artist      = options[:artist].to_s.strip
+      @title       = options[:title].to_s.strip
       @duration    = options[:duration].to_i
       @url_encoded = Utility.unless_nil_to String, options[:url_encoded]
       @url         = Utility.unless_nil_to String, options[:url]
@@ -162,20 +175,30 @@ module VkMusic
     #
     # @return [Audio]
     def self.from_node(node, client_id)
-      url_encoded = node.at_css("input").attribute("value").to_s
-      url_encoded = nil if url_encoded == Constants::URL::VK[:audio_unavailable] || url_encoded.empty?
-      id_array = node.attribute("data-id").to_s.split("_")
-      
-      new({
-        :id => id_array[1].to_i,
-        :owner_id => id_array[0].to_i,
-        :artist => node.at_css(".ai_artist").text.strip,
-        :title => node.at_css(".ai_title").text.strip,
-        :duration => node.at_css(".ai_dur").attribute("data-dur").to_s.to_i,
-        :url_encoded => url_encoded,
-        :url => nil,
-        :client_id => client_id
-      })
+      input = node.at_css("input")
+      if input
+        url_encoded = input.attribute("value").to_s
+        url_encoded = nil if url_encoded == Constants::URL::VK[:audio_unavailable] || url_encoded.empty?
+        id_array = node.attribute("data-id").to_s.split("_")
+        
+        new({
+          :id => id_array[1].to_i,
+          :owner_id => id_array[0].to_i,
+          :artist => node.at_css(".ai_artist").text.strip,
+          :title => node.at_css(".ai_title").text.strip,
+          :duration => node.at_css(".ai_dur").attribute("data-dur").to_s.to_i,
+          :url_encoded => url_encoded,
+          :url => nil,
+          :client_id => client_id
+        })
+      else
+        # Probably audios from some post
+        new({
+          :artist => node.at_css(".medias_audio_artist").text.strip,
+          :title => Utility.plain_text(node.at_css(".medias_audio_title")).strip,
+          :duration => Utility.parse_duration(node.at_css(".medias_audio_dur").text)
+        })
+      end
     end
     
     ##

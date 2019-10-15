@@ -1,7 +1,18 @@
-require_relative "vk_music/constants.rb"
-require_relative "vk_music/exceptions.rb"
-require_relative "vk_music/utility.rb"
-require_relative "vk_music/link_decoder.rb"
-require_relative "vk_music/audio.rb"
-require_relative "vk_music/playlist.rb"
-require_relative "vk_music/client.rb"
+require "cgi"
+require "logger"
+require "mechanize"
+require "execjs"
+require "json"
+
+require "vk_music/version"
+require "vk_music/constants"
+require "vk_music/exceptions"
+require "vk_music/utility"
+require "vk_music/link_decoder"
+require "vk_music/audio"
+require "vk_music/playlist"
+require "vk_music/client"
+
+##
+# Main module.
+module VkMusic; end

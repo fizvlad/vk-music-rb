@@ -1,5 +1,4 @@
-require "minitest/autorun"
-require_relative "../lib/vk_music.rb"
+require_relative "helper"
 
 begin
   CLIENT = VkMusic::Client.new(username: ARGV[0], password: ARGV[1])

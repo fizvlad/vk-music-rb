@@ -1,24 +1,6 @@
-desc "Create documentation"
-task :doc do
-  puts `yardoc`
-end
+require "bundler/gem_tasks"
+require "rake/testtask"
 
-desc "Build gem file"
-task :build do
-  puts `gem build vk_music.gemspec`
-end
-
-desc "Uninstall gem"
-task :uninstall do
-  puts `gem uninstall vk_music`
-end
-
-desc "Build and install gem"
-task :install_local => :build do
-  puts `gem install ./vk_music-*.gem`
-end
-
-desc "Run tests"
 task :test do
   puts "Running tests require login credetionals (NOTICE: they won't be hidden in anyway)"
   
@@ -34,8 +16,10 @@ task :test do
   puts
   ENV["SSL_CERT_FILE"] = ssl_cert_path unless ssl_cert_path.empty?
   
-  Dir[ "test/test*.rb" ].each do |file|
+  Dir[ "test/test_*.rb" ].each do |file|
     puts "\n\nRunning #{file}:"
     ruby "-w #{file} '#{username}' '#{password}'"
   end
 end
+
+task :default => :test

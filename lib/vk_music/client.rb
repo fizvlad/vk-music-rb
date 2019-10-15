@@ -1,6 +1,3 @@
-require "mechanize"
-require "json"
-
 ##
 # @!macro [new] options_hash_param
 #   @param options [Hash] hash with options.
@@ -210,7 +207,7 @@ module VkMusic
 
     ##
     # @!macro [new] wall__up_to_option
-    #   @option up_to [Integer] :up_to (10) maximum amount of audios to load from wall.
+    #   @option up_to [Integer] :up_to (50) maximum amount of audios to load from wall.
     #   
     # @!macro [new] wall__with_url_option
     #   @option options [Boolean] :with_url (true) automatically use {Client#from_id} to get download URLs.
@@ -260,7 +257,7 @@ module VkMusic
         raise ArgumentError, "Bad arguments", caller
       end
 
-      options[:up_to] ||= 10
+      options[:up_to] ||= 50
       options[:with_url] = true if options[:with_url].nil?
 
       wall__json(owner_id, post_id, options)
@@ -268,6 +265,8 @@ module VkMusic
 
     ##
     # Get audios attached to post.
+    #
+    # @note currently this method works incorrectly with reposts.
     #
     # @overload post(url)
     #   @param url [String] URL to post.
@@ -277,7 +276,7 @@ module VkMusic
     #   @option options [Integer] :owner_id numerical ID of wall owner.
     #   @option options [Integer] :post_id numerical ID of post.
     #
-    # @return [Array<Audio>] audios with download URLs.
+    # @return [Array<Audio>] array of audios. Possibly without download URL.
     def post(arg)
       begin
         case arg
@@ -294,20 +293,26 @@ module VkMusic
         raise ArgumentError, "Bad arguments", caller
       end
 
-      amount = attached_audios_amount(owner_id: owner_id, post_id: post_id)
-      wall(owner_id: owner_id, post_id: post_id, up_to: amount)
+      attached = attached_audios(owner_id: owner_id, post_id: post_id)
+      wall = wall(owner_id: owner_id, post_id: post_id, with_url: false)
+
+      no_link = attached.map do |a_empty|
+        # Here we just search for matching audios on wall
+        wall.find { |a| a.artist == a_empty.artist && a.title == a_empty.title } || a_empty
+      end
+      loaded_audios = from_id(no_link)
+      
+      loaded_audios.map.with_index { |el, i| el || no_link[i] }
     end
 
     ##
     # Get audios with download URLs by their IDs and secrets.
     #
-    # @note warning: audios must not match.
-    #
-    # @todo workaround for not unique audios in request
-    #
     # @param args [Array<Audio, Array<(owner_id, audio_id, secret_1, secret_2)>, "#{owner_id}_#{id}_#{secret_1}_#{secret_2}">]
     #
-    # @return [Array<Audio>] array of audios with download URLs.
+    # @return [Array<Audio, nil>] array of: audio with download URLs or audio
+    #   audio without URL if wasn't able to get it for audio or +nil+ if
+    #   matching element can't be retrieved for array or string.
     def from_id(args)
       begin
         args_formatted = args.map do |el| 
@@ -315,7 +320,7 @@ module VkMusic
             when Array
               el.join("_")
             when Audio
-              "#{el.owner_id}_#{el.id}_#{el.secret_1}_#{el.secret_2}"
+              el.full_id
             when String
               el # Do not change
             else
@@ -325,15 +330,29 @@ module VkMusic
       rescue
         raise ArgumentError, "Bad arguments", caller
       end
+      args_formatted.compact.uniq # Not dealing with nil or doubled IDs
       
-      result = []
+      audios = []
       args_formatted.each_slice(10) do |subarray|
         json = load__json__audios_by_id(subarray)
         subresult = audios__from_data(json["data"][0].to_a)
-        raise Exceptions::ParseError, "Result size don't match: excepected #{subarray.size}, got #{subresult.size}", caller if subresult.size != subarray.size
-        result.concat(subresult)
+        audios.concat(subresult)
       end
-      result
+      Utility.debug("Loaded audios from ids: #{audios.map(&:pp).join(", ")}")
+
+      args.map do |el|
+        case el
+          when Array
+            audios.find { |audio| audio.owner_id == el[0].to_i && audio.id == el[1].to_i }
+          when Audio
+            next el if el.full_id.nil? # Audio was skipped
+            audios.find { |audio| audio.owner_id == el.owner_id && audio.id == el.id }
+          when String
+            audios.find { |audio| [audio.owner_id, audio.id] == el.split("_").first(2).map(&:to_i) }
+          else
+            nil # This shouldn't happen actually
+        end
+      end
     end
 
     ##
@@ -436,18 +455,18 @@ module VkMusic
     end
 
     ##
-    # Get amount of audios attached to specified post.
+    # Get audios attached to specified post.
     #
-    # @overload attached_audios_amount(url)
+    # @overload attached_audios(url)
     #   @param url [String] URL to post.
     #
-    # @overload attached_audios_amount(options)
+    # @overload attached_audios(options)
     #   @macro options_hash_param
     #   @option options [Integer] :owner_id numerical ID of wall owner.
     #   @option options [Integer] :post_id numerical ID of post.
     #
-    # @return [Integer] amount of audios.
-    def attached_audios_amount(arg)
+    # @return [Array<Audio>] audios with only artist, title and duration.
+    def attached_audios(arg)
       begin
         case arg
           when String
@@ -472,7 +491,7 @@ module VkMusic
 
       raise Exceptions::ParseError, "Post not found: #{owner_id}_#{post_id}", caller unless page.css(".service_msg_error").empty?
       begin
-        result = page.css(".wi_body > .pi_medias .medias_audio").size
+        result = page.css(".wi_body > .pi_medias .medias_audio").map { |e| Audio.from_node(e, @id) }
       rescue Exception => error
         raise Exceptions::ParseError, "Unable to get amount of audios in post #{owner_id}_#{post_id}. Error: #{error.message}", caller
       end
@@ -623,10 +642,6 @@ module VkMusic
 
     # Load playlist through JSON requests.
     def playlist__json(owner_id, playlist_id, access_hash, options)
-      if options[:up_to] < 0 || options[:up_to] > 100
-        Utility.warn("Current implementation of this method is not able to return more than 100 first audios with URL.")
-      end
-
       # Trying to parse out audios
       begin
         first_json = load__json__playlist_section(owner_id, playlist_id, access_hash, offset: 0)
