@@ -32,6 +32,7 @@ module VkMusic
     #
     # @option options [String] :username usually telephone number or email.
     # @option options [String] :password
+    # @option options [String] :user_agent (Constants::DEFAULT_USER_AGENT)
     def initialize(options = {})
       # Arguments check
       raise ArgumentError, "Options hash must be provided", caller unless options.class == Hash
@@ -40,6 +41,7 @@ module VkMusic
       
       # Setting up client
       @agent = Mechanize.new
+      @agent.user_agent = options[:user_agent] || Constants::DEFAULT_USER_AGENT
       login(options[:username], options[:password])
     end
 
@@ -704,7 +706,7 @@ module VkMusic
     def login(username, password)
       Utility.debug("Logging in.")
       # Loading login page
-      homepage = load__page(Constants::URL::VK[:home])
+      homepage = load__page(Constants::URL::VK[:login])
       # Submitting login form
       login_form = homepage.forms.find { |form| form.action.start_with?(Constants::URL::VK[:login_action]) }
       login_form[Constants::VK_LOGIN_FORM_NAMES[:username]] = username.to_s

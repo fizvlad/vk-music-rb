@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vk_music (2.2.0)
+    vk_music (2.2.1)
       execjs (~> 2.7)
       json (~> 2.0)
       logger (~> 1.4)
