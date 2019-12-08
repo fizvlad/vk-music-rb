@@ -6,3 +6,5 @@ gemspec
 gem "logger", "~> 1.4"
 
 gem "mechanize", "~> 2.7"
+
+gem "pry", "~> 0.12.2"
