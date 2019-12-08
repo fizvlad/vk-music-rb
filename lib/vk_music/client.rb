@@ -333,14 +333,14 @@ module VkMusic
         raise ArgumentError, "Bad arguments", caller
       end
       args_formatted.compact.uniq # Not dealing with nil or doubled IDs
-      
+
       audios = []
       args_formatted.each_slice(10) do |subarray|
         json = load__json__audios_by_id(subarray)
         subresult = audios__from_data(json["data"][0].to_a)
         audios.concat(subresult)
       end
-      Utility.debug("Loaded audios from ids: #{audios.map(&:pp).join(", ")}")
+      VkMusic.debug("Loaded audios from ids: #{audios.map(&:pp).join(", ")}")
 
       args.map do |el|
         case el
@@ -508,7 +508,7 @@ module VkMusic
     # Load page by URL. And return Mechanize::Page.
     def load__page(url)
       uri = URI(url) if url.class != URI
-      Utility.debug("Loading #{uri}")
+      VkMusic.debug("Loading #{uri}")
       begin
         @agent.get(uri)
       rescue Exception => error
@@ -688,7 +688,7 @@ module VkMusic
     def wall__json(owner_id, post_id, options)
       if options[:up_to] < 0 || options[:up_to] > 91
         options[:up_to] = 91
-        Utility.warn("Current implementation of this method is not able to return more than 91 audios from wall.")
+        VkMusic.warn("Current implementation of this method is not able to return more than 91 audios from wall.")
       end
 
       begin
@@ -704,7 +704,7 @@ module VkMusic
 
     # Login
     def login(username, password)
-      Utility.debug("Logging in.")
+      VkMusic.debug("Logging in.")
       # Loading login page
       homepage = load__page(Constants::URL::VK[:login])
       # Submitting login form
