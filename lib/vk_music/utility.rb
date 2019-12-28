@@ -55,32 +55,6 @@ module VkMusic
     end
 
     ##
-    # Function to turn values into given class unless nil provided.
-    #
-    # @deprecated bad styling.
-    #
-    # Supported types:
-    # * +String+
-    # * +Integer+
-    #
-    # @param new_class [Class] class to transform to.
-    # @param obj [Object] object to check.
-    #
-    # @return object transformed to given class or +nil+ if object was +nil+ already.
-    def self.unless_nil_to(new_class, obj)
-      case
-        when obj.nil?
-          nil
-        when String <= new_class
-          obj.to_s
-        when Integer <= new_class
-          obj.to_i
-        else
-          raise ArgumentError, "Bad arguments", caller
-      end
-    end
-
-    ##
     # Get content of text children of provided Node.
     # @param node [Nokogiri::Xml::Node]
     # @return [String]
