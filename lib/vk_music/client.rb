@@ -38,7 +38,8 @@ module VkMusic
     # @todo search in group audios.
     # @param query [String] search query.
     # @param type [Symbol] what to search for.
-    # @return [Array<Audio>, Array<Playlist>] array with audios or playlists matching given string.
+    # @return [Array<Audio>, Array<Playlist>] array with audios or playlists
+    #   matching given string.
     def find(query = "", type: :audio)
       raise ArgumentError if query.empty?
       uri = URI(Constants::URL::VK[:audios])
@@ -59,6 +60,8 @@ module VkMusic
     ##
     # Get VK playlist.
     # Specify either +url+ or +(owner_id,playlist_id,access_hash)+.
+    # @note since updating URLs can take a lot of time in this case, you have to
+    #   do it manually with {Client#update_urls}.
     # @param url [String, nil] playlist URL.
     # @param owner_id [Integer, nil] playlist owner ID.
     # @param playlist_id [Integer, nil] ID of the playlist.
@@ -89,6 +92,8 @@ module VkMusic
     ##
     # Get user or group audios.
     # Specify either +url+ or +owner_id+.
+    # @note since updating URLs can take a lot of time in this case, you have to
+    #   do it manually with {Client#update_urls}.
     # @param url [String, nil]
     # @param owner_id [Integer, nil] numerical ID of owner.
     # @param up_to [Integer] maximum amount of audios to load.
@@ -122,7 +127,8 @@ module VkMusic
     # @param url [String] URL to post.
     # @param owner_id [Integer] numerical ID of wall owner.
     # @param post_id [Integer] numerical ID of post.
-    # @return [Array<Audio>] array of audios attached to post.
+    # @return [Array<Audio>] array of audios attached to post. Most of audios will
+    #   already have download URLs, but there might be audios which can't be resolved.
     def post(url: nil, owner_id: nil, post_id: nil)
       begin
         owner_id, post_id = url.match(Constants::Regex::VK_WALL_URL_POSTFIX).captures if url
