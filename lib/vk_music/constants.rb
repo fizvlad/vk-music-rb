@@ -4,7 +4,7 @@ module VkMusic
   module Constants
     ##
     # Default web user agent.
-    DEFAULT_USER_AGENT = "Mozilla/5.0 (Linux; Android 5.1.1; Redmi 3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Mobile Safari/537.36 OPR/54.2.2672.49907"
+    DEFAULT_USER_AGENT = "" # Using empty user agent confuses VK and it returnes MP3
 
     ##
     # Different URLs
