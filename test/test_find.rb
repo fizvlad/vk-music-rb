@@ -15,19 +15,14 @@ class TestVkMusic < MiniTest::Test
     assert_instance_of(VkMusic::Audio, results[0], "Results of search must be of class Audio")
     refute_nil(results[0].url, "Audio must have download url")
   end
-  
-  def test_find_no_query
-    results = CLIENT.find("")
-    assert_empty(results, "There must be no results for empty query")
-  end
-  
+
   def test_find_no_results
     results = CLIENT.find("I'm pretty sure no one ever would name a song like this 282E8EE")
     assert_empty(results, "There must be no results for such query")
   end
 
   def test_search_with_hash
-    results = CLIENT.search(query: "Sexualizer")
+    results = CLIENT.search("Sexualizer")
     refute_empty(results, "There must be some good music")
     assert_instance_of(VkMusic::Audio, results[0], "Results of search must be of class Audio")
     refute_nil(results[0].url, "Audio must have download url")
@@ -50,5 +45,5 @@ class TestVkMusic < MiniTest::Test
     results = CLIENT.find("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", type: :playlist)
     assert_empty(results, "There must be no results for such query")
   end
-  
+
 end

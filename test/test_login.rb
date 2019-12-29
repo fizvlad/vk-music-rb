@@ -7,13 +7,7 @@ class TestVkMusic < MiniTest::Test
       VkMusic::Client.new(username: "login", password: "password")
     end
   end
-  
-  def test_empty_data
-    assert_raises(VkMusic::LoginError) do
-      VkMusic::Client.new(username: "", password: "")
-    end
-  end
-  
+
   def test_good_data
     begin
       client = VkMusic::Client.new(username: ARGV[0], password: ARGV[1])
@@ -24,5 +18,5 @@ class TestVkMusic < MiniTest::Test
     refute_empty(client.name, "User name undefined")
     refute_nil(client.id, "User id undefined")
   end
-  
+
 end
