@@ -192,7 +192,7 @@ module VkMusic
     alias_method :from_id, :get_urls
     ##
     # Update download URLs of audios.
-    # @param args [Array<Audio>]
+    # @param audios [Array<Audio>]
     def update_urls(audios)
       audios_with_urls = get_urls(audios)
       audios.each.with_index do |a, i|
