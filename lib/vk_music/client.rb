@@ -144,12 +144,11 @@ module VkMusic
 
     ##
     # Get audios with download URLs by their IDs and secrets.
-    #
     # @param args [Array<Audio, Array<(owner_id, audio_id, secret_1, secret_2)>, "#{owner_id}_#{id}_#{secret_1}_#{secret_2}">]
     # @return [Array<Audio, nil>] array of: audio with download URLs or audio
     #   without URL if wasn't able to get it for audio or +nil+ if
     #   matching element can't be retrieved for array or string.
-    def from_id(args)
+    def get_urls(args)
       args_formatted = args.map do |el|
         case el
         when Array
@@ -190,7 +189,14 @@ module VkMusic
         end
       end
     end
-    alias_method :get_urls, :from_id
+    alias_method :from_id, :get_urls
+    ##
+    # Update download URLs of audios.
+    # @param args [Array<Audio>]
+    def update_urls(audios)
+      audios_with_urls = get_urls(audios)
+      audios.each.with_index { |a, i| a.update(from: audios_with_urls[i]) }
+    end
 
     ##
     # @!endgroup
