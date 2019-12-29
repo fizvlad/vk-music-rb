@@ -24,12 +24,14 @@ You can take a look on documentation [here](https://www.rubydoc.info/gems/vk_mus
 
 ### Logging in
 Firstly, it is required to create new *VkMusic::Client* and provide login credentials:
+
 ```ruby
 client = VkMusic::Client.new(username: "+71234567890", password: "password")
 ```
 
 ### Searching for audios
 You can search audios by name with following method:
+
 ```ruby
 audios = client.find("Acid Spit - Mega Drive")
 puts audios[0]     # Basic information about audio
@@ -38,31 +40,35 @@ puts audios[0].url # URL to access audio. Notice that it is only accessible from
 
 ### Parsing playlists
 You can load all the audios from playlist using following method:
+
 ```ruby
-playlist = client.playlist("https://vk.com/audio?z=audio_playlist-37661843_1/0e420c32c8b69e6637")
-```
-It is only possible to load up to 100 audios from playlist per request, so you can reduce amount of requests by setting up how many audios from playlist you actually need.
-For example, following method will perform only one HTML request:
-```ruby
-playlist = client.playlist("https://vk.com/audio?z=audio_playlist121570739_7", up_to: 100)
-urls = playlist.map(&:url) # URLs for every audio
+playlist = client.playlist(url: "https://vk.com/audio?z=audio_playlist-37661843_1/0e420c32c8b69e6637")
+last_audios = playlist.first(10) # => Array<Audio>
+client.update_urls(last_audios) # We have to manually retrieve URLs for playlists
+urls = last_audios.map(&:url) # URLs for every audio
 ```
 
 ### User or group audios
-You can load first 100 audios from user or group page. Those audios will be returned as playlist. To do it simply pass user or group id:
+You can load audios from user or group page. Those audios will be returned as playlist. To do it simply pass user or group id:
+
 ```ruby
-user_playlist = client.audios(owner_id: 8024985)
-group_playlist = client.audios(owner_id: -4790861) # Group and public id starts with '-'
+playlist = client.audios(owner_id: 8024985)
+last_audios = playlist.first(10) # => Array<Audio>
+client.update_urls(last_audios) # We have to manually retrieve URLs for playlists
+urls = last_audios.map(&:url) # URLs for every audio
 ```
 You can set how many audios you actually need as well:
+
 ```ruby
-user_playlist = client.audios(owner_id: 8024985, up_to: 10)
+user_playlist = client.audios(url: "vk.com/id8024985", up_to: 10)
 ```
 
 ### Audios from post
 You can load up to 10 audios attached to some post. Those audios will be returned as array:
+
 ```ruby
-audios = client.post("https://vk.com/wall-4790861_5453")
+audios = client.post(url: "https://vk.com/wall-4790861_5453")
+urls = audios.map(&:url) # URLs for every audio
 ```
 
 

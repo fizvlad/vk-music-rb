@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vk_music (2.2.1)
+    vk_music (3.0.0)
       execjs (~> 2.7)
       json (~> 2.0)
       logger (~> 1.4)
@@ -11,6 +11,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    coderay (1.1.2)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     execjs (2.7.0)
@@ -27,16 +28,20 @@ GEM
       nokogiri (~> 1.6)
       ntlm-http (~> 0.1, >= 0.1.1)
       webrobots (>= 0.0.9, < 0.2)
+    method_source (0.9.2)
     mime-types (3.3)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2019.1009)
     mini_portile2 (2.4.0)
-    minitest (5.12.2)
+    minitest (5.13.0)
     net-http-digest_auth (1.4.1)
     net-http-persistent (2.9.4)
-    nokogiri (1.10.4-x64-mingw32)
+    nokogiri (1.10.7-x64-mingw32)
       mini_portile2 (~> 2.4.0)
     ntlm-http (0.1.1)
+    pry (0.12.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     rake (10.5.0)
     unf (0.1.4)
       unf_ext
@@ -52,6 +57,7 @@ DEPENDENCIES
   logger (~> 1.4)
   mechanize (~> 2.7)
   minitest (~> 5.0)
+  pry (~> 0.12.2)
   rake (~> 10.0)
   vk_music!
   yard (~> 0.9)

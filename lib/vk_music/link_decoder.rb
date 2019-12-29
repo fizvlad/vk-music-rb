@@ -1,9 +1,7 @@
 module VkMusic
-
   ##
   # Module containing link decoding utilities.
   module LinkDecoder
-
     ##
     # JS code which creates function to unmask audio URL.
     js_code = <<~HEREDOC
@@ -90,19 +88,15 @@ module VkMusic
     ##
     # JS context with unmasking link.
     @@js_context = ExecJS.compile(js_code)
-    
+
     ##
     # Unmask audio download URL.
-    #
     # @param link [String] encoded link to audio. Usually looks like "https://m.vk.​com/mp3/audio_api_unavailable.mp3?extra=...".
     # @param client_id [Integer] ID of user which got this link. ID is required for decoding.
-    #
     # @return [String] audio download URL, which can be used only from current IP.
     def self.unmask_link(link, client_id)
-      Utility.debug("Unmasking link.")
+      VkMusic.debug("Unmasking link.")
       @@js_context.call("vk_unmask_link", link.to_s, client_id.to_i)
     end
-
   end
-  
 end

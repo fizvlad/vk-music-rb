@@ -10,7 +10,7 @@ end
 class TestVkMusic < MiniTest::Test
 
   def test_url_1
-    arr = CLIENT.wall("https://vk.com/mashup", up_to: 10)
+    arr = CLIENT.wall(url: "https://vk.com/mashup", up_to: 10, with_url: true)
     assert_instance_of(Array, arr, "Result must be an array")
     refute_empty(arr, "There must be something on the wall")
     assert_equal(10, arr.size, "Size must be exactly the given")
@@ -20,7 +20,7 @@ class TestVkMusic < MiniTest::Test
   end
 
   def test_url_2
-    arr = CLIENT.wall("https://vk.com/mashup", with_url: false)
+    arr = CLIENT.wall(url: "https://vk.com/mashup", with_url: false)
     refute_empty(arr, "There must be something on the wall")
     assert_instance_of(VkMusic::Audio, arr[0], "Playlist members must be of class Audio")
     assert(arr[0].url_accessable?, "Audio must have accessable URL")
@@ -36,20 +36,20 @@ class TestVkMusic < MiniTest::Test
   end
 
   def test_empty_wall
-    arr = CLIENT.wall("https://vk.com/club185224844")
+    arr = CLIENT.wall(url: "https://vk.com/club185224844")
     assert_empty(arr, "This wall is empty")
   end
 
   def test_bad_url
     assert_raises(VkMusic::ParseError) do
-      CLIENT.wall("abc")
+      CLIENT.wall(url: "abc")
     end
   end
 
   def test_not_accessable_page
     assert_raises(VkMusic::ParseError) do
-      CLIENT.wall("https://vk.com/club2")
+      CLIENT.wall(url: "https://vk.com/club2")
     end
   end
-  
+
 end
