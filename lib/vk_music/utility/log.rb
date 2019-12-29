@@ -4,7 +4,7 @@ module VkMusic
 
   ##
   # Default logger
-  @@logger = Logger.new($LOG_FILE || STDOUT,
+  @@logger = Logger.new(defined?($LOG_FILE) ? $LOGFILE : STDOUT,
     formatter: Proc.new do |severity, datetime, progname, msg|
       "[#{datetime}] #{severity}#{progname ? " - #{progname}" : ""}:\t #{msg}\n"
     end
