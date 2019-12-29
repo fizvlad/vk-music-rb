@@ -195,7 +195,10 @@ module VkMusic
     # @param args [Array<Audio>]
     def update_urls(audios)
       audios_with_urls = get_urls(audios)
-      audios.each.with_index { |a, i| a.update(from: audios_with_urls[i]) }
+      audios.each.with_index do |a, i|
+        a_u = audios_with_urls[i]
+        a.update(from: a_u) unless a_u.nil?
+      end
     end
 
     ##
