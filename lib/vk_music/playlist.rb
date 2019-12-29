@@ -60,6 +60,11 @@ module VkMusic
     def [](index)
       @list[index]
     end
+    ##
+    # @return [Boolean] whether no audios loaded for this playlist.
+    def empty?
+      @list.empty?
+    end
 
     ##
     # Initialize new playlist.
