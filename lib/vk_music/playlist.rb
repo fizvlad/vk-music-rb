@@ -24,6 +24,10 @@ module VkMusic
     attr_reader :real_size
 
     ##
+    # @!visibility private
+    attr_reader :list
+
+    ##
     # @return [String] playlist description in Russian.
     def to_s
       (@subtitle && !@subtitle.empty? ? "#{@subtitle} - " : "") +
