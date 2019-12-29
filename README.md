@@ -42,7 +42,7 @@ puts audios[0].url # URL to access audio. Notice that it is only accessible from
 You can load all the audios from playlist using following method:
 
 ```ruby
-playlist = client.playlist("https://vk.com/audio?z=audio_playlist-37661843_1/0e420c32c8b69e6637")
+playlist = client.playlist(url: "https://vk.com/audio?z=audio_playlist-37661843_1/0e420c32c8b69e6637")
 last_audios = playlist.first(10) # => Array<Audio>
 client.update_urls(last_audios) # We have to manually retrieve URLs for playlists
 urls = last_audios.map(&:url) # URLs for every audio
