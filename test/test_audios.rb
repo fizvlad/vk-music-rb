@@ -69,7 +69,7 @@ class TestVkMusic < MiniTest::Test
   end
 
   def test_group_with_no_audios
-    pl = CLIENT.audios(url: "vk.com/club52298374")
+    pl = CLIENT.audios(url: "https://vk.com/dusic_bot")
     assert_empty(pl, "This group got no audios")
   end
 

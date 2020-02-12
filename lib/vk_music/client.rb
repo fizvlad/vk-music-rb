@@ -419,7 +419,10 @@ module VkMusic
     def audios_from_page(obj)
       page = obj.is_a?(Mechanize::Page) ? obj : load_page(obj)
       begin
-        page.css(".audio_item.ai_has_btn").map { |elem| Audio.from_node(elem, @id) }
+        page.css(".audio_item.ai_has_btn").map do |elem|
+          data = JSON.parse(elem.attribute("data-audio"))
+          Audio.from_data(data, @id)
+        end
       rescue
         raise Exceptions::ParseError
       end
@@ -534,7 +537,7 @@ module VkMusic
     def playlist_urls_from_page(obj)
       page = obj.is_a?(Mechanize::Page) ? obj : load_page(obj)
       begin
-        page.css(".AudioShowcase__block_playlists .AudioPlaylistSlider .al_playlist").map { |elem| elem.attribute("href").to_s }
+        page.css(".AudioBlock_music_playlists .AudioPlaylistSlider .al_playlist").map { |elem| elem.attribute("href").to_s }
       rescue
         raise Exceptions::ParseError
       end

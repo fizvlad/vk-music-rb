@@ -13,7 +13,7 @@ class TestVkMusic < MiniTest::Test
     results = CLIENT.find("Rick Astley")
     refute_empty(results, "There must be some music of Rick Astley")
     assert_instance_of(VkMusic::Audio, results[0], "Results of search must be of class Audio")
-    refute_nil(results[0].url, "Audio must have download url")
+    assert(results[0].url_accessable?, "Audio must be accessable")
   end
 
   def test_find_no_results
@@ -25,7 +25,7 @@ class TestVkMusic < MiniTest::Test
     results = CLIENT.search("Sexualizer")
     refute_empty(results, "There must be some good music")
     assert_instance_of(VkMusic::Audio, results[0], "Results of search must be of class Audio")
-    refute_nil(results[0].url, "Audio must have download url")
+    assert(results[0].url_accessable?, "Audio must be accessable")
   end
 
   def test_find_bad_arg
