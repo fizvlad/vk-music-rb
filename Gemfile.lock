@@ -36,13 +36,15 @@ GEM
     minitest (5.13.0)
     net-http-digest_auth (1.4.1)
     net-http-persistent (2.9.4)
+    nokogiri (1.10.7)
+      mini_portile2 (~> 2.4.0)
     nokogiri (1.10.7-x64-mingw32)
       mini_portile2 (~> 2.4.0)
     ntlm-http (0.1.1)
     pry (0.12.2)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
-    rake (10.5.0)
+    rake (13.0.1)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.6)
@@ -50,6 +52,7 @@ GEM
     yard (0.9.20)
 
 PLATFORMS
+  ruby
   x64-mingw32
 
 DEPENDENCIES
@@ -58,7 +61,7 @@ DEPENDENCIES
   mechanize (~> 2.7)
   minitest (~> 5.0)
   pry (~> 0.12.2)
-  rake (~> 10.0)
+  rake (~> 13.0)
   vk_music!
   yard (~> 0.9)
 
