@@ -71,6 +71,13 @@ audios = client.post(url: "https://vk.com/wall-4790861_5453")
 urls = audios.map(&:url) # URLs for every audio
 ```
 
+### Recommended audios and etc
+You can load audios from recommended sections, novices and VK charts:
+
+```ruby
+audios = client.block(url: "https://m.vk.com/audio?act=block&block=PUlQVA8GR0R3W0tMF2teRGpJUVQPGVpfdF1YRwMGXUpkXktMF2tYUWRHS0IXDlpKZFpcVA8FFg")
+```
+
 
 ## Development
 
