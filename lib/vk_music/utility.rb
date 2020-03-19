@@ -29,6 +29,8 @@ module VkMusic
           :playlist
         when Constants::Regex::VK_WALL_URL_POSTFIX, Constants::Regex::VK_POST_URL_POSTFIX
           :post
+        when Constants::Regex::VK_BLOCK_URL
+          :block
         when Constants::Regex::VK_URL
           :audios
         else
