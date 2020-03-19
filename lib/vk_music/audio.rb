@@ -120,6 +120,7 @@ module VkMusic
       @owner_id = owner_id
       @secret_1 = secret_1
       @secret_2 = secret_2
+      @secret_1 = @secret_2 if @secret_1.nil? || @secret_1.empty?
       @artist = artist.strip
       @title = title.strip
       @duration = duration
