@@ -8,14 +8,17 @@ require "vk_music"
 
 require "pry"
 
-print "Login:    "
+print "Login (leave this empty if no login required): "
 username = STDIN.gets.chomp
 
-print "Password: "
-password = STDIN.gets.chomp
-puts
+unless username.empty?
+  print "Password: "
+  password = STDIN.gets.chomp
+  puts
 
-$client = VkMusic::Client.new(username: username, password: password)
-puts "You can now access client at $client"
+  $client = VkMusic::Client.new(username: username, password: password)
+  puts "You can now access client at $client"
+end
+puts
 
 Pry.start
