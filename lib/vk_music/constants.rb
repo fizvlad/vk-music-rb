@@ -22,7 +22,7 @@ module VkMusic
         login_action: "https://login.vk.com",
         wall: "https://m.vk.com/wall",
         audio_unavailable: "https://m.vk.com/mp3/audio_api_unavailable.mp3",
-        profile_audios: "https://m.vk.com/audios",
+        profile_audios: "https://m.vk.com/audios"
       }
     end
 
@@ -59,6 +59,9 @@ module VkMusic
       ##
       # Post URL regular expression #2.
       VK_WALL_URL_POSTFIX = /.*wall(-?\d+)_(\d+)/
+      ##
+      # Audios block ID
+      VK_BLOCK_URL = /(?:section=recoms_block&type=|act=block&block=)([a-zA-Z\d]+)/
     end
 
     ##

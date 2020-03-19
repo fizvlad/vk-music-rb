@@ -196,6 +196,7 @@ module VkMusic
       end
     end
     alias_method :from_id, :get_urls
+
     ##
     # Update download URLs of audios.
     # @param audios [Array<Audio>]
@@ -205,6 +206,25 @@ module VkMusic
         a_u = audios_with_urls[i]
         a.update(from: a_u) unless a_u.nil?
       end
+    end
+
+    ##
+    # Retrieve audios from recommendations or alike pages.
+    # Specify either +url+ or +block_id+.
+    # @param url [String] URL.
+    # @param block_id [String] ID of block.
+    # @return [Array<Audio>] array of audios attached to post. Most of audios will
+    #   already have download URLs, but there might be audios which can't be resolved.
+    def block(url: nil, block_id: nil)
+      begin
+        block_id = url.match(Constants::Regex::VK_BLOCK_URL).captures.first if url
+      rescue
+        raise Exceptions::ParseError
+      end
+
+      uri = URI(Constants::URL::VK[:audios])
+      uri.query = Utility.hash_to_params({ "act" => "block", "block" => block_id })
+      audios_from_page(uri)
     end
 
     ##
