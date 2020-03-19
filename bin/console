@@ -7,4 +7,15 @@ require "vk_music"
 # with your gem easier. You can also use a different console, if you like.
 
 require "pry"
+
+print "Login:    "
+username = STDIN.gets.chomp
+
+print "Password: "
+password = STDIN.gets.chomp
+puts
+
+$client = VkMusic::Client.new(username: username, password: password)
+puts "You can now access client at $client"
+
 Pry.start
