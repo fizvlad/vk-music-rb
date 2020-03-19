@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vk_music (3.0.0)
+    vk_music (3.1.0)
       execjs (~> 2.7)
       json (~> 2.0)
       logger (~> 1.4)
@@ -17,7 +17,7 @@ GEM
     execjs (2.7.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
-    json (2.2.0)
+    json (2.3.0)
     logger (1.4.1)
     mechanize (2.7.6)
       domain_name (~> 0.5, >= 0.5.1)
