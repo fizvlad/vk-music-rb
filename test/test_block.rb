@@ -24,7 +24,7 @@ class TestVkMusic < MiniTest::Test
   end
 
   def test_recommedations
-    results = CLIENT.block(block_id: "PUldVA8FR0RzSVNUR1EICSsYNgRQVwQLNTQNE0FVAgpkR0tPFw5aSmRTS0wBB1xRdFxfQQBJ")
+    results = CLIENT.block(block_id: "PUlQVA8GR0R3W0tMF0YOBSkGGilHUQgJKxg2ElBACg8qSUVUDRZRV3NcW0UFDFlXaklcVA8WNFVxSUVUARZRV2pJWEMXDlpKZFlfVA8FXlF0WFlOBwUW")
     refute_empty(results, "There must be some music in charts")
     assert_instance_of(VkMusic::Audio, results[0], "Results must be of class Audio")
     assert(results[0].url_accessable?, "Audio must be accessable")

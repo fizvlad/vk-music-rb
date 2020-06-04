@@ -2,6 +2,16 @@ require_relative "helper"
 
 begin
   CLIENT = VkMusic::Client.new(username: ARGV[0], password: ARGV[1])
+
+  audio = CLIENT.audios(owner_id: 8024985).first
+  ID = audio.id
+  OWNER_ID = audio.owner_id
+  AH1 = audio.secret_1
+  AH2 = audio.secret_2
+
+  ID_STRING = "#{OWNER_ID}_#{ID}_#{AH1}_#{AH2}"
+  ID_ARRAY_1 = [OWNER_ID.to_i, ID.to_i, AH1, AH2]
+  ID_ARRAY_2 = [OWNER_ID.to_s, ID.to_s, AH1, AH2]
 rescue VkMusic::LoginError
   puts "Unable to login! Please check provided credetionals"
   exit
@@ -11,7 +21,7 @@ class TestVkMusic < MiniTest::Test
 
   def test_one_id
     results = CLIENT.from_id([
-      "2000202604_456242434_32f6f3df29dc8e9c71_82fbafed15ef65709b"
+      ID_STRING
     ])
     refute_empty(results, "There must be some music")
     assert_instance_of(Array, results, "Result must be an Array")
@@ -21,8 +31,8 @@ class TestVkMusic < MiniTest::Test
 
   def test_doubled_id
     results = CLIENT.from_id([
-      "2000202604_456242434_32f6f3df29dc8e9c71_82fbafed15ef65709b",
-      [2000202604, 456242434, "32f6f3df29dc8e9c71", "82fbafed15ef65709b"]
+      ID_STRING,
+      ID_ARRAY_1
     ])
     assert_equal(2, results.size, "There must be equal size result")
     refute_nil(results[0].url, "Audio must have download url")
@@ -31,8 +41,8 @@ class TestVkMusic < MiniTest::Test
 
   def test_two_id
     results = CLIENT.from_id([
-      "2000202604_456242434_32f6f3df29dc8e9c71_82fbafed15ef65709b",
-      ["2000023175", "456242595", "addd832f78d7c61b6d", "b6b14f49280d4d55f0"]
+      ID_STRING,
+      ID_ARRAY_2
     ])
     assert_equal(2, results.size, "There must be 2 audios")
     refute_nil(results[0].url, "Audio must have download url")
@@ -42,31 +52,29 @@ class TestVkMusic < MiniTest::Test
   # TODO: test with many audios
 
   def test_bad_last
-    results = CLIENT.from_id([
-      "2000202604_456242434_32f6f3df29dc8e9c71_82fbafed15ef65709b",
-      ["42", "1337", "aaaa", "aaaaaa"]
-    ])
-    assert_equal(2, results.size, "There must be 2 audios")
-    assert_instance_of(VkMusic::Audio, results[0], "Correct result of search must be of class Audio")
-    assert_nil(results[1], "Last audio got incorrect id")
+    assert_raises(VkMusic::ParseError) do
+      CLIENT.from_id([
+        ID_ARRAY_2,
+        ["42", "1337", "aaaa", "aaaaaa"]
+      ])
+    end
   end
 
   def test_bad_all
-    results = CLIENT.from_id([
-      ["42", "1337", "aaaa", "aaaaaa"],
-      "123_123_123_123"
-    ])
-    assert_equal(2, results.size, "There must be 2 audios")
-    assert_nil(results[0], "Both audios got incorrect ID")
-    assert_nil(results[1], "Both audios got incorrect ID")
+    assert_raises(VkMusic::ParseError) do
+      CLIENT.from_id([
+        ["42", "1337", "aaaa", "aaaaaa"],
+        "123_123_123_123"
+      ])
+    end
   end
 
   def test_initial_array_not_changed
     init = [
-      ["2000023175", "456242595", "addd832f78d7c61b6d", "b6b14f49280d4d55f0"]
+      ID_ARRAY_2
     ]
     CLIENT.from_id(init)
     assert_instance_of(Array, init[0], "Function must not change initial array")
   end
-  
+
 end

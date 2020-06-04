@@ -48,10 +48,11 @@ class TestVkMusic < MiniTest::Test
   end
 
   def test_playlist_large
-    pl = CLIENT.playlist(url: "https://vk.com/audio?z=audio_playlist121570739_7")
+    pl = CLIENT.playlist(url: "https://vk.com/music/playlist/-137903314_248", use_web: false)
     refute_empty(pl, "This playlist must not be empty")
-    refute_empty(pl[0].url, "Audio must have download url")
-    refute_empty(pl[-1].url, "Audio must have download url")
+    assert(pl.size > 200, "This playlist got more than 200 audios")
+    assert(pl[101].url_accessable?, "Audio must have all the data needed for getting download URL")
+    assert(pl[-1].url_accessable?, "Audio must have all the data needed for getting download URL")
   end
 
   def test_playlist_empty
