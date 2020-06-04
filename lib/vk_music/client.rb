@@ -81,7 +81,7 @@ module VkMusic
         raise Exceptions::ParseError
       end
       raise ArgumentError unless owner_id && playlist_id
-      use_web = up_to <= 200 if use_web.nil?
+      use_web ||= (up_to <= 200)
       if use_web
         playlist_web(owner_id, playlist_id, access_hash, up_to: up_to)
       else
