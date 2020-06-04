@@ -467,26 +467,7 @@ module VkMusic
     # @param up_to [Integer] if less than 0, all audios will be loaded.
     # @return [Playlist]
     def playlist_web(owner_id, playlist_id, access_hash = nil, up_to: -1)
-      # Load first page and get info
-      first_page = load_page_playlist(owner_id, playlist_id, access_hash, offset: 0)
-      begin
-        # Parse out essential data
-        title = first_page.at_css(".audioPlaylist__title").text.strip
-        subtitle = first_page.at_css(".audioPlaylist__subtitle").text.strip
-
-        footer_node = first_page.at_css(".audioPlaylist__footer")
-        if footer_node
-          footer_match = footer_node.text.strip.match(/^\d+/)
-          real_size = footer_match ? footer_match[0].to_i : 0
-        else
-          real_size = 0
-        end
-      rescue
-        raise Exceptions::ParseError
-      end
-      # Now we can be sure we are on correct page and have essential data.
-
-      first_page_audios = audios_from_page(first_page)
+      first_page_audios, title, subtitle, real_size = playlist_first_page_web(owner_id, playlist_id, access_hash || "")
 
       # Check whether need to make additional requests
       up_to = real_size if (up_to < 0 || up_to > real_size)
@@ -514,18 +495,16 @@ module VkMusic
     # @param up_to [Integer] if less than 0, all audios will be loaded.
     # @return [Playlist]
     def playlist_json(owner_id, playlist_id, access_hash, up_to: -1)
-      # Trying to parse out audios
-      first_json = load_json_playlist_section(owner_id, playlist_id, access_hash, offset: 0)
-      begin
-        first_data = first_json["data"][0]
-        first_data_audios = audios_from_data(first_data["list"])
-      rescue
-        raise Exceptions::ParseError
+      if playlist_id == -1
+        first_audios, title, subtitle, real_size = playlist_first_page_json(owner_id, playlist_id, access_hash || "")
+      else
+        first_audios, title, subtitle, real_size = playlist_first_page_web(owner_id, playlist_id, access_hash || "")
       end
+      # NOTE: We need to load first page from web to be able to unmask links in future
 
-      real_size = first_data["totalCount"]
+      # Check whether need to make additional requests
       up_to = real_size if (up_to < 0 || up_to > real_size)
-      list = first_data_audios.first(up_to)
+      list = first_audios.first(up_to)
       while list.length < up_to do
         json = load_json_playlist_section(owner_id, playlist_id, access_hash, offset: list.length)
         audios = begin
@@ -538,16 +517,67 @@ module VkMusic
 
       begin
         Playlist.new(list,
-          id: first_data["id"],
-          owner_id: first_data["owner_id"],
-          access_hash: first_data["access_hash"],
-          title: CGI.unescapeHTML(first_data["title"].to_s),
-          subtitle: CGI.unescapeHTML(first_data["subtitle"].to_s),
+          id: playlist_id,
+          owner_id: owner_id,
+          access_hash: access_hash,
+          title: title,
+          subtitle: subtitle,
           real_size: real_size
         )
       rescue
         raise Exceptions::ParseError
       end
+    end
+
+    ##
+    # Load playlist first page in web and return essential data.
+    # @note not suitable for user audios
+    # @param owner_id [Integer]
+    # @param playlist_id [Integer]
+    # @param access_hash [String, nil]
+    # @return [Array<Array, String, String, Integer>] array with audios from first page, title, subtitle and playlist real size.
+    def playlist_first_page_web(owner_id, playlist_id, access_hash)
+      first_page = load_page_playlist(owner_id, playlist_id, access_hash, offset: 0)
+      begin
+        # Parse out essential data
+        title = first_page.at_css(".audioPlaylist__title").text.strip
+        subtitle = first_page.at_css(".audioPlaylist__subtitle").text.strip
+
+        footer_node = first_page.at_css(".audioPlaylist__footer")
+        if footer_node
+          footer_match = footer_node.text.strip.match(/^\d+/)
+          real_size = footer_match ? footer_match[0].to_i : 0
+        else
+          real_size = 0
+        end
+
+        first_audios = audios_from_page(first_page)
+      rescue
+        raise Exceptions::ParseError
+      end
+      [first_audios, title, subtitle, real_size]
+    end
+
+    ##
+    # Load playlist first page in JSON and return essential data.
+    # @param owner_id [Integer]
+    # @param playlist_id [Integer]
+    # @param access_hash [String, nil]
+    # @return [Array<Array, String, String, Integer>] array with audios from first page, title, subtitle and playlist real size.
+    def playlist_first_page_json(owner_id, playlist_id, access_hash)
+      first_json = load_json_playlist_section(owner_id, playlist_id, access_hash, offset: 0)
+      begin
+        first_data = first_json["data"][0]
+        first_data_audios = audios_from_data(first_data["list"])
+      rescue
+        raise Exceptions::ParseError
+      end
+
+      real_size = first_data["totalCount"]
+      title = CGI.unescapeHTML(first_data["title"].to_s)
+      subtitle = CGI.unescapeHTML(first_data["subtitle"].to_s)
+
+      [first_data_audios, title, subtitle, real_size]
     end
 
     ##
