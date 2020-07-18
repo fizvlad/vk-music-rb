@@ -545,7 +545,9 @@ module VkMusic
 
         footer_node = first_page.at_css(".audioPlaylist__footer")
         if footer_node
-          footer_match = footer_node.text.strip.match(/^\d+/)
+          footer_text = footer_node.text.strip
+          footer_text.gsub!(/\s/, "") # Removing all whitespace to get rid of delimiters ('1 042 audios')
+          footer_match = footer_text.match(/^\d+/)
           real_size = footer_match ? footer_match[0].to_i : 0
         else
           real_size = 0
