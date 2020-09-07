@@ -153,7 +153,7 @@ module VkMusic
       else
         # Probably audios from some post
         new(
-          artist: node.at_css(".medias_audio_artist").text.strip,
+          artist: node.at_css(".medias_music_author").text.strip,
           title: Utility.plain_text(node.at_css(".medias_audio_title")).strip,
           duration: Utility.parse_duration(node.at_css(".medias_audio_dur").text)
         )
