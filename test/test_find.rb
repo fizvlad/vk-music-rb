@@ -25,6 +25,7 @@ class TestVkMusic < MiniTest::Test
     results = CLIENT.search("Sexualizer")
     refute_empty(results, "There must be some good music")
     assert_instance_of(VkMusic::Audio, results[0], "Results of search must be of class Audio")
+    assert(results[0].title.include? "Sexualizer")
     assert(results[0].url_accessable?, "Audio must be accessable")
   end
 
@@ -42,7 +43,7 @@ class TestVkMusic < MiniTest::Test
   end
 
   def test_find_unexisting_playlist
-    results = CLIENT.find("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", type: :playlist)
+    results = CLIENT.find("asdasdasdasdad1231232131asfaf", type: :playlist)
     assert_empty(results, "There must be no results for such query")
   end
 
