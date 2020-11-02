@@ -43,13 +43,12 @@ module VkMusic
     def find(query = "", type: :audio)
       raise ArgumentError if query.empty?
       uri = URI(Constants::URL::VK[:audios])
+      search_page = load_ajax(uri, { "q" => query })
       case type
       when :audio
-        uri.query = Utility.hash_to_params({ "act" => "search", "q" => query })
-        audios_from_page(uri)
+        audios_from_ajax(search_page)
       when :playlist
-        uri.query = Utility.hash_to_params({ "q" => query, "tab" => "global" })
-        urls = playlist_urls_from_page(uri)
+        urls = playlist_urls_from_page(search_page)
         urls.map { |url| playlist(url: url, up_to: 0, use_web: false) }
       else
         raise ArgumentError
@@ -363,6 +362,23 @@ module VkMusic
         raise Exceptions::ParseError, error.message, caller
       end
     end
+    ##
+    # Load response to AJAX post request.
+    # @param url [String, URI]
+    # @return [Nokogiri::XML::Document]
+    def load_ajax(url, query = {})
+      uri = URI(url) if url.class != URI
+      query["_ajax"] = 1
+      headers = { "Content-Type" => "application/x-www-form-urlencoded", "x-requested-with" => "XMLHttpRequest" }
+      VkMusic.debug("Loading #{uri} with query #{query}")
+      begin
+        page = @agent.post(uri, query, headers)
+        str = JSON.parse(page.body.strip)["data"][2]
+        Nokogiri::XML("<body>#{CGI.unescapeElement(str)}</body>")
+      rescue
+        raise Exceptions::RequestError
+      end
+    end
 
     ##
     # Load playlist web page.
@@ -454,6 +470,20 @@ module VkMusic
     def audios_from_data(data)
       begin
         data.map { |audio_data| Audio.from_data(audio_data, @id) }
+      rescue
+        raise Exceptions::ParseError
+      end
+    end
+    ##
+    # Load audios from AJAX data.
+    # @param page [Nokogiri::XML::Document]
+    # @return [Array<Audio>]
+    def audios_from_ajax(page)
+      begin
+        page.css(".audio_item.ai_has_btn").map do |elem|
+          data = JSON.parse(elem.attribute("data-audio"))
+          Audio.from_data(data, @id)
+        end
       rescue
         raise Exceptions::ParseError
       end
