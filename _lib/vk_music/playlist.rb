@@ -3,6 +3,30 @@ module VkMusic
   # VK playlist.
   class Playlist
     include Enumerable
+    ##
+    # Initialize new playlist.
+    #
+    # @param list [Array] list of audios in playlist.
+    # @param id [Integer, nil]
+    # @param owner_id [Integer, nil]
+    # @param access_hash [String, nil]
+    # @param title [String]
+    # @param subtitle [String, nil]
+    # @param real_size [Integer, nil]
+    def initialize(list, id: nil, owner_id: nil, access_hash: nil, title: '', subtitle: nil, real_size: nil)
+      raise(ArgumentError) unless list.is_a?(Array)
+
+      # Saving list
+      @list = list.dup
+
+      # Setting up attributes
+      @id = id
+      @owner_id = owner_id
+      @access_hash = access_hash
+      @title = title
+      @subtitle = subtitle
+      @real_size = real_size
+    end
 
     ##
     # @return [Integer, nil] playlist ID.
@@ -30,14 +54,15 @@ module VkMusic
     ##
     # @return [String] playlist description in Russian.
     def to_s
-      (@subtitle && !@subtitle.empty? ? "#{@subtitle} - " : "") +
-      @title +
-      (@real_size ? "(#{self.length} из #{@real_size} аудиозаписей загружено)" : " (#{self.length} аудиозаписей)")
+      (@subtitle && !@subtitle.empty? ? "#{@subtitle} - " : '') +
+        @title +
+        (@real_size ? "(#{length} из #{@real_size} аудиозаписей загружено)" : " (#{length} аудиозаписей)")
     end
+
     ##
     # @return [String] Same to {#to_s}, but also outputs list of audios.
     def pp
-      "#{to_s}:\n#{@list.map(&:pp).join("\n")}"
+      "#{self}:\n#{@list.map(&:pp).join("\n")}"
     end
 
     ##
@@ -51,6 +76,7 @@ module VkMusic
     def each(&block)
       @list.each(&block)
     end
+
     ##
     # @return [Integer] amount of audios. This can be less than real size as not all audios might be loaded.
     def length
@@ -64,34 +90,11 @@ module VkMusic
     def [](index)
       @list[index]
     end
+
     ##
     # @return [Boolean] whether no audios loaded for this playlist.
     def empty?
       @list.empty?
-    end
-
-    ##
-    # Initialize new playlist.
-    #
-    # @param list [Array] list of audios in playlist.
-    # @param id [Integer, nil]
-    # @param owner_id [Integer, nil]
-    # @param access_hash [String, nil]
-    # @param title [String]
-    # @param subtitle [String, nil]
-    # @param real_size [Integer, nil]
-    def initialize(list, id: nil, owner_id: nil, access_hash: nil, title: "", subtitle: nil, real_size: nil)
-      raise ArgumentError unless list.is_a?(Array)
-      # Saving list
-      @list = list.dup
-
-      # Setting up attributes
-      @id = id
-      @owner_id = owner_id
-      @access_hash = access_hash
-      @title = title
-      @subtitle = subtitle
-      @real_size = real_size
     end
   end
 end

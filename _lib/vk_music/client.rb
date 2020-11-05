@@ -17,8 +17,9 @@ module VkMusic
     # @param username [String] usually telephone number or email.
     # @param password [String]
     # @param user_agent [String]
-    def initialize(username: "", password: "", user_agent: Constants::DEFAULT_USER_AGENT)
-      raise ArgumentError if username.empty? || password.empty?
+    def initialize(username: '', password: '', user_agent: Constants::DEFAULT_USER_AGENT)
+      raise(ArgumentError) if username.empty? || password.empty?
+
       # Setting up client
       @agent = Mechanize.new
       @agent.user_agent = user_agent
@@ -26,7 +27,7 @@ module VkMusic
     end
 
     ##
-    #@!group Loading audios
+    # @!group Loading audios
 
     ##
     # Search for audio or playlist.
@@ -40,10 +41,11 @@ module VkMusic
     # @param type [Symbol] what to search for.
     # @return [Array<Audio>, Array<Playlist>] array with audios or playlists
     #   matching given string.
-    def find(query = "", type: :audio)
-      raise ArgumentError if query.empty?
+    def find(query = '', type: :audio)
+      raise(ArgumentError) if query.empty?
+
       uri = URI(Constants::URL::VK[:audios])
-      search_page = load_ajax(uri, { "q" => query })
+      search_page = load_ajax(uri, { 'q' => query })
       case type
       when :audio
         audios_from_ajax(search_page)
@@ -51,10 +53,10 @@ module VkMusic
         urls = playlist_urls_from_page(search_page)
         urls.map { |url| playlist(url: url, up_to: 0, use_web: false) }
       else
-        raise ArgumentError
+        raise(ArgumentError)
       end
     end
-    alias_method :search, :find
+    alias search find
 
     ##
     # Get VK playlist.
@@ -76,10 +78,11 @@ module VkMusic
     def playlist(url: nil, owner_id: nil, playlist_id: nil, access_hash: nil, up_to: Constants::MAXIMUM_PLAYLIST_SIZE, use_web: nil)
       begin
         owner_id, playlist_id, access_hash = url.match(Constants::Regex::VK_PLAYLIST_URL_POSTFIX).captures if url
-      rescue
-        raise Exceptions::ParseError
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
-      raise ArgumentError unless owner_id && playlist_id
+      raise(ArgumentError) unless owner_id && playlist_id
+
       use_web ||= (up_to <= 200)
       if use_web
         playlist_web(owner_id, playlist_id, access_hash, up_to: up_to)
@@ -131,17 +134,18 @@ module VkMusic
     def post(url: nil, owner_id: nil, post_id: nil)
       begin
         owner_id, post_id = url.match(Constants::Regex::VK_WALL_URL_POSTFIX).captures if url
-      rescue
-        raise Exceptions::ParseError
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
 
       attached = attached_audios(owner_id: owner_id, post_id: post_id)
       wall = wall(owner_id: owner_id, post_id: post_id, with_url: false)
 
-      no_link = attached.map do |a_empty|
-        # Here we just search for matching audios on wall
-        wall.find { |a| a.artist == a_empty.artist && a.title == a_empty.title } || a_empty
-      end
+      no_link =
+        attached.map do |a_empty|
+          # Here we just search for matching audios on wall
+          wall.find { |a| a.artist == a_empty.artist && a.title == a_empty.title } || a_empty
+        end
       loaded_audios = from_id(no_link)
 
       loaded_audios.map.with_index { |el, i| el || no_link[i] }
@@ -154,31 +158,32 @@ module VkMusic
     #   without URL if wasn't able to get it for audio or +nil+ if
     #   matching element can't be retrieved for array or string.
     def get_urls(args)
-      args_formatted = args.map do |el|
-        case el
-        when Array
-          el.join("_")
-        when Audio
-          el.full_id
-        when String
-          el # Do not change
-        else
-          raise ArgumentError
+      args_formatted =
+        args.map do |el|
+          case el
+          when Array
+            el.join('_')
+          when Audio
+            el.full_id
+          when String
+            el # Do not change
+          else
+            raise(ArgumentError)
+          end
         end
-      end
       args_formatted.compact.uniq # Not dealing with nil or doubled IDs
 
       audios = []
       begin
         args_formatted.each_slice(10) do |subarray|
           json = load_json_audios_by_id(subarray)
-          subresult = audios_from_data(json["data"][0].to_a)
+          subresult = audios_from_data(json['data'][0].to_a)
           audios.concat(subresult)
         end
-      rescue
-        raise Exceptions::ParseError
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
-      VkMusic.debug("Loaded audios from ids: #{audios.map(&:pp).join(", ")}")
+      VkMusic.debug("Loaded audios from ids: #{audios.map(&:pp).join(', ')}")
 
       args.map do |el|
         case el
@@ -186,15 +191,16 @@ module VkMusic
           audios.find { |audio| audio.owner_id == el[0].to_i && audio.id == el[1].to_i }
         when Audio
           next el if el.full_id.nil? # Audio was skipped
+
           audios.find { |audio| audio.owner_id == el.owner_id && audio.id == el.id }
         when String
-          audios.find { |audio| [audio.owner_id, audio.id] == el.split("_").first(2).map(&:to_i) }
+          audios.find { |audio| [audio.owner_id, audio.id] == el.split('_').first(2).map(&:to_i) }
         else
           nil # This shouldn't happen actually
         end
       end
     end
-    alias_method :from_id, :get_urls
+    alias from_id get_urls
 
     ##
     # Update download URLs of audios.
@@ -217,12 +223,12 @@ module VkMusic
     def block(url: nil, block_id: nil)
       begin
         block_id = url.match(Constants::Regex::VK_BLOCK_URL).captures.first if url
-      rescue
-        raise Exceptions::ParseError
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
 
       uri = URI(Constants::URL::VK[:audios])
-      uri.query = Utility.hash_to_params({ "act" => "block", "block" => block_id })
+      uri.query = Utility.hash_to_params({ 'act' => 'block', 'block' => block_id })
       audios_from_page(uri)
     end
 
@@ -247,25 +253,25 @@ module VkMusic
         str.match(/-?\d+/).to_s.to_i # Numbers with sign
       when Constants::Regex::VK_PREFIXED_ID_STR
         id = str.match(/\d+/).to_s.to_i # Just numbers. Sign needed
-        id *= -1 unless str.start_with?("id")
+        id *= -1 unless str.start_with?('id')
         id
       when Constants::Regex::VK_CUSTOM_ID
         url = "#{Constants::URL::VK[:home]}/#{str}"
         begin
           page = load_page(url)
         rescue Exceptions::RequestError
-          raise Exceptions::ParseError
+          raise(Exceptions::ParseError)
         end
 
-        raise Exceptions::ParseError unless page.at_css(".PageBlock .owner_panel")
+        raise(Exceptions::ParseError) unless page.at_css('.PageBlock .owner_panel')
 
         begin
           page.link_with(href: Constants::Regex::VK_HREF_ID_CONTAINING).href.slice(Constants::Regex::VK_ID).to_i # Numbers with sign
-        rescue
-          raise Exceptions::ParseError
+        rescue StandardError
+          raise(Exceptions::ParseError)
         end
       else
-        raise Exceptions::ParseError
+        raise(Exceptions::ParseError)
       end
     end
 
@@ -278,28 +284,30 @@ module VkMusic
     # @param owner_id [Integer] numerical ID of wall owner.
     # @return [Integer, nil] ID of last post or +nil+ if there are no posts.
     def last_post_id(url: nil, owner_id: nil)
-      path = if url
-        url.match(Constants::Regex::VK_URL)[1]
-      else
-        path = "#{owner_id < 0 ? "club" : "id"}#{owner_id.abs}"
-      end
-      raise ArgumentError, "Requesting this method for id0 is forbidden", caller if path == "id0"
+      path =
+        if url
+          url.match(Constants::Regex::VK_URL)[1]
+        else
+          path = "#{owner_id < 0 ? 'club' : 'id'}#{owner_id.abs}"
+        end
+      raise(ArgumentError, 'Requesting this method for id0 is forbidden', caller) if path == 'id0'
 
       url = "#{Constants::URL::VK[:home]}/#{path}"
       page = load_page(url)
 
       # Ensure this isn't some random vk page
-      raise Exceptions::ParseError unless page.at_css(".PageBlock .owner_panel")
+      raise(Exceptions::ParseError) unless page.at_css('.PageBlock .owner_panel')
 
       begin
-        posts = page.css(".wall_posts > .wall_item .anchor")
-        posts_ids = posts.map do |post|
-          post ? post.attribute("name").to_s.match(Constants::Regex::VK_POST_URL_POSTFIX)[2].to_i : 0
-        end
+        posts = page.css('.wall_posts > .wall_item .anchor')
+        posts_ids =
+          posts.map do |post|
+            post ? post.attribute('name').to_s.match(Constants::Regex::VK_POST_URL_POSTFIX)[2].to_i : 0
+          end
         # To avoid checking id of pinned post need to take maximum id.
-        return posts_ids.max
-      rescue
-        raise Exceptions::ParseError
+        posts_ids.max
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
     end
 
@@ -313,22 +321,23 @@ module VkMusic
     def attached_audios(url: nil, owner_id: nil, post_id: nil)
       begin
         owner_id, post_id = url.match(Constants::Regex::VK_WALL_URL_POSTFIX).captures if url
-      rescue
-        raise Exceptions::ParseError
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
 
       url = "#{Constants::URL::VK[:wall]}#{owner_id}_#{post_id}"
       begin
         page = load_page(url)
       rescue Exceptions::RequestError
-        raise Exceptions::ParseError
+        raise(Exceptions::ParseError)
       end
 
-      raise Exceptions::ParseError unless page.css(".service_msg_error").empty?
+      raise(Exceptions::ParseError) unless page.css('.service_msg_error').empty?
+
       begin
-        page.css(".wi_body > .pi_medias .medias_audio").map { |e| Audio.from_node(e, @id) }
-      rescue
-        raise Exceptions::ParseError
+        page.css('.wi_body > .pi_medias .medias_audio').map { |e| Audio.from_node(e, @id) }
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
     end
 
@@ -346,10 +355,11 @@ module VkMusic
       VkMusic.debug("Loading #{uri}")
       begin
         @agent.get(uri)
-      rescue
-        raise Exceptions::RequestError
+      rescue StandardError
+        raise(Exceptions::RequestError)
       end
     end
+
     ##
     # Load JSON from web page.
     # @param url [String, URI]
@@ -358,25 +368,26 @@ module VkMusic
       page = load_page(url)
       begin
         JSON.parse(page.body.strip)
-      rescue Exception => error
-        raise Exceptions::ParseError, error.message, caller
+      rescue Exception => e
+        raise(Exceptions::ParseError, e.message, caller)
       end
     end
+
     ##
     # Load response to AJAX post request.
     # @param url [String, URI]
     # @return [Nokogiri::XML::Document]
     def load_ajax(url, query = {})
       uri = URI(url) if url.class != URI
-      query["_ajax"] = 1
-      headers = { "Content-Type" => "application/x-www-form-urlencoded", "x-requested-with" => "XMLHttpRequest" }
+      query['_ajax'] = 1
+      headers = { 'Content-Type' => 'application/x-www-form-urlencoded', 'x-requested-with' => 'XMLHttpRequest' }
       VkMusic.debug("Loading #{uri} with query #{query}")
       begin
         page = @agent.post(uri, query, headers)
-        str = JSON.parse(page.body.strip)["data"][2]
+        str = JSON.parse(page.body.strip)['data'][2]
         Nokogiri::XML("<body>#{CGI.unescapeElement(str)}</body>")
-      rescue
-        raise Exceptions::RequestError
+      rescue StandardError
+        raise(Exceptions::RequestError)
       end
     end
 
@@ -390,12 +401,13 @@ module VkMusic
     def load_page_playlist(owner_id, playlist_id, access_hash = nil, offset: 0)
       uri = URI(Constants::URL::VK[:audios])
       uri.query = Utility.hash_to_params({
-        act: "audio_playlist#{owner_id}_#{playlist_id}",
-        access_hash: access_hash.to_s,
-        offset: offset
-      })
+                                           act: "audio_playlist#{owner_id}_#{playlist_id}",
+                                           access_hash: access_hash.to_s,
+                                           offset: offset
+                                         })
       load_page(uri)
     end
+
     ##
     # Load JSON playlist section with +load_section+ request.
     # @param owner_id [Integer]
@@ -406,14 +418,14 @@ module VkMusic
     def load_json_playlist_section(owner_id, playlist_id, access_hash = nil, offset: 0)
       uri = URI(Constants::URL::VK[:audios])
       uri.query = Utility.hash_to_params({
-        act: "load_section",
-        owner_id: owner_id,
-        playlist_id: playlist_id,
-        access_hash: access_hash.to_s,
-        type: "playlist",
-        offset: offset,
-        utf8: true
-      })
+                                           act: 'load_section',
+                                           owner_id: owner_id,
+                                           playlist_id: playlist_id,
+                                           access_hash: access_hash.to_s,
+                                           type: 'playlist',
+                                           offset: offset,
+                                           utf8: true
+                                         })
       load_json(uri)
     end
 
@@ -424,12 +436,13 @@ module VkMusic
     def load_json_audios_by_id(ids)
       uri = URI(Constants::URL::VK[:audios])
       uri.query = Utility.hash_to_params({
-        act: "reload_audio",
-        ids: ids,
-        utf8: true
-      })
+                                           act: 'reload_audio',
+                                           ids: ids,
+                                           utf8: true
+                                         })
       load_json(uri)
     end
+
     ##
     # Load JSON audios with +load_section+ from wall.
     # @param owner_id [Integer]
@@ -438,13 +451,13 @@ module VkMusic
     def load_json_audios_wall(owner_id, post_id)
       uri = URI(Constants::URL::VK[:audios])
       uri.query = Utility.hash_to_params({
-        act: "load_section",
-        owner_id: owner_id,
-        post_id: post_id,
-        type: "wall",
-        wall_type: "own",
-        utf8: true
-      })
+                                           act: 'load_section',
+                                           owner_id: owner_id,
+                                           post_id: post_id,
+                                           type: 'wall',
+                                           wall_type: 'own',
+                                           utf8: true
+                                         })
       load_json(uri)
     end
 
@@ -455,38 +468,36 @@ module VkMusic
     def audios_from_page(obj)
       page = obj.is_a?(Mechanize::Page) ? obj : load_page(obj)
       begin
-        page.css(".audio_item.ai_has_btn").map do |elem|
-          data = JSON.parse(elem.attribute("data-audio"))
+        page.css('.audio_item.ai_has_btn').map do |elem|
+          data = JSON.parse(elem.attribute('data-audio'))
           Audio.from_data(data, @id)
         end
-      rescue
-        raise Exceptions::ParseError
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
     end
+
     ##
     # Load audios from JSON data.
     # @param data [Hash]
     # @return [Array<Audio>]
     def audios_from_data(data)
-      begin
-        data.map { |audio_data| Audio.from_data(audio_data, @id) }
-      rescue
-        raise Exceptions::ParseError
-      end
+      data.map { |audio_data| Audio.from_data(audio_data, @id) }
+    rescue StandardError
+      raise(Exceptions::ParseError)
     end
+
     ##
     # Load audios from AJAX data.
     # @param page [Nokogiri::XML::Document]
     # @return [Array<Audio>]
     def audios_from_ajax(page)
-      begin
-        page.css(".audio_item.ai_has_btn").map do |elem|
-          data = JSON.parse(elem.attribute("data-audio"))
-          Audio.from_data(data, @id)
-        end
-      rescue
-        raise Exceptions::ParseError
+      page.css('.audio_item.ai_has_btn').map do |elem|
+        data = JSON.parse(elem.attribute('data-audio'))
+        Audio.from_data(data, @id)
       end
+    rescue StandardError
+      raise(Exceptions::ParseError)
     end
 
     ##
@@ -497,17 +508,18 @@ module VkMusic
     # @param up_to [Integer] if less than 0, all audios will be loaded.
     # @return [Playlist]
     def playlist_web(owner_id, playlist_id, access_hash = nil, up_to: -1)
-      first_page_audios, title, subtitle, real_size = playlist_first_page_web(owner_id, playlist_id, access_hash || "")
+      first_page_audios, title, subtitle, real_size = playlist_first_page_web(owner_id, playlist_id, access_hash || '')
 
       # Check whether need to make additional requests
-      up_to = real_size if (up_to < 0 || up_to > real_size)
+      up_to = real_size if up_to < 0 || up_to > real_size
       list = first_page_audios.first(up_to)
-      while list.length < up_to do
+      while list.length < up_to
         playlist_page = load_page_playlist(owner_id, playlist_id, access_hash, offset: list.length)
         list.concat(audios_from_page(playlist_page).first(up_to - list.length))
       end
 
-      Playlist.new(list,
+      Playlist.new(
+        list,
         id: id,
         owner_id: owner_id,
         access_hash: access_hash,
@@ -526,27 +538,29 @@ module VkMusic
     # @return [Playlist]
     def playlist_json(owner_id, playlist_id, access_hash, up_to: -1)
       if playlist_id == -1
-        first_audios, title, subtitle, real_size = playlist_first_page_json(owner_id, playlist_id, access_hash || "")
+        first_audios, title, subtitle, real_size = playlist_first_page_json(owner_id, playlist_id, access_hash || '')
       else
-        first_audios, title, subtitle, real_size = playlist_first_page_web(owner_id, playlist_id, access_hash || "")
+        first_audios, title, subtitle, real_size = playlist_first_page_web(owner_id, playlist_id, access_hash || '')
       end
       # NOTE: We need to load first page from web to be able to unmask links in future
 
       # Check whether need to make additional requests
-      up_to = real_size if (up_to < 0 || up_to > real_size)
+      up_to = real_size if up_to < 0 || up_to > real_size
       list = first_audios.first(up_to)
-      while list.length < up_to do
+      while list.length < up_to
         json = load_json_playlist_section(owner_id, playlist_id, access_hash, offset: list.length)
-        audios = begin
-          audios_from_data(json["data"][0]["list"])
-        rescue
-          raise Exceptions::ParseError
-        end
+        audios =
+          begin
+            audios_from_data(json['data'][0]['list'])
+          rescue StandardError
+            raise(Exceptions::ParseError)
+          end
         list.concat(audios.first(up_to - list.length))
       end
 
       begin
-        Playlist.new(list,
+        Playlist.new(
+          list,
           id: playlist_id,
           owner_id: owner_id,
           access_hash: access_hash,
@@ -554,8 +568,8 @@ module VkMusic
           subtitle: subtitle,
           real_size: real_size
         )
-      rescue
-        raise Exceptions::ParseError
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
     end
 
@@ -570,13 +584,13 @@ module VkMusic
       first_page = load_page_playlist(owner_id, playlist_id, access_hash, offset: 0)
       begin
         # Parse out essential data
-        title = first_page.at_css(".audioPlaylist__title").text.strip
-        subtitle = first_page.at_css(".audioPlaylist__subtitle").text.strip
+        title = first_page.at_css('.audioPlaylist__title').text.strip
+        subtitle = first_page.at_css('.audioPlaylist__subtitle').text.strip
 
-        footer_node = first_page.at_css(".audioPlaylist__footer")
+        footer_node = first_page.at_css('.audioPlaylist__footer')
         if footer_node
           footer_text = footer_node.text.strip
-          footer_text.gsub!(/\s/, "") # Removing all whitespace to get rid of delimiters ('1 042 audios')
+          footer_text.gsub!(/\s/, '') # Removing all whitespace to get rid of delimiters ('1 042 audios')
           footer_match = footer_text.match(/^\d+/)
           real_size = footer_match ? footer_match[0].to_i : 0
         else
@@ -584,8 +598,8 @@ module VkMusic
         end
 
         first_audios = audios_from_page(first_page)
-      rescue
-        raise Exceptions::ParseError
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
       [first_audios, title, subtitle, real_size]
     end
@@ -599,15 +613,15 @@ module VkMusic
     def playlist_first_page_json(owner_id, playlist_id, access_hash)
       first_json = load_json_playlist_section(owner_id, playlist_id, access_hash, offset: 0)
       begin
-        first_data = first_json["data"][0]
-        first_data_audios = audios_from_data(first_data["list"])
-      rescue
-        raise Exceptions::ParseError
+        first_data = first_json['data'][0]
+        first_data_audios = audios_from_data(first_data['list'])
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
 
-      real_size = first_data["totalCount"]
-      title = CGI.unescapeHTML(first_data["title"].to_s)
-      subtitle = CGI.unescapeHTML(first_data["subtitle"].to_s)
+      real_size = first_data['totalCount']
+      title = CGI.unescapeHTML(first_data['title'].to_s)
+      subtitle = CGI.unescapeHTML(first_data['subtitle'].to_s)
 
       [first_data_audios, title, subtitle, real_size]
     end
@@ -619,9 +633,9 @@ module VkMusic
     def playlist_urls_from_page(obj)
       page = obj.is_a?(Mechanize::Page) ? obj : load_page(obj)
       begin
-        page.css(".AudioBlock_music_playlists .AudioPlaylistSlider .al_playlist").map { |elem| elem.attribute("href").to_s }
-      rescue
-        raise Exceptions::ParseError
+        page.css('.AudioBlock_music_playlists .AudioPlaylistSlider .al_playlist').map { |elem| elem.attribute('href').to_s }
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
     end
 
@@ -635,15 +649,15 @@ module VkMusic
     def wall_json(owner_id, post_id, up_to: 91, with_url: false)
       if up_to < 0 || up_to > 91
         up_to = 91
-        VkMusic.warn("Current implementation of this method is not able to return more than 91 audios from wall.")
+        VkMusic.warn('Current implementation of this method is not able to return more than 91 audios from wall.')
       end
 
       json = load_json_audios_wall(owner_id, post_id)
       begin
-        data = json["data"][0]
-        audios = audios_from_data(data["list"]).first(up_to)
-      rescue
-        raise Exceptions::ParseError
+        data = json['data'][0]
+        audios = audios_from_data(data['list']).first(up_to)
+      rescue StandardError
+        raise(Exceptions::ParseError)
       end
       with_url ? from_id(audios) : audios
     end
@@ -651,7 +665,7 @@ module VkMusic
     ##
     # Login to VK.
     def login(username, password)
-      VkMusic.debug("Logging in.")
+      VkMusic.debug('Logging in.')
       # Loading login page
       homepage = load_page(Constants::URL::VK[:login])
       # Submitting login form
@@ -661,7 +675,9 @@ module VkMusic
       after_login = @agent.submit(login_form)
 
       # Checking whether logged in
-      raise Exceptions::LoginError, "Unable to login. Redirected to #{after_login.uri.to_s}", caller unless after_login.uri.to_s == Constants::URL::VK[:feed]
+      unless after_login.uri.to_s == Constants::URL::VK[:feed]
+        raise(Exceptions::LoginError, "Unable to login. Redirected to #{after_login.uri}", caller)
+      end
 
       # Parsing information about this profile
       profile = load_page(Constants::URL::VK[:profile])
