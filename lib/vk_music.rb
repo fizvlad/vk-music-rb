@@ -1,9 +1,25 @@
 # frozen_string_literal: true
 
+require 'mechanize'
 require 'json'
+require 'logger'
 
 # Main module
-module VkMusic; end
+module VkMusic
+  @@log = Logger.new($stdout)
+
+  # Logger of library classes
+  # @return [Logger]
+  def self.log
+    @@log
+  end
+
+  # Replace logger
+  # @param logger [Logger]
+  def self.log=(logger)
+    @@log = logger
+  end
+end
 
 require_relative 'vk_music/version'
 require_relative 'vk_music/utility'
