@@ -9,6 +9,9 @@ group :test, :development do
   # Debugging console
   gem 'pry'
 
+  # Another debugging console
+  gem 'byebug'
+
   # The thing, forcing you to write good code
   gem 'rubocop', require: false
 
