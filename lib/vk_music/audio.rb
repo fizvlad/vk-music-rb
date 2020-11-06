@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module VkMusic
-  # Class representing VK audio.
+  # Class representing VK audio
   class Audio
     # @return [Integer, nil] ID of audio
     attr_reader :id
@@ -40,109 +40,6 @@ module VkMusic
       @url_encoded = url_encoded
       @url = url
       @client_id = client_id
-    end
-
-    # Parses audio from +Nokogiri::XML::Node+ or data +Array+
-    # @param from [Nokogiri::XML::Node, Array]
-    # @param client_id [Integer]
-    # @return [Audio]
-    def self.parse(from, client_id)
-      case from
-      when Nokogiri::XML::Node
-        AudioNodeParser.call(from, client_id)
-      when Array
-        AudioDataParser.call(from, client_id)
-      else
-        raise(ArgumentError, "Bad data type provided: #{from.class}")
-      end
-    end
-
-    ##
-    # Read decoded download URL.
-    #
-    # If link was already decoded, returns cached value. Else decodes existing link.
-    # If no link can be provided, returns +nil+.
-    # @return [String, nil] decoded download URL or +nil+ if not available.
-    def url
-      if url_cached?
-        @url
-      elsif @url_encoded && @client_id
-        @url = VkMusic::LinkDecoder.unmask_link(@url_encoded, @client_id)
-      else
-        @url # => nil
-      end
-    end
-    ##
-    # @return [String, nil] encoded download URL.
-    attr_reader :url_encoded
-    ##
-    # @return [Integer, nil] user ID which should be use for decoding.
-    attr_reader :client_id
-
-    ##
-    # @return [String, nil] full ID of audio or +nil+ if some of components are missing.
-    def full_id
-      return unless @owner_id && @id && @secret1 && @secret2
-
-      "#{@owner_id}_#{@id}_#{@secret1}_#{@secret2}"
-    end
-
-    ##
-    # @return [Boolean] whether decoded URL is already cached.
-    def url_cached?
-      !!@url
-    end
-
-    ##
-    # @return [Boolean] whether able to get download URL without web requests.
-    def url_available?
-      !!(url_cached? || (@url_encoded && @client_id))
-    end
-
-    ##
-    # @return [Boolean] whether it's possible to get download URL with {Client#from_id}.
-    def url_accessable?
-      !!(@id && @owner_id && @secret1 && @secret2)
-    end
-
-    ##
-    # @return [String] information about audio.
-    def to_s
-      "#{@artist} - #{@title} [#{Utility.format_seconds(@duration)}]"
-    end
-
-    ##
-    # @return [String] extended information about audio.
-    def pp
-      "#{self} (#{
-        if url_available?
-          'Able to get decoded URL right away'
-        elsif url_accessable?
-          'Able to retrieve URL with request'
-        else
-          'URL not accessable'
-        end
-      })"
-    end
-
-    ##
-    # Update audio from another audio or from provided hash.
-    # @param from [Audio, nil]
-    # @param url [String, nil]
-    # @param url_encoded [String, nil]
-    # @param client_id [String, nil]
-    # @return [self]
-    def update(from: nil, url: nil, url_encoded: nil, client_id: nil)
-      if from
-        url_encoded = from.url_encoded
-        url = from.url_cached? ? from.url : nil
-        client_id = from.client_id
-      end
-
-      @url_encoded = url_encoded unless url_encoded.nil?
-      @url = url unless url.nil?
-      @client_id = client_id unless client_id.nil?
-      self
     end
   end
 end
