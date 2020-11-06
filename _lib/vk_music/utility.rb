@@ -55,24 +55,5 @@ module VkMusic
       end
       qs
     end
-
-    ##
-    # Get content of text children of provided Node.
-    # @param node [Nokogiri::Xml::Node]
-    # @return [String]
-    def self.plain_text(node)
-      node.children.select(&:text?).map(&:text).join('')
-    end
-
-    ##
-    # Turn human readable track length to its size in seconds.
-    # @param str [String] string in format "HH:MM:SS" or something alike (+/d++ Regex selector is used).
-    # @return [Integer] amount of seconds.
-    def self.parse_duration(str)
-      str.scan(/\d+/)
-         .map(&:to_i)
-         .reverse
-         .each_with_index.reduce(0) { |m, arr| m + arr[0] * 60**arr[1] }
-    end
   end
 end

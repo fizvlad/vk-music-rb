@@ -19,3 +19,9 @@ Lint/ConstantResolution:
   Enabled: false
 Style/Copyright:
   Enabled: false
+Metrics/ParameterLists:
+  Enabled: false
+Layout/FirstMethodParameterLineBreak:
+  Enabled: false
+Style/MethodCallWithArgsParentheses:
+  Enabled: false
