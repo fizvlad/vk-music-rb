@@ -6,4 +6,6 @@
 /doc/
 /pkg/
 /spec/reports/
+/spec_data/*
+!/spec_data/README.md
 /tmp/
