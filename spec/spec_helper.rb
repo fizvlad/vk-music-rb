@@ -3,6 +3,8 @@
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 require 'vk_music'
 require 'byebug'
+require 'dotenv'
+Dotenv.load
 
 # Read spec_data file.
 # @param name [String]

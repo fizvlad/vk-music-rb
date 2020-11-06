@@ -23,4 +23,7 @@ group :test, :development do
 
   # Docs
   gem 'yard', require: false
+
+  # .env support
+  gem 'dotenv'
 end
