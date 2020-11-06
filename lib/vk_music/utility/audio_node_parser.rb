@@ -10,30 +10,39 @@ module VkMusic
       def call(node, client_id)
         input = node.at_css('input')
         if input
-          url_encoded = input.attribute('value').to_s
-          url_encoded = nil if url_encoded == Constants::URL::VK[:audio_unavailable] || url_encoded.empty?
-          id_array = node.attribute('data-id').to_s.split('_')
-
-          new(
-            id: id_array[1].to_i,
-            owner_id: id_array[0].to_i,
-            artist: node.at_css('.ai_artist').text.strip,
-            title: node.at_css('.ai_title').text.strip,
-            duration: node.at_css('.ai_dur').attribute('data-dur').to_s.to_i,
-            url_encoded: url_encoded,
-            url: nil,
-            client_id: client_id
-          )
+          parse_input(input, node, client_id)
         else
-          new(
-            artist: node.at_css('.medias_music_author').text.strip,
-            title: Utility.plain_text(node.at_css('.medias_audio_title')).strip,
-            duration: Utility.parse_duration(node.at_css('.medias_audio_dur').text)
-          )
+          parse_post(node, client_id)
         end
       end
 
       private
+
+      def parse_input(input, node, client_id)
+        id_array = get_id_array(node)
+        artist, title, duration = get_main_data(node)
+
+        new(id: Integer(id_array[1], 10), owner_id: Integer(id_array[0], 10),
+            artist: artist, title: title, duration: duration,
+            url_encoded: get_encoded_url(input), url: nil, client_id: client_id)
+      end
+
+      def get_encoded_url(input)
+        url_encoded = input.attribute('value').to_s
+        url_encoded = nil if url_encoded.empty? || url_encoded == Constants::URL::VK[:audio_unavailable]
+
+        url_encoded
+      end
+
+      def get_id_array(node)
+        node.attribute('data-id').to_s.split('_')
+      end
+
+      def get_main_data(node)
+        node.at_css('.ai_artist').text.strip,
+        node.at_css('.ai_title').text.strip,
+        Integer(node.at_css('.ai_dur').attribute('data-dur').to_s, 10)
+      end
 
       def parse_post(node, client_id)
         artist = node.at_css('.medias_music_author').text.strip
