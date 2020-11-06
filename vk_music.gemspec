@@ -33,4 +33,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency('logger', '~> 1.4')
   spec.add_runtime_dependency('mechanize', '~> 2.7')
   spec.add_runtime_dependency('net-http-persistent', '2.9.4')
+  spec.add_runtime_dependency('json', '~> 2.3')
 end
