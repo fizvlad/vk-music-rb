@@ -23,10 +23,15 @@ Layout/EndOfLine:
   Enabled: false
 Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
+Layout/FirstHashElementIndentation:
+  Enabled: false
 Lint/ConstantResolution:
   Enabled: false
 Metrics/ParameterLists:
   Enabled: false
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*_spec.rb'
 Style/MethodCallWithArgsParentheses:
   Enabled: false
 Style/Copyright:
@@ -34,4 +39,6 @@ Style/Copyright:
 Style/ClassVars:
   Enabled: false
 Style/MissingElse:
+  Enabled: false
+Style/StringHashKeys:
   Enabled: false
