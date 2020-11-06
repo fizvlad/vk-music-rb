@@ -21,6 +21,8 @@ Layout/MultilineMethodArgumentLineBreaks:
   Enabled: false
 Layout/EndOfLine:
   Enabled: false
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
 Lint/ConstantResolution:
   Enabled: false
 Metrics/ParameterLists:
@@ -28,4 +30,8 @@ Metrics/ParameterLists:
 Style/MethodCallWithArgsParentheses:
   Enabled: false
 Style/Copyright:
+  Enabled: false
+Style/ClassVars:
+  Enabled: false
+Style/MissingElse:
   Enabled: false
