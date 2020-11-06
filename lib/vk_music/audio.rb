@@ -36,7 +36,7 @@ module VkMusic
       @secret2 = secret2
       @artist = artist.to_s.strip
       @title = title.to_s.strip
-      @duration = Integer(duration, 10)
+      @duration = duration
       @url_encoded = url_encoded
       @url = url
       @client_id = client_id
