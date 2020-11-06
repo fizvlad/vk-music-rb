@@ -10,7 +10,7 @@ module VkMusic
     attr_reader :owner_id
     ##
     # @return [String, nil] part of secret hash which used when using +act=reload_audio+.
-    attr_reader :secret_1, :secret_2
+    attr_reader :secret1, :secret2
     ##
     # @return [String] name of artist.
     attr_reader :artist
@@ -25,20 +25,20 @@ module VkMusic
     # Initialize new audio.
     # @param id [Integer, nil]
     # @param owner_id [Integer, nil]
-    # @param secret_1 [String, nil]
-    # @param secret_2 [String, nil]
+    # @param secret1 [String, nil]
+    # @param secret2 [String, nil]
     # @param artist [String]
     # @param title [String]
     # @param duration [Integer]
     # @param url_encoded [String, nil]
     # @param url [String, nil]
     # @param client_id [Integer, nil]
-    def initialize(id: nil, owner_id: nil, secret_1: nil, secret_2: nil, artist: '', title: '', duration: 0, url_encoded: nil, url: nil, client_id: nil)
+    def initialize(id: nil, owner_id: nil, secret1: nil, secret2: nil, artist: '', title: '', duration: 0, url_encoded: nil, url: nil, client_id: nil)
       @id = id
       @owner_id = owner_id
-      @secret_1 = secret_1
-      @secret_2 = secret_2
-      @secret_1 = @secret_2 if @secret_1.nil? || @secret_1.empty?
+      @secret1 = secret1
+      @secret2 = secret2
+      @secret1 = @secret2 if @secret1.nil? || @secret1.empty?
       @artist = artist.strip
       @title = title.strip
       @duration = duration
@@ -93,8 +93,8 @@ module VkMusic
       new(
         id: data[0].to_i,
         owner_id: data[1].to_i,
-        secret_1: secrets[3],
-        secret_2: secrets[5],
+        secret1: secrets[3],
+        secret2: secrets[5],
         artist: CGI.unescapeHTML(data[4]),
         title: CGI.unescapeHTML(data[3]),
         duration: data[5].to_i,
@@ -129,9 +129,9 @@ module VkMusic
     ##
     # @return [String, nil] full ID of audio or +nil+ if some of components are missing.
     def full_id
-      return unless @owner_id && @id && @secret_1 && @secret_2
+      return unless @owner_id && @id && @secret1 && @secret2
 
-      "#{@owner_id}_#{@id}_#{@secret_1}_#{@secret_2}"
+      "#{@owner_id}_#{@id}_#{@secret1}_#{@secret2}"
     end
 
     ##
@@ -149,7 +149,7 @@ module VkMusic
     ##
     # @return [Boolean] whether it's possible to get download URL with {Client#from_id}.
     def url_accessable?
-      !!(@id && @owner_id && @secret_1 && @secret_2)
+      !!(@id && @owner_id && @secret1 && @secret2)
     end
 
     ##

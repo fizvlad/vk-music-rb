@@ -6,8 +6,8 @@ begin
   audio = CLIENT.audios(owner_id: 8_024_985).first
   ID = audio.id
   OWNER_ID = audio.owner_id
-  AH1 = audio.secret_1
-  AH2 = audio.secret_2
+  AH1 = audio.secret1
+  AH2 = audio.secret2
 
   ID_STRING = "#{OWNER_ID}_#{ID}_#{AH1}_#{AH2}".freeze
   ID_ARRAY_1 = [OWNER_ID.to_i, ID.to_i, AH1, AH2].freeze

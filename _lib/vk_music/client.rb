@@ -153,7 +153,7 @@ module VkMusic
 
     ##
     # Get audios with download URLs by their IDs and secrets.
-    # @param args [Array<Audio, Array<(owner_id, audio_id, secret_1, secret_2)>, "#{owner_id}_#{id}_#{secret_1}_#{secret_2}">]
+    # @param args [Array<Audio, Array<(owner_id, audio_id, secret1, secret2)>, "#{owner_id}_#{id}_#{secret1}_#{secret2}">]
     # @return [Array<Audio, nil>] array of: audio with download URLs or audio
     #   without URL if wasn't able to get it for audio or +nil+ if
     #   matching element can't be retrieved for array or string.
