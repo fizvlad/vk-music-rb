@@ -13,15 +13,19 @@ AllCops:
   TargetRubyVersion: 2.7
   EnabledByDefault: true
 
+Layout/FirstMethodParameterLineBreak:
+  Enabled: false
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: false
+Layout/MultilineMethodArgumentLineBreaks:
+  Enabled: false
 Layout/EndOfLine:
   Enabled: false
 Lint/ConstantResolution:
   Enabled: false
-Style/Copyright:
-  Enabled: false
 Metrics/ParameterLists:
   Enabled: false
-Layout/FirstMethodParameterLineBreak:
-  Enabled: false
 Style/MethodCallWithArgsParentheses:
+  Enabled: false
+Style/Copyright:
   Enabled: false
