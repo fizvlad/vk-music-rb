@@ -51,35 +51,10 @@ module VkMusic
       when Nokogiri::XML::Node
         AudioNodeParser.call(from, client_id)
       when Array
-        # TODO
+        AudioDataParser.call(from, client_id)
       else
         raise(ArgumentError, "Bad data type provided: #{from.class}")
       end
-    end
-
-    ##
-    # Initialize new audio from VK data array.
-    # @param data [Array]
-    # @param client_id [Integer]
-    # @return [Audio]
-    def self.from_data(data, client_id)
-      url_encoded = data[2].to_s
-      url_encoded = nil if url_encoded.empty?
-
-      secrets = data[13].to_s.split('/')
-
-      new(
-        id: data[0].to_i,
-        owner_id: data[1].to_i,
-        secret_1: secrets[3],
-        secret_2: secrets[5],
-        artist: CGI.unescapeHTML(data[4]),
-        title: CGI.unescapeHTML(data[3]),
-        duration: data[5].to_i,
-        url_encoded: url_encoded,
-        url: nil,
-        client_id: client_id
-      )
     end
 
     ##
@@ -107,9 +82,9 @@ module VkMusic
     ##
     # @return [String, nil] full ID of audio or +nil+ if some of components are missing.
     def full_id
-      return unless @owner_id && @id && @secret_1 && @secret_2
+      return unless @owner_id && @id && @secret1 && @secret2
 
-      "#{@owner_id}_#{@id}_#{@secret_1}_#{@secret_2}"
+      "#{@owner_id}_#{@id}_#{@secret1}_#{@secret2}"
     end
 
     ##
@@ -127,7 +102,7 @@ module VkMusic
     ##
     # @return [Boolean] whether it's possible to get download URL with {Client#from_id}.
     def url_accessable?
-      !!(@id && @owner_id && @secret_1 && @secret_2)
+      !!(@id && @owner_id && @secret1 && @secret2)
     end
 
     ##
