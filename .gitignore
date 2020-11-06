@@ -1,5 +1,6 @@
 /.byebug_history
 /.bundle/
+/.legacy/
 /.yardoc
 /_yardoc/
 /coverage/
