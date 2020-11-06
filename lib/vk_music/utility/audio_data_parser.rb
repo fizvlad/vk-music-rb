@@ -12,11 +12,11 @@ module VkMusic
           url_encoded = get_url_encoded(data)
           secrets = get_secrets(data)
 
-          new(id: Integer(data[0], 10), owner_id: Integer(data[1], 10),
-              secret1: secrets[3], secret2: secrets[5],
-              artist: CGI.unescapeHTML(data[4]), title: CGI.unescapeHTML(data[3]),
-              duration: Integer(data[5], 10),
-              url_encoded: url_encoded, url: nil, client_id: client_id)
+          Audio.new(id: data[0], owner_id: data[1],
+                    secret1: secrets[3], secret2: secrets[5],
+                    artist: CGI.unescapeHTML(data[4]), title: CGI.unescapeHTML(data[3]),
+                    duration: data[5],
+                    url_encoded: url_encoded, url: nil, client_id: client_id)
         end
 
         private
