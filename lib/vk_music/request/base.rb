@@ -32,11 +32,17 @@ module VkMusic
       # @param agent [Mechanize]
       # @return [Mechanize::Page]
       def call(agent)
+        before_call
+
         @response = case method
         when 'GET' then get(agent)
         when 'POST' then post(agent)
         else raise(ArgumentError, "unsupported method #{method}")
         end
+
+        after_call
+
+        @response
       end
 
       private
@@ -51,6 +57,10 @@ module VkMusic
         uri = URI(path)
         agent.post(uri, data, headers)
       end
+
+      def before_call; end
+
+      def after_call; end
     end
   end
 end

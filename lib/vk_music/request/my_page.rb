@@ -7,6 +7,11 @@ module VkMusic
       ID_CONTAINING_HREF = /(?:audios|photo|write|owner_id=|friends\?id=)(-?\d+)/.freeze
       private_constant :ID_CONTAINING_HREF
 
+      # @return [Integer]
+      attr_reader :id
+      # @return [String]
+      attr_reader :name
+
       # Initialize new request
       def initialize
         super("#{VK_ROOT}/id0", {}, 'GET', {})
@@ -14,14 +19,11 @@ module VkMusic
         @name = nil
       end
 
-      # @return [Integer]
-      def id
-        @id ||= Integer(@response.link_with(href: ID_CONTAINING_HREF).href.slice(/\d+/), 10)
-      end
+      private
 
-      # @return [String]
-      def name
-        @name ||= @response.title.to_s
+      def after_call
+        @id = Integer(@response.link_with(href: ID_CONTAINING_HREF).href.slice(/\d+/), 10)
+        @name = @response.title.to_s
       end
     end
   end
