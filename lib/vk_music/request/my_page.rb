@@ -4,9 +4,6 @@ module VkMusic
   module Request
     # Logging in request
     class MyPage < Base
-      ID_CONTAINING_HREF = /(?:audios|photo|write|owner_id=|friends\?id=)(-?\d+)/.freeze
-      private_constant :ID_CONTAINING_HREF
-
       # @return [Integer]
       attr_reader :id
       # @return [String]
@@ -22,8 +19,9 @@ module VkMusic
       private
 
       def after_call
-        @id = Integer(@response.link_with(href: ID_CONTAINING_HREF).href.slice(/\d+/), 10)
-        @name = @response.title.to_s
+        parser = WebParser::MyPage.new(@response)
+        @id = parser.id
+        @name = parser.name
       end
     end
   end

@@ -17,12 +17,18 @@ module VkMusic
 
       # Send login form
       def send_form(login, password, agent)
-        form = @response.forms.find { |f| f.action.start_with?('https://login.vk.com') }
+        form = @parser.login_form
         form['email'] = login
         form['pass'] = password
         page = agent.submit(form)
 
         @success = (page.uri.to_s == 'https://m.vk.com/feed')
+      end
+
+      private
+
+      def after_call
+        @parser = WebParser::Login.new(@response)
       end
     end
   end
