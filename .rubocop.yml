@@ -25,6 +25,10 @@ Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
 Layout/FirstHashElementIndentation:
   Enabled: false
+Layout/MultilineAssignmentLayout:
+  EnforcedStyle: same_line
+Layout/CaseIndentation:
+  EnforcedStyle: end
 Lint/ConstantResolution:
   Enabled: false
 Metrics/ParameterLists:
@@ -41,4 +45,6 @@ Style/ClassVars:
 Style/MissingElse:
   Enabled: false
 Style/StringHashKeys:
+  Enabled: false
+Style/ImplicitRuntimeError:
   Enabled: false
