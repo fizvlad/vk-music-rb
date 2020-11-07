@@ -48,3 +48,5 @@ Style/StringHashKeys:
   Enabled: false
 Style/ImplicitRuntimeError:
   Enabled: false
+Style/NumericLiterals:
+  Enabled: false
