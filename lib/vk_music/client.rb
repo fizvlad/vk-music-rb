@@ -25,13 +25,29 @@ module VkMusic
       @agent = Mechanize.new
       @agent.user_agent = user_agent
 
-      self.login
+      raise('Failed to login!') unless self.login
+
+      load_id_and_name
+      VkMusic.log.info("Client#{@id}") { "Logged in as User##{@id} (#{@name})" }
     end
 
     # Make a login request
+    # @return [Boolean] whether login was successful
     def login
       VkMusic.log.info("Client#{@id}") { 'Logging in...' }
-      # TODO
+      login = Request::Login.new
+      login.call(agent)
+      login.send_form(@login, @password, agent)
+      login.success?
+    end
+
+    # Load user id and name
+    def load_id_and_name
+      VkMusic.log.info("Client#{@id}") { 'Loading user id and name' }
+      my_page = Request::MyPage.new
+      my_page.call(agent)
+      @id = my_page.id
+      @name = my_page.name
     end
   end
 end
