@@ -64,7 +64,16 @@ module VkMusic
     # @param type [Symbol]
     # @return [Array<Audio>, Array<Playlist>]
     def find(query = '', type: :audio)
-      # TODO
+      return [] if query.empty?
+
+      page = Request::Search.new(query, id)
+      page.call(agent)
+
+      case type
+      when :audio, :audios then page.audios
+      when :playlist, :playlists then page.playlists
+      else []
+      end
     end
     alias search find
 
