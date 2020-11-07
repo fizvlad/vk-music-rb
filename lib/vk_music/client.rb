@@ -38,7 +38,10 @@ module VkMusic
       login = Request::Login.new
       login.call(agent)
       login.send_form(@login, @password, agent)
-      login.success?
+      return true if login.success?
+
+      VkMusic.log.warn("Client#{@id}") { "Login failed. Redirected to #{login.response.uri}" }
+      false
     end
 
     # Load user id and name
