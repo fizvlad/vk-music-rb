@@ -4,6 +4,7 @@ require 'execjs'
 require 'mechanize'
 require 'json'
 require 'logger'
+require 'forwardable'
 
 # Main module
 module VkMusic

@@ -17,25 +17,7 @@ module VkMusic
         )
       end
 
-      # @return [Array<Audio>]
-      def audios
-        @parser.audios
-      end
-
-      # @return [String?]
-      def all_audios_link
-        # TODO
-      end
-
-      # @return [Array<Playlist>]
-      def playlists
-        @parser.playlists
-      end
-
-      # @return [String?]
-      def all_playlists_link
-        # TODO
-      end
+      def_delegators :@parser, :audios, :audios_all_path, :playlists, :playlists_all_path
 
       private
 

@@ -4,6 +4,8 @@ module VkMusic
   module Request
     # Base class for most of requests
     class Base
+      extend Forwardable
+
       # @return [String]
       attr_reader :path
       # @return [Hash]
