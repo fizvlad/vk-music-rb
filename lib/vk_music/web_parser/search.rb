@@ -5,6 +5,7 @@ module VkMusic
     # Audio search page parser
     class Search < Base
       # Audios found
+      # @return [Array<Audio>]
       def audios
         title_index = search_result_blocks.find_index { |node| node.inner_text.include?('Все аудиозаписи') }
         block = search_result_blocks[title_index + 1]
@@ -15,14 +16,11 @@ module VkMusic
         end
       end
 
-      # Link to page with all results
+      # Path to page with all results
+      # @return [String]
       def audios_all_path
         title = search_result_blocks.find { |node| node.inner_text.include?('Все аудиозаписи') }
         title.at_css('a').attribute('href').value
-
-        block.css('.audioPlaylists__item').map do |elem|
-          Utility::PlaylistNodeParser.call(elem)
-        end
       end
 
       # Playlists found
@@ -30,11 +28,13 @@ module VkMusic
         title_index = search_result_blocks.find_index { |node| node.inner_text.include?('Альбомы') }
         block = search_result_blocks[title_index + 1]
 
-        # TODO
-        []
+        block.css('.audioPlaylists__item').map do |elem|
+          Utility::PlaylistNodeParser.call(elem)
+        end
       end
 
-      # Link to page with all results
+      # Path to page with all results
+      # @return [String]
       def playlists_all_path
         title = search_result_blocks.find { |node| node.inner_text.include?('Альбомы') }
         title.at_css('a').attribute('href').value

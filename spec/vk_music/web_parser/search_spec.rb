@@ -26,6 +26,16 @@ RSpec.describe VkMusic::WebParser::Search do
     end
   end
 
+  describe '#playlists' do
+    let(:result) { instance.playlists }
+
+    it :aggregate_failures do
+      expect(result).to be_a(Array)
+      expect(result).to all(be_an(VkMusic::Playlist))
+      expect(result.size).to be >= 3
+    end
+  end
+
   describe '#playlists_all_path' do
     let(:result) { instance.playlists_all_path }
 

@@ -7,7 +7,7 @@ module VkMusic
       # @param node [Nokogiri::XML::Node]
       # @return [Playlist]
       def self.call(node)
-        url = node.at_css('').attribute('href').value
+        url = node.at_css('.audioPlaylists__itemLink').attribute('href').value
         owner_id, id, access_hash = PlaylistUrlParser.call(url)
 
         Playlist.new([],
