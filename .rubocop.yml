@@ -50,3 +50,5 @@ Style/ImplicitRuntimeError:
   Enabled: false
 Style/NumericLiterals:
   Enabled: false
+Style/DisableCopsWithinSourceCodeDirective:
+  Enabled: false
