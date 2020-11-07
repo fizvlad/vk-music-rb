@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'execjs'
 require 'mechanize'
 require 'json'
 require 'logger'
