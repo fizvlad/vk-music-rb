@@ -12,6 +12,8 @@ module VkMusic
       attr_reader :method
       # @return [Hash]
       attr_reader :headers
+      # @return [Mechanize::File?]
+      attr_reader :response
 
       # Initialize new request
       # @param path [String]
@@ -23,12 +25,14 @@ module VkMusic
         @data = data
         @method = method.upcase
         @headers = headers
+
+        @response = nil
       end
 
       # @param agent [Mechanize]
       # @return [Mechanize::Page]
       def call(agent)
-        case method
+        @response = case method
         when 'GET' then get(agent)
         when 'POST' then post(agent)
         else raise(ArgumentError, "unsupported method #{method}")

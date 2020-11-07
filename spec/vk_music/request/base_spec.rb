@@ -13,7 +13,7 @@ RSpec.describe VkMusic::Request::Base do
   let(:result) { request.call(agent) }
   let(:parsed_result) { JSON.parse(result.body) }
 
-  context 'GET request' do
+  context 'when GET request' do
     let(:path) { 'get' }
     let(:method) { 'GET' }
     let(:data) { { getarg1: 'getval1', getarg2: nil, getarg3: '' } }
@@ -26,7 +26,7 @@ RSpec.describe VkMusic::Request::Base do
     end
   end
 
-  context 'POST request' do
+  context 'when POST request' do
     let(:path) { 'post' }
     let(:method) { 'POST' }
     let(:data) { { postarg1: 'postval1', postarg2: nil, postarg3: '', postarr: [1, 2, 3] } }
