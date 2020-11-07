@@ -13,12 +13,20 @@ def spec_data(name)
   File.read("spec_data/#{name}.response")
 end
 
+# Path to file where testing cookies will be stored
+AGENT_COOKIES_PATH = 'spec_data/logged_in_agent.cookies'
+
 # @return [Mechanize] logged in Mechanize client.
 def logged_in_agent
   agent = Mechanize.new
-  login = VkMusic::Request::Login.new
-  login.call(agent)
-  login.send_form(ENV['VK_LOGIN'], ENV['VK_PASSWORD'], agent)
+  if File.exist?(AGENT_COOKIES_PATH)
+    agent.cookie_jar.load(AGENT_COOKIES_PATH)
+  else
+    login = VkMusic::Request::Login.new
+    login.call(agent)
+    login.send_form(ENV['VK_LOGIN'], ENV['VK_PASSWORD'], agent)
+    agent.cookie_jar.save(AGENT_COOKIES_PATH)
+  end
   agent
 end
 
