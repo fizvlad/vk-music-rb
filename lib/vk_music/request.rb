@@ -3,6 +3,7 @@
 module VkMusic
   # Bunch of different web requests
   module Request
+    # VK root URL
     VK_ROOT = 'https://m.vk.com'
     public_constant :VK_ROOT
   end
