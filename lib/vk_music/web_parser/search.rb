@@ -8,6 +8,8 @@ module VkMusic
       # @return [Array<Audio>]
       def audios
         title_index = search_result_blocks.find_index { |node| node.inner_text.include?('Все аудиозаписи') }
+        return [] if title_index.nil?
+
         block = search_result_blocks[title_index + 1]
 
         block.css('.audio_item.ai_has_btn').map do |elem|
@@ -17,15 +19,20 @@ module VkMusic
       end
 
       # Path to page with all results
-      # @return [String]
+      # @return [String?]
       def audios_all_path
         title = search_result_blocks.find { |node| node.inner_text.include?('Все аудиозаписи') }
+        return if title.nil?
+
         title.at_css('a').attribute('href').value
       end
 
       # Playlists found
+      # @return [Array<Playlist>]
       def playlists
         title_index = search_result_blocks.find_index { |node| node.inner_text.include?('Альбомы') }
+        return [] if title_index.nil?
+
         block = search_result_blocks[title_index + 1]
 
         block.css('.audioPlaylists__item').map do |elem|
@@ -34,9 +41,11 @@ module VkMusic
       end
 
       # Path to page with all results
-      # @return [String]
+      # @return [String?]
       def playlists_all_path
         title = search_result_blocks.find { |node| node.inner_text.include?('Альбомы') }
+        return if title.nil?
+
         title.at_css('a').attribute('href').value
       end
 
