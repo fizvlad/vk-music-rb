@@ -36,6 +36,7 @@ module VkMusic
       def call(agent)
         before_call
 
+        log
         @response = case method
         when 'GET' then get(agent)
         when 'POST' then post(agent)
@@ -48,6 +49,12 @@ module VkMusic
       end
 
       private
+
+      def log
+        VkMusic.log.debug('request') do
+          "#{method} to '#{path}', with data: #{data}, headers: #{headers}"
+        end
+      end
 
       def get(agent)
         uri = URI(path)
