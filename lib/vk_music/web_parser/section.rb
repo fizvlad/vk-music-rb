@@ -11,6 +11,8 @@ module VkMusic
 
       # @return [Array<Audio>]
       def audios
+        return [] if json.nil? || !json.key?('list')
+
         json['list'].map do |el|
           Utility::AudioDataParser.call(el, @client_id)
         end
@@ -32,6 +34,11 @@ module VkMusic
       # @return [Integer?]
       def real_size
         json['totalCount']
+      end
+
+      # @return [Boolean]
+      def more?
+        json['hasMore'].to_s == '1'
       end
     end
   end

@@ -23,12 +23,12 @@ module VkMusic
         )
       end
 
-      def_delegators :@parser, :audios, :title, :subtitle, :real_size
+      def_delegators :@parser, :audios, :title, :subtitle, :real_size, :more?
 
       private
 
       def after_call
-        @parser = WebParser::Section.new(@response, @client_id)
+        @parser = WebParser::Section.new(@response, client_id: @client_id)
       end
     end
   end
