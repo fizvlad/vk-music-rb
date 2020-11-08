@@ -31,9 +31,8 @@ module VkMusic
           while audios.size < up_to
             section = Request::Section.new(owner_id, playlist_id, access_hash, audios.size, client_id)
             section.call(agent)
+            audios.concat(section.audios)
             break if section.audios.empty? || !section.more?
-
-            audios += section.audios
           end
         end
       end
