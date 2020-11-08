@@ -6,6 +6,7 @@ module VkMusic
 end
 
 require_relative 'utility/audio_data_parser'
+require_relative 'utility/audio_items_parser'
 require_relative 'utility/audio_node_parser'
 require_relative 'utility/duration_parser'
 require_relative 'utility/link_decoder'

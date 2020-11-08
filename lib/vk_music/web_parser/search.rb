@@ -12,10 +12,7 @@ module VkMusic
 
         block = search_result_blocks[title_index + 1]
 
-        block.css('.audio_item.ai_has_btn').map do |elem|
-          data = JSON.parse(elem.attribute('data-audio').value)
-          Utility::AudioDataParser.call(data, @client_id)
-        end
+        Utility::AudioItemsParser(block, @client_id)
       end
 
       # Path to page with all results
