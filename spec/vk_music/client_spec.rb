@@ -79,7 +79,7 @@ RSpec.describe VkMusic::Client do
     let(:up_to) { 10_000 }
     let(:result) { instance.playlist(url: url, up_to: up_to) }
 
-    context 'when usual playlist' do
+    context 'when playlist' do
       let(:url) { 'https://vk.com/music/playlist/19198851_39318804_6c2b34085c37213dfb' }
 
       it :aggregate_failures do
@@ -87,6 +87,33 @@ RSpec.describe VkMusic::Client do
         expect(result.size).to eq(6)
         expect(result.real_size).to eq(6)
         expect(result.title).to eq('Klooe - Electrify The Love [EP]')
+      end
+    end
+
+    context 'when album' do
+      let(:url) { 'https://vk.com/music/album/-2000637322_637322_e677ea2eab62dc17a8' }
+
+      it :aggregate_failures do
+        expect(result).to be_a(VkMusic::Playlist)
+        expect(result.size).to eq(30)
+        expect(result.real_size).to eq(30)
+        expect(result.title).to eq('La La Land Original Motion Picture Score')
+      end
+    end
+
+    context 'when large playlist' do
+      let(:url) { 'https://vk.com/music/playlist/274274487_57' }
+
+      it :aggregate_failures do
+        expect(result).to be_a(VkMusic::Playlist)
+        expect(result.size).to be >= 1000
+        expect(result.real_size).to be >= 1000
+      end
+
+      context 'when up_to specified' do
+        let(:up_to) { 120 }
+
+        it { expect(result.size).to eq(120) }
       end
     end
   end
