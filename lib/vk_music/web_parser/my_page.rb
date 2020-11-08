@@ -4,18 +4,16 @@ module VkMusic
   module WebParser
     # Current user page parser
     class MyPage < Base
-      # Link with user id in it
-      ID_CONTAINING_HREF = /(?:audios|photo|write|owner_id=|friends\?id=)(-?\d+)/.freeze
-      private_constant :ID_CONTAINING_HREF
-
       # User id
       def id
-        Integer(@node.link_with(href: ID_CONTAINING_HREF).href.slice(/\d+/), 10)
+        link = @node.at_css('.ip_user_link .op_owner')
+        Integer(link.attribute('href').value.delete_prefix('/id'), 10)
       end
 
       # User name
       def name
-        @node.title.to_s
+        link = @node.at_css('.ip_user_link .op_owner')
+        link.attribute('data-name').value
       end
     end
   end
