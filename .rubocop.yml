@@ -52,3 +52,5 @@ Style/NumericLiterals:
   Enabled: false
 Style/DisableCopsWithinSourceCodeDirective:
   Enabled: false
+Layout/MultilineHashKeyLineBreaks:
+  Enabled: false
