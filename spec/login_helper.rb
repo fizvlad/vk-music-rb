@@ -20,9 +20,8 @@ AGENT_COOKIES_PATH = 'spec_data/logged_in_agent.cookies'
 # @return [Mechanize] logged in Mechanize client.
 def logged_in_agent
   agent = Mechanize.new
-  scj = saved_cookie_jar
-  if scj
-    agent.cookie_jar = scj
+  if File.exist?(AGENT_COOKIES_PATH)
+    load_cookie_jar(agent.cookie_jar)
   else
     login_agent(agent)
   end
@@ -35,35 +34,24 @@ def logged_in_client
   VkMusic::Client.new(agent: logged_in_agent)
 end
 
-# @return [HTTP::CookieJar?]
-def saved_cookie_jar
-  return unless File.exist?(AGENT_COOKIES_PATH)
-
-  cookie_jar = HTTP::CookieJar.new
+# @param [HTTP::CookieJar]
+def load_cookie_jar(jar)
   data = File.read(AGENT_COOKIES_PATH)
-  if data.start_with?('{')
-    saved_cookie_jar_json(cookie_jar, data)
-  else
-    saved_cookie_jar_mechanize(cookie_jar)
-  end
-  return if cookie_jar.empty?
-
-  cookie_jar
+  data.start_with?('{') ? load_cookie_jar_json(jar, data) : load_cookie_jar_mechanize(jar)
 rescue StandardError => e
-  VkMusic.log.warn('spec') { "Failed to parse saved cookies: #{e}" }
-  nil
+  VkMusic.log.error('spec') { "Failed to parse saved cookies: #{e}:\m#{e.full_message}" }
 end
 
 # Loads cookies from JSON data
-def saved_cookie_jar_json(cookie_jar, data)
+def load_cookie_jar_json(jar, data)
   VkMusic.log.info('spec') { 'Loading JSON cookies' }
   JSON.parse(data).each_pair do |k, v|
-    cookie_jar.add(URI('https://m.vk.com'), HTTP::Cookie.new(k, v))
+    jar.add(URI('https://m.vk.com'), HTTP::Cookie.new(k, v))
   end
 end
 
 # Loads cookies from Mechanize file
-def saved_cookie_jar_mechanize(cookie_jar)
+def load_cookie_jar_mechanize(jar)
   VkMusic.log.info('spec') { 'Loading Mechanize cookies' }
-  cookie_jar.load(AGENT_COOKIES_PATH)
+  jar.load(AGENT_COOKIES_PATH)
 end
