@@ -12,4 +12,6 @@ end
 require_relative 'request/base'
 require_relative 'request/login'
 require_relative 'request/my_page'
+require_relative 'request/playlist'
 require_relative 'request/search'
+require_relative 'request/section'
