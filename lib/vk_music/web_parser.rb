@@ -8,4 +8,5 @@ end
 require_relative 'web_parser/base'
 require_relative 'web_parser/login'
 require_relative 'web_parser/my_page'
+require_relative 'web_parser/playlist'
 require_relative 'web_parser/search'

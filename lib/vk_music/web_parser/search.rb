@@ -12,7 +12,7 @@ module VkMusic
 
         block = search_result_blocks[title_index + 1]
 
-        Utility::AudioItemsParser(block, @client_id)
+        Utility::AudioItemsParser.call(block, @client_id)
       end
 
       # Path to page with all results
