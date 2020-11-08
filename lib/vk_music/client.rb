@@ -19,16 +19,20 @@ module VkMusic
     # @return [Mechanize] client used to access web pages
     attr_reader :agent
 
-    # @param login [String]
-    # @param password [String]
-    def initialize(login:, password:, user_agent: DEFAULT_USERAGENT)
+    # @param login [String, nil]
+    # @param password [String, nil]
+    # @param user_agent [String]
+    # @param agent [Mechanize?] if specified, provided agent will be used
+    def initialize(login: nil, password: nil, user_agent: DEFAULT_USERAGENT, agent: nil)
       @login = login
       @password = password
+      @agent = agent
+      if @agent.nil?
+        @agent = Mechanize.new
+        @agent.user_agent = user_agent
 
-      @agent = Mechanize.new
-      @agent.user_agent = user_agent
-
-      raise('Failed to login!') unless self.login
+        raise('Failed to login!') unless self.login
+      end
 
       load_id_and_name
       VkMusic.log.info("Client#{@id}") { "Logged in as User##{@id} (#{@name})" }
@@ -84,14 +88,13 @@ module VkMusic
     # @param access_hash [String, nil] access hash for the playlist. Might not exist
     # @param up_to [Integer] maximum amount of audios to load. If 0, no audios
     #   would be loaded (plain information about playlist)
-    # @param use_web [Boolean, nil] if +true+ web version of pages sill be used, if +false+
-    #   JSON will be used (latter is faster, but using web allow to get URLs instantly).
-    #   If +nil+ mixed algorithm will be used: if provided +up_to+ value is less than 200
-    #   web will be used
-    # @return [Playlist]
+    # @return [Playlist?]
     def playlist(url: nil, owner_id: nil, playlist_id: nil, access_hash: nil,
-                 up_to: MAXIMUM_PLAYLIST_SIZE, use_web: nil)
-      # TODO
+                 up_to: MAXIMUM_PLAYLIST_SIZE)
+      owner_id, playlist_id, access_hash = Utility::PlaylistUrlParser.call(url) if url
+      return if owner_id.nil? || playlist_id.nil?
+
+      Utility::PlaylistLoader.call(agent, id, owner_id, playlist_id, access_hash, up_to)
     end
 
     # Get user or group audios. Specify either +url+ or +owner_id+
@@ -99,7 +102,7 @@ module VkMusic
     # @param owner_id [Integer, nil]
     # @param up_to [Integer] maximum amount of audios to load. If 0, no audios
     #   would be loaded (plain information about playlist)
-    # @return [Playlist]
+    # @return [Playlist?]
     def audios(url: nil, owner_id: nil, up_to: MAXIMUM_PLAYLIST_SIZE)
       # TODO
     end

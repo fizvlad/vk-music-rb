@@ -73,4 +73,21 @@ RSpec.describe VkMusic::Client do
       end
     end
   end
+
+  describe '#playlist' do
+    let(:url) { '' }
+    let(:up_to) { 10_000 }
+    let(:result) { instance.playlist(url: url, up_to: up_to) }
+
+    context 'when usual playlist' do
+      let(:url) { 'https://vk.com/music/playlist/19198851_39318804_6c2b34085c37213dfb' }
+
+      it :aggregate_failures do
+        expect(result).to be_a(VkMusic::Playlist)
+        expect(result.size).to eq(6)
+        expect(result.real_size).to eq(6)
+        expect(result.title).to eq('Klooe - Electrify The Love [EP]')
+      end
+    end
+  end
 end
