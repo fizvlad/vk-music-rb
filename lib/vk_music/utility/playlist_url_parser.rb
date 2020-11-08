@@ -14,7 +14,7 @@ module VkMusic
       public_constant :VK_PLAYLIST_URL_POSTFIX
 
       # @param url [String]
-      # @return [Array(Integer, Integer, String?)] playlist data array:
+      # @return [Array(Integer?, Integer?, String?)] playlist data array:
       #   +[owner_id, playlist_id, access_hash]+
       def self.call(url)
         owner_id, playlist_id, access_hash = url.match(VK_PLAYLIST_URL_POSTFIX).captures
@@ -24,6 +24,8 @@ module VkMusic
         access_hash = nil if access_hash&.empty?
 
         [owner_id, playlist_id, access_hash]
+      rescue StandardError
+        [nil, nil, nil]
       end
     end
   end
