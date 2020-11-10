@@ -22,7 +22,10 @@ module VkMusic
       private
 
       def after_call
-        inner = JSON.parse(@response.body.strip)['data'][2]
+        json = JSON.parse(@response.body.strip)
+        raise 'Captcha requested' if json['key'] == 'captcha_key'
+
+        inner = json['data'][2]
         html = Nokogiri::HTML.fragment(CGI.unescapeElement(inner))
         @parser = WebParser::Search.new(html)
       end
