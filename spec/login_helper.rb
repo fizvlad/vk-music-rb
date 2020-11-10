@@ -1,12 +1,5 @@
 # frozen_string_literal: true
 
-# Read spec_data file.
-# @param name [String]
-# @return [String]
-def spec_data(name)
-  File.read("spec_data/#{name}.response")
-end
-
 # Logs in provided agent
 def login_agent(agent)
   login = VkMusic::Request::Login.new
@@ -15,7 +8,7 @@ def login_agent(agent)
 end
 
 # Path to file where testing cookies will be stored
-AGENT_COOKIES_PATH = 'spec_data/logged_in_agent.cookies'
+AGENT_COOKIES_PATH = 'spec_data/.cookies'
 
 # @return [Mechanize] logged in Mechanize client.
 def logged_in_agent

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe VkMusic::Request::MyPage do
+RSpec.describe VkMusic::Request::MyPage, :vcr do
   let(:agent) { logged_in_agent }
   let(:instance) { described_class.new }
 

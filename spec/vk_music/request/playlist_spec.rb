@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe VkMusic::Request::Playlist do
+RSpec.describe VkMusic::Request::Playlist, :vcr do
   let(:client) { logged_in_client }
   let(:instance) { described_class.new(-137903314, 248, nil, client.id) }
   let(:owner_id) { -137903314 }

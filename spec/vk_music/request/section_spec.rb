@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe VkMusic::Request::Search do
+RSpec.describe VkMusic::Request::Search, :vcr do
   let(:client) { logged_in_client }
   let(:instance) { described_class.new(query, client.id) }
   let(:query) { 'test' }

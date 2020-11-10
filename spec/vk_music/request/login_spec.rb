@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe VkMusic::Request::Login do
+RSpec.describe VkMusic::Request::Login, :vcr do
   let(:agent) { Mechanize.new }
   let(:login) { '' }
   let(:password) { '' }

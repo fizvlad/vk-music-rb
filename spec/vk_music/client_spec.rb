@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe VkMusic::Client do
+RSpec.describe VkMusic::Client, :vcr do
   let(:instance) { logged_in_client }
 
   describe '.new' do

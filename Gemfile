@@ -26,4 +26,10 @@ group :test, :development do
 
   # .env support
   gem 'dotenv'
+
+  # Save web requests for fast and reliable testing
+  gem 'vcr'
+
+  # Stub web requests
+  gem 'webmock'
 end
