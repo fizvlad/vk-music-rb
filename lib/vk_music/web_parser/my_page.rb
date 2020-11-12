@@ -6,8 +6,7 @@ module VkMusic
     class MyPage < Base
       # User id
       def id
-        link = @node.at_css('.ip_user_link .op_owner')
-        Integer(link.attribute('href').value.delete_prefix('/id'), 10)
+        Integer(@node.content.match(/window.vk = {"id":(\d+)/).captures.first, 10)
       end
 
       # User name
