@@ -8,11 +8,13 @@ module VkMusic
       # @param client_id [Integer]
       # @param owner_id [Integer]
       # @param up_to [Integer]
-      # @return [Playlist]
+      # @return [Playlist?]
       def self.call(agent, client_id, owner_id, up_to)
         page = Request::Section.new(owner_id, -1, '', 0, client_id)
         page.call(agent)
         audios = page.audios
+        return if audios.nil? || audios.empty?
+
         up_to = page.real_size if up_to > page.real_size
 
         rest = SectionLoader.call(agent, client_id, owner_id, -1, '', audios.size, up_to - audios.size)

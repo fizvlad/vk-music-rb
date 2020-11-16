@@ -104,7 +104,10 @@ module VkMusic
     #   would be loaded (plain information about playlist)
     # @return [Playlist?]
     def audios(url: nil, owner_id: nil, up_to: MAXIMUM_PLAYLIST_SIZE)
-      # TODO
+      owner_id = Utility::ProfileIdResolver.call(agent, url) if url
+      return if owner_id.nil?
+
+      Utility::AudiosLoader.call(agent, id, owner_id, up_to)
     end
 
     # Get audios on wall of user or group starting with given post. Specify
