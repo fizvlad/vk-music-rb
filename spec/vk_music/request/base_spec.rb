@@ -10,7 +10,7 @@ RSpec.describe VkMusic::Request::Base do
   let(:method) { 'GET' }
   let(:headers) { {} }
   let(:request) { described_class.new(url, data, method, headers) }
-  let(:result) { request.call(agent) }
+  let(:result) { request.call(agent).response }
   let(:parsed_result) { JSON.parse(result.body) }
 
   context 'when GET request' do
