@@ -2,8 +2,8 @@
 
 module VkMusic
   module WebParser
-    # Section JSON parser
-    class Section < Base
+    # PlaylistSection JSON parser
+    class PlaylistSection < Base
       # Parsed JSON
       def json
         @json ||= JSON.parse(@node.content.strip)['data'].first || {}

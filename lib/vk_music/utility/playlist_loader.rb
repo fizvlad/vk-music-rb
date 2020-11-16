@@ -19,8 +19,8 @@ module VkMusic
 
         up_to = page.real_size if up_to > page.real_size
 
-        rest = SectionLoader.call(agent, client_id, owner_id, playlist_id, access_hash,
-                                  audios.size, up_to - audios.size)
+        rest = PlaylistSectionLoader.call(agent, client_id, owner_id, playlist_id, access_hash,
+                                          audios.size, up_to - audios.size)
         audios.concat(rest)
         Playlist.new(audios, id: playlist_id, owner_id: owner_id, access_hash: access_hash,
                              title: page.title, subtitle: page.subtitle, real_size: page.real_size)

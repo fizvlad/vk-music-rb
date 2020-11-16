@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Load sections into playlist
-    class SectionLoader
+    class PlaylistSectionLoader
       # @param agent [Mechanize]
       # @param client_id [Integer]
       # @param owner_id [Integer]
@@ -16,7 +16,7 @@ module VkMusic
         audios = []
 
         while audios.size < up_to
-          section = Request::Section.new(owner_id, playlist_id, access_hash, offset + audios.size, client_id)
+          section = Request::PlaylistSection.new(owner_id, playlist_id, access_hash, offset + audios.size, client_id)
           section.call(agent)
           audios.concat(section.audios)
           break if section.audios.empty? || !section.more?

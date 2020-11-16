@@ -3,7 +3,7 @@
 module VkMusic
   module Request
     # Playlist in web-mobile request
-    class Section < Base
+    class PlaylistSection < Base
       # Initialize new request
       # @param owner_id [Integer]
       # @param playlist_id [Integer]
@@ -28,7 +28,7 @@ module VkMusic
       private
 
       def after_call
-        @parser = WebParser::Section.new(@response, client_id: @client_id)
+        @parser = WebParser::PlaylistSection.new(@response, client_id: @client_id)
       end
     end
   end

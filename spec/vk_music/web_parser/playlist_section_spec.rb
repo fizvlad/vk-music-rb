@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe VkMusic::WebParser::Section do
+RSpec.describe VkMusic::WebParser::PlaylistSection do
   let(:data) { spec_data('playlist_section') }
   let(:instance) { described_class.new(data) }
 
