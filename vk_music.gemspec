@@ -11,7 +11,8 @@ Gem::Specification.new do |spec|
   spec.email         = ['fizvlad@mail.ru']
 
   spec.summary       = 'Provides interface to work with VK music via HTTP requests'
-  spec.description   = 'Library to work with audios on popular Russian social network vk.com. VK disabled their public API for audios, so it is now necessary to use parsers instead.'
+  spec.description   = 'Library to work with audios on popular Russian social network vk.com. VK disabled their ' \
+                       'public API for audios, so it is now necessary to use parsers instead.'
   spec.homepage      = 'https://github.com/fizvlad/vk-music-rb'
   spec.license       = 'MIT'
 
@@ -23,15 +24,14 @@ Gem::Specification.new do |spec|
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
-  spec.files =
-    Dir.chdir(File.expand_path(__dir__)) do
-      `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
-    end
+  spec.files = Dir.chdir(File.expand_path(__dir__)) do
+    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  end
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency('execjs', '~> 2.7')
+  spec.add_runtime_dependency('json', '~> 2.3')
   spec.add_runtime_dependency('logger', '~> 1.4')
   spec.add_runtime_dependency('mechanize', '~> 2.7')
   spec.add_runtime_dependency('net-http-persistent', '2.9.4')
-  spec.add_runtime_dependency('json', '~> 2.3')
 end

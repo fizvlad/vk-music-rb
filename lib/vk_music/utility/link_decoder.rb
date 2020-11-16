@@ -92,7 +92,8 @@ module VkMusic
       @@js_context = ExecJS.compile(JS_CODE)
 
       # Unmask audio download URL
-      # @param link [String] encoded link to audio. Usually looks like "https://m.vk.​com/mp3/audio_api_unavailable.mp3?extra=...".
+      # @param link [String] encoded link to audio. Usually looks like
+      #   "https://m.vk.com/mp3/audio_api_unavailable.mp3?extra=...".
       # @param client_id [Integer] ID of user which got this link. ID is required for decoding.
       # @return [String] audio download URL, which can be used only from current IP.
       def self.call(link, client_id)
