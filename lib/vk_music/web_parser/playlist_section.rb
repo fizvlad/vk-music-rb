@@ -30,7 +30,7 @@ module VkMusic
         return unless json&.key?('rawDescription')
 
         re = json['rawDescription']
-        return if re.empty?
+        return if re.nil? || re.empty?
 
         re
       end
