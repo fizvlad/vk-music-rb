@@ -110,15 +110,25 @@ module VkMusic
       Utility::AudiosLoader.call(agent, id, owner_id, up_to)
     end
 
-    # Get audios on wall of user or group starting with given post. Specify
-    #   either +url+ or +(owner_id,post_id)+
-    # @note this method is only able to load up to 91 audios from wall.
-    # @param url [String] URL to post.
-    # @param owner_id [Integer]  numerical ID of wall owner.
-    # @param post_id [Integer] numerical ID of post.
-    # @return [Array<Audio>] array of audios from wall.
-    def wall(url: nil, owner_id: nil, post_id: nil, up_to: 91, with_url: false)
-      # TODO
+    # Get audios on wall of user or group starting. Specify either +url+ or +owner_id+
+    #   or +(owner_id,post_id)+
+    # @param url [String] URL to post or profile page
+    # @param owner_id [Integer] numerical ID of wall owner
+    # @param owner_id [Integer] ID of post to start looking from. If not specified, will be
+    #   used ID of last post
+    # @return [Playlist?]
+    def wall(url: nil, owner_id: nil, post_id: nil)
+      owner_id, post_id = Utility::PostUrlParser.call(url) if url
+      if post_id.nil?
+        if url
+          owner_id, post_id = Utility::LastProfilePostLoader.call(agent, url: url)
+        elsif owner_id
+          owner_id, post_id = Utility::LastProfilePostLoader.call(agent, owner_id: owner_id)
+        end
+      end
+      return if owner_id.nil? || post_id.nil?
+
+      Utility::WallLoader.call(agent, id, owner_id, post_id)
     end
 
     # Get audios attached to post. Specify either +url+ or +(owner_id,post_id)+.

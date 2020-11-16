@@ -193,4 +193,74 @@ RSpec.describe VkMusic::Client, :vcr do
       end
     end
   end
+
+  describe '#wall' do
+    let(:url) { '' }
+    let(:up_to) { 100 }
+    let(:result) { instance.wall(url: url) }
+
+    context 'when user with empty wall' do
+      let(:url) { 'https://vk.com/id1' }
+
+      it :aggregate_failures do
+        expect(result).to be_nil
+      end
+    end
+
+    context 'when group' do
+      let(:url) { 'https://vk.com/mashup' }
+
+      it :aggregate_failures do
+        expect(result).to be_a(VkMusic::Playlist)
+        expect(result.size).to eq(100)
+        expect(result.title).to eq('Аудиозаписи со стены #mashup')
+      end
+
+      context 'when owner_id specified' do
+        let(:result) { instance.wall(owner_id: -39786657) }
+
+        it :aggregate_failures do
+          expect(result).to be_a(VkMusic::Playlist)
+          expect(result.size).to eq(100)
+          expect(result.title).to eq('Аудиозаписи со стены #mashup')
+        end
+      end
+
+      context 'when owner_id and post_id are specified' do
+        let(:result) { instance.wall(owner_id: -39786657, post_id: 398228) }
+
+        it :aggregate_failures do
+          expect(result).to be_a(VkMusic::Playlist)
+          expect(result.size).to eq(100)
+          expect(result.title).to eq('Аудиозаписи со стены #mashup')
+        end
+      end
+
+      context 'when owner_id and post_id are specified in url' do
+        let(:result) { instance.wall(url: 'https://vk.com/wall-39786657_398228') }
+
+        it :aggregate_failures do
+          expect(result).to be_a(VkMusic::Playlist)
+          expect(result.size).to eq(100)
+          expect(result.title).to eq('Аудиозаписи со стены #mashup')
+        end
+      end
+    end
+
+    context 'when 404' do
+      let(:url) { 'https://vk.com/a' }
+
+      it :aggregate_failures do
+        expect(result).to be_nil
+      end
+    end
+
+    context 'when feed' do
+      let(:url) { 'https://vk.com/feed' }
+
+      it :aggregate_failures do
+        expect(result).to be_nil
+      end
+    end
+  end
 end
