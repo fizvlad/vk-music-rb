@@ -32,7 +32,7 @@ module VkMusic
       end
 
       # @param agent [Mechanize]
-      # @return [Mechanize::Page]
+      # @return [self]
       def call(agent)
         before_call
 
@@ -45,7 +45,7 @@ module VkMusic
 
         after_call
 
-        @response
+        self
       end
 
       private
