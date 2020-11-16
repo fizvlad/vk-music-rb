@@ -12,7 +12,7 @@ module VkMusic
         super("#{VK_ROOT}/#{profile_path}", {}, 'GET', {})
       end
 
-      def_delegators :@parser, :id
+      def_delegators :@parser, :id, :last_post_id
 
       private
 

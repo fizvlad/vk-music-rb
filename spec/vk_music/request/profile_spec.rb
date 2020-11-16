@@ -13,6 +13,7 @@ RSpec.describe VkMusic::Request::Profile, :vcr do
     it :aggregate_failures do
       instance.call(client.agent)
       expect(instance.id).to eq(10050301)
+      expect(instance.last_post_id).to be > 35_000
     end
   end
 
@@ -22,6 +23,7 @@ RSpec.describe VkMusic::Request::Profile, :vcr do
     it :aggregate_failures do
       instance.call(client.agent)
       expect(instance.id).to eq(-39786657)
+      expect(instance.last_post_id).to be > 398_000
     end
   end
 end
