@@ -11,8 +11,8 @@ RSpec.describe VkMusic::Request::Profile, :vcr do
     let(:path) { 'spoontamer' }
 
     it :aggregate_failures do
+      instance.call(client.agent)
       expect(instance.id).to eq(10050301)
-      expect(instance.name).to eq('name')
     end
   end
 
@@ -20,8 +20,8 @@ RSpec.describe VkMusic::Request::Profile, :vcr do
     let(:path) { 'mashup' }
 
     it :aggregate_failures do
+      instance.call(client.agent)
       expect(instance.id).to eq(-39786657)
-      expect(instance.name).to eq('name')
     end
   end
 end
