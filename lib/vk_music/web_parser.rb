@@ -5,10 +5,4 @@ module VkMusic
   module WebParser; end
 end
 
-require_relative 'web_parser/base'
-require_relative 'web_parser/login'
-require_relative 'web_parser/my_page'
-require_relative 'web_parser/playlist'
-require_relative 'web_parser/playlist_section'
-require_relative 'web_parser/profile'
-require_relative 'web_parser/search'
+Dir[File.join(__dir__, 'web_parser', '*.rb')].each { |file| require_relative file }

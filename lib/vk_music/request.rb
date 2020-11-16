@@ -9,10 +9,4 @@ module VkMusic
   end
 end
 
-require_relative 'request/base'
-require_relative 'request/login'
-require_relative 'request/my_page'
-require_relative 'request/playlist'
-require_relative 'request/playlist_section'
-require_relative 'request/profile'
-require_relative 'request/search'
+Dir[File.join(__dir__, 'request', '*.rb')].each { |file| require_relative file }

@@ -5,15 +5,4 @@ module VkMusic
   module Utility; end
 end
 
-require_relative 'utility/audio_data_parser'
-require_relative 'utility/audio_items_parser'
-require_relative 'utility/audio_node_parser'
-require_relative 'utility/audios_loader'
-require_relative 'utility/duration_parser'
-require_relative 'utility/link_decoder'
-require_relative 'utility/node_text_children_reader'
-require_relative 'utility/playlist_loader'
-require_relative 'utility/playlist_node_parser'
-require_relative 'utility/playlist_section_loader'
-require_relative 'utility/playlist_url_parser'
-require_relative 'utility/profile_id_resolver'
+Dir[File.join(__dir__, 'utility', '*.rb')].each { |file| require_relative file }
