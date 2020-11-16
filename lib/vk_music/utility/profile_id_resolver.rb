@@ -6,7 +6,7 @@ module VkMusic
     class ProfileIdResolver
       class << self
         # vk.com url regex
-        VK_URL = %r{(?:vk\.com/)?(.+)}.freeze
+        VK_URL = %r{(?:https?://)?(?:vk\.com/)?([^/?&]+)}.freeze
         private_constant :VK_URL
 
         # vk.com user path regex

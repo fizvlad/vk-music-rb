@@ -58,6 +58,12 @@ RSpec.describe VkMusic::Utility::ProfileIdResolver, :vcr do
       let(:url) { 'vk.com/mashup' }
 
       it { expect(result).to eq(-39786657) }
+
+      context 'when full url club' do
+        let(:url) { 'https://vk.com/mashup' }
+
+        it { expect(result).to eq(-39786657) }
+      end
     end
 
     context 'when 404' do
