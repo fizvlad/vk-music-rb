@@ -88,6 +88,14 @@ RSpec.describe VkMusic::Client, :vcr do
         expect(result.real_size).to eq(6)
         expect(result.title).to eq('Klooe - Electrify The Love [EP]')
       end
+
+      context 'when private playlist without access hash' do
+        let(:url) { 'https://vk.com/music/playlist/-37661843_1' }
+
+        it :aggregate_failures do
+          expect(result).to be_nil
+        end
+      end
     end
 
     context 'when album' do
@@ -114,6 +122,74 @@ RSpec.describe VkMusic::Client, :vcr do
         let(:up_to) { 120 }
 
         it { expect(result.size).to eq(120) }
+      end
+    end
+
+    context 'when gibberish' do
+      let(:url) { 'https://vk.com/music/playlist/11111_22222' }
+
+      it :aggregate_failures do
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  describe '#audios' do
+    let(:url) { '' }
+    let(:up_to) { 10_000 }
+    let(:result) { instance.audios(url: url, up_to: up_to) }
+
+    context 'when user' do
+      let(:url) { 'https://vk.com/id8024985' }
+
+      it :aggregate_failures do
+        expect(result).to be_a(VkMusic::Playlist)
+        expect(result.size).to be >= 2000
+        expect(result.real_size).to be >= 2000
+        expect(result.title).to eq('Музыка Святослава Комиссарова')
+      end
+
+      context 'when user with closed profile' do
+        let(:url) { 'https://vk.com/id15' }
+
+        it :aggregate_failures do
+          expect(result).to be_nil
+        end
+      end
+
+      context 'when user with closed audios' do
+        let(:url) { 'https://vk.com/id18' }
+
+        it :aggregate_failures do
+          expect(result).to be_nil
+        end
+      end
+    end
+
+    context 'when group' do
+      let(:url) { 'https://vk.com/mashup' }
+
+      it :aggregate_failures do
+        expect(result).to be_a(VkMusic::Playlist)
+        expect(result.size).to be >= 2000
+        expect(result.real_size).to be >= 2000
+        expect(result.title).to eq('Музыка сообщества #mashup')
+      end
+
+      context 'when closed group' do
+        let(:url) { 'https://vk.com/vkappdevelopers' }
+
+        it :aggregate_failures do
+          expect(result).to be_nil
+        end
+      end
+
+      context 'when group with closed audios' do
+        let(:url) { 'https://vk.com/overhearspbsu' }
+
+        it :aggregate_failures do
+          expect(result).to be_nil
+        end
       end
     end
   end
