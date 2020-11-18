@@ -41,5 +41,20 @@ module VkMusic
       @url = url
       @client_id = client_id
     end
+
+    # @return [Boolean] whether URL saved into url attribute
+    def url_cached?
+      !!@url
+    end
+
+    # @return [Boolean] whether able to get download URL without web requests
+    def url_available?
+      url_cached? || !!(@url_encoded && @client_id)
+    end
+
+    # @return [Boolean] whether it's possible to get download URL with {Client#from_id}
+    def url_accessable?
+      !!(@id && @owner_id && @secret_1 && @secret_2)
+    end
   end
 end
