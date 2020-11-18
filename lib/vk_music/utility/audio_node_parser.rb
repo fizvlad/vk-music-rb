@@ -23,9 +23,9 @@ module VkMusic
           id_array = get_id_array(node)
           artist, title, duration = get_main_data(node)
 
-          new(id: Integer(id_array[1], 10), owner_id: Integer(id_array[0], 10),
-              artist: artist, title: title, duration: duration,
-              url_encoded: get_encoded_url(input), url: nil, client_id: client_id)
+          Audio.new(id: Integer(id_array[1], 10), owner_id: Integer(id_array[0], 10),
+                    artist: artist, title: title, duration: duration,
+                    url_encoded: get_encoded_url(input), url: nil, client_id: client_id)
         end
 
         def get_encoded_url(input)
@@ -51,12 +51,7 @@ module VkMusic
           artist = node.at_css('.medias_music_author').text.strip
           title = NodeTextChildrenReader.call(node.at_css('.medias_audio_title'))
           duration = DurationParser.call(node.at_css('.medias_audio_dur').text)
-          new(
-            artist: artist,
-            title: title,
-            duration: duration,
-            client_id: client_id
-          )
+          Audio.new(artist: artist, title: title, duration: duration, client_id: client_id)
         end
       end
     end
