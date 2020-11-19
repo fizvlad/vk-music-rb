@@ -137,7 +137,11 @@ module VkMusic
     # @param post_id [Integer]
     # @return [Array<Audio>] array of audios attached to post
     def post(url: nil, owner_id: nil, post_id: nil)
-      # TODO
+      owner_id, post_id = Utility::PostUrlParser.call(url) if url
+
+      return [] if owner_id.nil? || post_id.nil?
+
+      Utility::PostLoader.call(agent, id, owner_id, post_id)
     end
 
     # Get audios with download URLs by their IDs and secrets

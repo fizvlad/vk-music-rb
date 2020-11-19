@@ -263,4 +263,69 @@ RSpec.describe VkMusic::Client, :vcr do
       end
     end
   end
+
+  describe '#post' do
+    let(:url) { '' }
+    let(:result) { instance.post(url: url) }
+
+    context 'when post with audio' do
+      let(:url) { 'https://vk.com/wall-39786657_399071' }
+
+      it :aggregate_failures do
+        expect(result).to be_a(Array)
+        expect(result.size).to eq(1)
+        expect(result.first).to be_a(VkMusic::Audio)
+        expect(result.first.artist).to eq('sektorjazza')
+        expect(result.first.title).to eq('супертрек из брата 2 forever young сергей бодров 1997-2002 r.i.p.')
+        expect(result.first.duration).to eq(253)
+        expect(result.first).to be_url_accessable
+      end
+    end
+
+    context 'when reply' do
+      let(:url) { 'https://vk.com/wall-39786657_399073' }
+
+      it 'returnes audios from post', :aggregate_failures do
+        expect(result).to be_a(Array)
+        expect(result.size).to eq(1)
+        expect(result.first).to be_a(VkMusic::Audio)
+        expect(result.first.artist).to eq('sektorjazza')
+        expect(result.first.title).to eq('супертрек из брата 2 forever young сергей бодров 1997-2002 r.i.p.')
+        expect(result.first.duration).to eq(253)
+        expect(result.first).to be_url_accessable
+      end
+    end
+
+    context 'when not wall' do
+      let(:url) { 'https://vk.com/feed' }
+
+      it :aggregate_failures do
+        expect(result).to be_empty
+      end
+    end
+
+    context 'when 404' do
+      let(:url) { 'https://vk.com/a' }
+
+      it :aggregate_failures do
+        expect(result).to be_empty
+      end
+    end
+
+    context 'when playlist attached' do
+      let(:url) { 'https://vk.com/wall-39786657_398918' }
+
+      it :aggregate_failures do
+        expect(result).to be_empty
+      end
+    end
+
+    context 'when repost' do
+      let(:url) { 'https://vk.com/wall-39786657_399552' }
+
+      it :aggregate_failures do
+        expect(result).to be_empty
+      end
+    end
+  end
 end
