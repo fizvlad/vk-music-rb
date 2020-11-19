@@ -43,4 +43,11 @@ RSpec.describe VkMusic::Request::Base do
       expect(parsed_result['headers']).to include({ 'x-requested-with' => 'XMLHttpRequest' })
     end
   end
+
+  context 'when gibberish method' do
+    let(:path) { 'get' }
+    let(:method) { 'ASDASD' }
+
+    it { expect { result }.to raise_error(ArgumentError) }
+  end
 end

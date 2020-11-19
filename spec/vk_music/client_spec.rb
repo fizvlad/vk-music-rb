@@ -72,6 +72,13 @@ RSpec.describe VkMusic::Client, :vcr do
         it { expect(result).to be_empty }
       end
     end
+
+    context 'when searching for gibberish' do
+      let(:type) { :gibberish }
+      let(:query) { '' }
+
+      it { expect(result).to be_empty }
+    end
   end
 
   describe '#playlist' do
