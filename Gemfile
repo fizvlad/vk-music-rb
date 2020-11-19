@@ -32,4 +32,7 @@ group :test, :development do
 
   # Stub web requests
   gem 'webmock'
+
+  # Test coverage
+  gem 'simplecov', require: false, group: :test
 end
