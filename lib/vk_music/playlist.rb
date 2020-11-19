@@ -3,6 +3,7 @@
 module VkMusic
   # Class representing VK playlist
   class Playlist
+    extend Forwardable
     include Enumerable
 
     # @return [Integer, nil] playlist ID
@@ -17,17 +18,19 @@ module VkMusic
     attr_reader :subtitle
     # @return [Integer, nil] real size of playlist or +nil+ if unknown
     attr_reader :real_size
+    # @return [Array] audios array
+    attr_reader :audios
 
     # Initialize new playlist
-    # @param list [Array] list of audios in playlist
+    # @param audios [Array] list of audios in playlist
     # @param id [Integer, nil]
     # @param owner_id [Integer, nil]
     # @param access_hash [String, nil]
     # @param title [String]
     # @param subtitle [String, nil]
     # @param real_size [Integer, nil]
-    def initialize(list, id: nil, owner_id: nil, access_hash: nil, title: '', subtitle: nil, real_size: nil)
-      @list = list.dup
+    def initialize(audios, id: nil, owner_id: nil, access_hash: nil, title: '', subtitle: nil, real_size: nil)
+      @audios = audios.dup
       @id = id
       @owner_id = owner_id
       @access_hash = access_hash
@@ -36,30 +39,6 @@ module VkMusic
       @real_size = real_size
     end
 
-    # @return [Array<Audio>] duplicate of array of playlist audios
-    def to_a
-      @list.dup
-    end
-
-    # @!visibility private
-    def each(&block)
-      @list.each(&block)
-    end
-
-    # @!visibility private
-    def length
-      @list.length
-    end
-    alias size length
-
-    # @!visibility private
-    def [](index)
-      @list[index]
-    end
-
-    # @!visibility private
-    def empty?
-      @list.empty?
-    end
+    def_delegators :@audios, :each, :length, :size, :[], :empty?
   end
 end
