@@ -56,5 +56,11 @@ module VkMusic
     def url_accessable?
       !!(@id && @owner_id && @secret_1 && @secret_2)
     end
+
+    # @param audio [Autio]
+    # @return [Boolean] whether artist, title and duration are same
+    def like?(audio)
+      artist == audio.artist && title == audio.title && duration == audio.duration
+    end
   end
 end
