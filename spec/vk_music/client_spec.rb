@@ -128,9 +128,19 @@ RSpec.describe VkMusic::Client, :vcr do
     context 'when gibberish' do
       let(:url) { 'https://vk.com/music/playlist/11111_22222' }
 
-      it :aggregate_failures do
-        expect(result).to be_nil
-      end
+      it { expect(result).to be_nil }
+    end
+
+    context 'when 404' do
+      let(:url) { 'https://vk.com/a' }
+
+      it { expect(result).to be_nil }
+    end
+
+    context 'when feed' do
+      let(:url) { 'https://vk.com/feed' }
+
+      it { expect(result).to be_nil }
     end
   end
 
@@ -191,6 +201,18 @@ RSpec.describe VkMusic::Client, :vcr do
           expect(result).to be_nil
         end
       end
+    end
+
+    context 'when 404' do
+      let(:url) { 'https://vk.com/a' }
+
+      it { expect(result).to be_nil }
+    end
+
+    context 'when feed' do
+      let(:url) { 'https://vk.com/a' }
+
+      it { expect(result).to be_nil }
     end
   end
 
