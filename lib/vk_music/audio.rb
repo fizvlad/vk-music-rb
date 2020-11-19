@@ -42,6 +42,13 @@ module VkMusic
       @client_id = client_id
     end
 
+    # @return [String?]
+    def full_id
+      return unless @id && @owner_id && @secret1 && @secret2
+
+      "#{@id}_#{@owner_id}_#{@secret1}_#{@secret2}"
+    end
+
     # @return [Boolean] whether URL saved into url attribute
     def url_cached?
       !!@url
@@ -54,7 +61,7 @@ module VkMusic
 
     # @return [Boolean] whether it's possible to get download URL with {Client#from_id}
     def url_accessable?
-      !!(@id && @owner_id && @secret_1 && @secret_2)
+      !!full_id
     end
 
     # @param audio [Autio]
