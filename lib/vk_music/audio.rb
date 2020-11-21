@@ -46,7 +46,7 @@ module VkMusic
     def full_id
       return unless @id && @owner_id && @secret1 && @secret2
 
-      "#{@id}_#{@owner_id}_#{@secret1}_#{@secret2}"
+      "#{@owner_id}_#{@id}_#{@secret1}_#{@secret2}"
     end
 
     # @return [Boolean] whether URL saved into url attribute

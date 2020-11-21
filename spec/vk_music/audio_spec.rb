@@ -24,7 +24,7 @@ RSpec.describe VkMusic::Audio do
   describe '#full_id' do
     let(:result) { instance.full_id }
 
-    it { expect(result).to eq('123_456_text_text') }
+    it { expect(result).to eq('456_123_text_text') }
 
     context 'when no secrets' do
       let(:secret) { nil }
