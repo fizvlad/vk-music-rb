@@ -14,7 +14,7 @@ module VkMusic
 
       # Profile id
       def id
-        link = @node.link_with(href: ID_CONTAINING_HREF, css: '.basisProfile a,.basisGroup a')
+        link = node.link_with(href: ID_CONTAINING_HREF, css: '.basisProfile a,.basisGroup a')
         return unless link
 
         Integer(link.href.match(ID_CONTAINING_HREF).captures.first, 10)
@@ -22,7 +22,7 @@ module VkMusic
 
       # Last post ID
       def last_post_id
-        ids = @node.css('.wall_posts .wall_item').map do |el|
+        ids = node.css('.wall_posts .wall_item').map do |el|
           str = el.at_css('.post__anchor')&.attr('name')&.match(POST_ANCHOR_NAME_REGEX)&.captures&.last
           str ? Integer(str, 10) : nil
         end

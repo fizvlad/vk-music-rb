@@ -49,7 +49,7 @@ module VkMusic
       private
 
       def search_result_blocks
-        @search_result_blocks ||= @node.css('.AudioBlock').children
+        @search_result_blocks ||= node.css('.AudioBlock').children
       end
     end
   end

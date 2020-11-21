@@ -6,7 +6,7 @@ module VkMusic
     class Post < Base
       # @return [Array<Audio>]
       def audios
-        @node.css('.wi_body > .pi_medias .medias_audio').map do |el|
+        node.css('.wi_body > .pi_medias .medias_audio').map do |el|
           Utility::AudioNodeParser.call(el, @client_id)
         end
       end

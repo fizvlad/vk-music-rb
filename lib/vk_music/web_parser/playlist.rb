@@ -6,17 +6,17 @@ module VkMusic
     class Playlist < Base
       # @return [Array<Audio>]
       def audios
-        Utility::AudioItemsParser.call(@node, @client_id)
+        Utility::AudioItemsParser.call(node, @client_id)
       end
 
       # @return [String]
       def title
-        @node.at_css('.audioPlaylist__title').content.strip
+        node.at_css('.audioPlaylist__title').content.strip
       end
 
       # @return [String?]
       def subtitle
-        result = @node.at_css('.audioPlaylist__subtitle').content.strip
+        result = node.at_css('.audioPlaylist__subtitle').content.strip
         return if result.nil? || result.empty?
 
         result
@@ -24,7 +24,7 @@ module VkMusic
 
       # @return [Integer?]
       def real_size
-        content = @node.at_css('.audioPlaylist__footer').content
+        content = node.at_css('.audioPlaylist__footer').content
         matches = content.gsub(/\s/, '').match(/^(\d+)/)&.captures
         matches ? Integer(matches.first, 10) : nil
       end

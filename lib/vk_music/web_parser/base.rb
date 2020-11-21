@@ -4,11 +4,23 @@ module VkMusic
   module WebParser
     # Base class for all web parsers
     class Base
-      # @param obj [String, Nokogiri::XML::Searchable]
+      # @param content [String, Nokogiri::XML::Searchable]
       # @param client_id [Integer?]
-      def initialize(obj, client_id: nil)
-        @node = obj.is_a?(String) ? Nokogiri::HTML.fragment(obj) : obj
+      def initialize(content, client_id: nil)
+        @content = content
         @client_id = client_id
+      end
+
+      private
+
+      attr_reader :content
+
+      def node
+        @node ||= @content.is_a?(String) ? Nokogiri::HTML.fragment(@content) : @content
+      end
+
+      def json
+        @json ||= JSON.parse(@content.is_a?(String) ? @content : @content.body)
       end
     end
   end

@@ -5,31 +5,31 @@ module VkMusic
     # WallSection JSON parser
     class WallSection < Base
       # Parsed JSON
-      def json
-        @json ||= JSON.parse(@node.content.strip)['data'].first || {}
+      def data
+        @data ||= json['data'].first || {}
       end
 
       # @return [Array<Audio>]
       def audios
-        return unless json&.key?('list')
+        return unless data&.key?('list')
 
-        json['list'].map do |el|
+        data['list'].map do |el|
           Utility::AudioDataParser.call(el, @client_id)
         end
       end
 
       # @return [String]
       def title
-        return unless json&.key?('title')
+        return unless data&.key?('title')
 
-        json['title'].to_s
+        data['title'].to_s
       end
 
       # @return [String?]
       def subtitle
-        return unless json&.key?('rawDescription')
+        return unless data&.key?('rawDescription')
 
-        re = json['rawDescription']
+        re = data['rawDescription']
         return if re.nil? || re.empty?
 
         re
@@ -37,16 +37,16 @@ module VkMusic
 
       # @return [Integer?]
       def real_size
-        return unless json&.key?('totalCount')
+        return unless data&.key?('totalCount')
 
-        json['totalCount']
+        data['totalCount']
       end
 
       # @return [Boolean]
       def more?
-        return unless json&.key?('hasMore')
+        return unless data&.key?('hasMore')
 
-        json['hasMore'].to_s == '1'
+        data['hasMore'].to_s == '1'
       end
     end
   end
