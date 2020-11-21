@@ -9,4 +9,5 @@ module VkMusic
   end
 end
 
+require_relative 'request/base'
 Dir[File.join(__dir__, 'request', '*.rb')].each { |file| require_relative file }
