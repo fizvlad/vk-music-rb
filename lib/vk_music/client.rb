@@ -145,13 +145,21 @@ module VkMusic
     end
 
     # Get audios with download URLs by their IDs and secrets
-    # @param args [Array<Audio, Array<(owner_id, audio_id, secret_1, secret_2)>,
+    # @param args [Array<Audio, (owner_id, audio_id, secret_1, secret_2),
     #   "#{owner_id}_#{id}_#{secret_1}_#{secret_2}">]
     # @return [Array<Audio, nil>] array of: audio with download URLs or audio
     #   without URL if wasn't able to get it for audio or +nil+ if
     #   matching element can't be retrieved for array or string
     def get_urls(args)
-      # TODO
+      ids = Utility::AudiosIdsGetter.call(args)
+      audios = Utility::AudiosFromIdsLoader.call(agent, ids, id)
+
+      args.map do |el|
+        # NOTE: can not load unaccessable audio, so just returning it
+        next el if el.is_a?(Audio) && !el.url_accessable?
+
+        audios.find { |a| a.id_matches?(el) }
+      end
     end
     alias from_id get_urls
 

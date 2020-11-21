@@ -357,4 +357,67 @@ RSpec.describe VkMusic::Client, :vcr do
       end
     end
   end
+
+  describe '#get_urls' do
+    let(:audios) { [] }
+    let(:result) { instance.get_urls(audios) }
+
+    it { expect(result).to be_empty }
+
+    context 'when from find' do
+      let(:audios) { instance.find('test', type: :audio) }
+
+      it :aggregate_failures do
+        expect(result).to be_a(Array)
+        expect(result.size).to eq(6)
+        expect(result).to all(be_a(VkMusic::Audio))
+        expect(result).to all(be_url_available)
+      end
+    end
+
+    context 'when from playlist' do
+      let(:url) { 'https://vk.com/music/playlist/19198851_39318804_6c2b34085c37213dfb' }
+      let(:audios) { instance.playlist(url: url).audios }
+
+      it :aggregate_failures do
+        expect(result).to be_a(Array)
+        expect(result.size).to eq(6)
+        expect(result).to all(be_a(VkMusic::Audio))
+        expect(result).to all(be_url_available)
+      end
+    end
+
+    context 'when from audios' do
+      let(:audios) { instance.audios(url: 'vk.com/id8024985', up_to: 10).audios }
+
+      it :aggregate_failures do
+        expect(result).to be_a(Array)
+        expect(result.size).to eq(10)
+        expect(result).to all(be_a(VkMusic::Audio))
+        expect(result).to all(be_url_available)
+      end
+    end
+
+    context 'when from wall' do
+      let(:audios) { instance.wall(url: 'https://vk.com/mashup').audios.first(10) }
+
+      it :aggregate_failures do
+        expect(result).to be_a(Array)
+        expect(result.size).to eq(10)
+        expect(result).to all(be_a(VkMusic::Audio))
+        expect(result).to all(be_url_available)
+      end
+    end
+
+    context 'when from post' do
+      let(:audios) { instance.post(url: 'https://vk.com/wall-39786657_399071') }
+
+      it :aggregate_failures do
+        expect(result).to be_a(Array)
+        expect(result.size).to eq(1)
+        expect(result.first).to be_a(VkMusic::Audio)
+        expect(result.first).to be_url_available
+      end
+    end
+  end
 end
