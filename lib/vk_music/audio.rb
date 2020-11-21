@@ -64,10 +64,22 @@ module VkMusic
       !!full_id
     end
 
-    # @param audio [Autio]
+    # @param audio [Audio]
     # @return [Boolean] whether artist, title and duration are same
     def like?(audio)
       artist == audio.artist && title == audio.title && duration == audio.duration
+    end
+
+    # @param [Audio, Array(owner_id, audio_id, secret1, secret2), String]
+    # @return [Boolean] id-based comparison
+    def id_matches?(data)
+      data_id = case data
+      when Array then data.join('_')
+      when Audio then data.full_id
+      when String then data.strip
+      end
+
+      full_id == data_id
     end
   end
 end
