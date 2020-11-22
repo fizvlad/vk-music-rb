@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe VkMusic::Audio do
+RSpec.describe VkMusic::Audio, :vcr do
   let(:data) do
     {
       id: 123, owner_id: 456, secret1: secret, secret2: secret,
@@ -70,6 +70,30 @@ RSpec.describe VkMusic::Audio do
       let(:url) { 'url' }
 
       it { expect(result).to be(true) }
+    end
+  end
+
+  describe '#url' do
+    context 'when url is already cached' do
+      let(:url) { 'stub' }
+
+      it { expect(instance.url).to eq('stub') }
+    end
+
+    context 'when no urls' do
+      let(:url_encoded) { nil }
+      let(:url) { nil }
+
+      it { expect(instance.url).to be_nil }
+    end
+
+    context 'when with encoded url' do
+      let(:client) { logged_in_client }
+      let(:instance) { client.find('test', type: :audio).first }
+
+      before { client.update_urls([instance]) }
+
+      it { expect(instance.url).to be_a(String) }
     end
   end
 end
