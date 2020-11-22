@@ -166,7 +166,12 @@ module VkMusic
     # Update download URLs of provided audios
     # @param audios [Array<Audio>]
     def update_urls(audios)
-      # TODO
+      with_url = get_urls(audios)
+      audios.each.with_index do |audio, i|
+        audio_with_url = with_url[i]
+        audio.update(audio_with_url) if audio_with_url
+      end
+      audios
     end
 
     private

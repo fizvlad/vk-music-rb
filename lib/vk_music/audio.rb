@@ -3,12 +3,6 @@
 module VkMusic
   # Class representing VK audio
   class Audio
-    # @return [Integer, nil] ID of audio
-    attr_reader :id
-    # @return [Integer, nil] ID of audio owner
-    attr_reader :owner_id
-    # @return [String, nil] part of secret hash which used when using +act=reload_audio+
-    attr_reader :secret1, :secret2
     # @return [String] name of artist
     attr_reader :artist
     # @return [String] title of song
@@ -25,7 +19,7 @@ module VkMusic
     # @param title [String]
     # @param duration [Integer]
     # @param url_encoded [String, nil]
-    # @param url [String, nil]
+    # @param url [String, nil] decoded URL
     # @param client_id [Integer, nil]
     def initialize(id: nil, owner_id: nil, secret1: nil, secret2: nil,
                    artist: '', title: '', duration: 0,
@@ -38,8 +32,29 @@ module VkMusic
       @title = title.to_s.strip
       @duration = duration
       @url_encoded = url_encoded
-      @url = url
+      @url_decoded = url
       @client_id = client_id
+    end
+
+    # @return [String?]
+    def url
+      return @url_decoded if @url_decoded
+
+      return unless @url_encoded && @client_id
+
+      Utility::LinkDecoder.call(@url_encoded, @client_id)
+    end
+
+    # Update audio data from another one
+    def update(audio)
+      VkMusic.log.warn('Audio') { "Performing update of #{self} from #{audio}" } unless like?(audio)
+      @id = audio.id
+      @owner_id = audio.owner_id
+      @secret1 = audio.secret1
+      @secret2 = audio.secret2
+      @url_encoded = audio.url_encoded
+      @url_decoded = audio.url_decoded
+      @client_id = audio.client_id
     end
 
     # @return [String?]
@@ -51,7 +66,7 @@ module VkMusic
 
     # @return [Boolean] whether URL saved into url attribute
     def url_cached?
-      !!@url
+      !!@url_decoded
     end
 
     # @return [Boolean] whether able to get download URL without web requests
@@ -81,5 +96,14 @@ module VkMusic
 
       full_id == data_id
     end
+
+    # @return [String] pretty-printed audio name
+    def to_s
+      "#{@artist} - #{@title} [#{@duration}s]"
+    end
+
+    protected
+
+    attr_reader :id, :owner_id, :secret1, :secret2, :url_encoded, :url_decoded, :client_id
   end
 end

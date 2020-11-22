@@ -388,11 +388,11 @@ RSpec.describe VkMusic::Client, :vcr do
     end
 
     context 'when from audios' do
-      let(:audios) { instance.audios(url: 'vk.com/id8024985', up_to: 10).audios }
+      let(:audios) { instance.audios(url: 'vk.com/id8024985', up_to: 50).audios }
 
       it :aggregate_failures do
         expect(result).to be_a(Array)
-        expect(result.size).to eq(10)
+        expect(result.size).to eq(50)
         expect(result).to all(be_a(VkMusic::Audio))
         expect(result).to all(be_url_available)
       end
@@ -417,6 +417,23 @@ RSpec.describe VkMusic::Client, :vcr do
         expect(result.size).to eq(1)
         expect(result.first).to be_a(VkMusic::Audio)
         expect(result.first).to be_url_available
+      end
+    end
+  end
+
+  describe '#update_urls' do
+    let(:audios) { [] }
+    let(:call) { instance.update_urls(audios) }
+
+    context 'when from find' do
+      let(:audios) { instance.find('test', type: :audio) }
+
+      it :aggregate_failures do
+        call
+        expect(audios).to be_a(Array)
+        expect(audios.size).to eq(6)
+        expect(audios).to all(be_a(VkMusic::Audio))
+        expect(audios).to all(be_url_accessable)
       end
     end
   end
