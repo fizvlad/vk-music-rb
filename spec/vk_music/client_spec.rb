@@ -426,12 +426,12 @@ RSpec.describe VkMusic::Client, :vcr do
     let(:call) { instance.update_urls(audios) }
 
     context 'when from find' do
-      let(:audios) { instance.find('test', type: :audio) }
+      let(:audios) { instance.audios(url: 'vk.com/id8024985', up_to: 50).audios }
 
       it :aggregate_failures do
         call
         expect(audios).to be_a(Array)
-        expect(audios.size).to eq(6)
+        expect(audios.size).to eq(50)
         expect(audios).to all(be_a(VkMusic::Audio))
         expect(audios).to all(be_url_accessable)
       end
