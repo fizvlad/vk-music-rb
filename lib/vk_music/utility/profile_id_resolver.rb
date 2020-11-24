@@ -4,24 +4,24 @@ module VkMusic
   module Utility
     # Get user or group id from url
     class ProfileIdResolver
+      # vk.com url regex
+      VK_PATH = %r{(?:https?://)?(?:vk\.com/)?([^/?&]+)}.freeze
+      public_constant :VK_PATH
+
+      # vk.com user path regex
+      USER_PATH = /id(\d+)/.freeze
+      public_constant :USER_PATH
+
+      # vk.com user club regex
+      CLUB_PATH = /(?:club|group|public|event)(\d+)/.freeze
+      public_constant :CLUB_PATH
+
       class << self
-        # vk.com url regex
-        VK_URL = %r{(?:https?://)?(?:vk\.com/)?([^/?&]+)}.freeze
-        private_constant :VK_URL
-
-        # vk.com user path regex
-        USER_PATH = /id(\d+)/.freeze
-        private_constant :USER_PATH
-
-        # vk.com user club regex
-        CLUB_PATH = /(?:club|group|public|event)(\d+)/.freeze
-        private_constant :CLUB_PATH
-
         # @param agent [Mechanize]
         # @param url [String] URL to profile page
         # @return [Integer?] ID of profile or +nil+ if not a profile page
         def call(agent, url)
-          path = url.match(VK_URL)&.captures&.first
+          path = url.match(VK_PATH)&.captures&.first
           return unless path
 
           direct_match = direct_match(path)
