@@ -8,7 +8,7 @@ def login_agent(agent)
 end
 
 # Path to file where testing cookies will be stored
-AGENT_COOKIES_PATH = 'spec_data/.cookies'
+AGENT_COOKIES_PATH = 'spec/.cookies'
 
 # @return [Mechanize] logged in Mechanize client.
 def logged_in_agent

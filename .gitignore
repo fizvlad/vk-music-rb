@@ -8,9 +8,7 @@
 /doc/
 /pkg/
 /spec/reports/
-/spec_data/.cookies
-/spec_data/cassetes/*
-!/spec_data/cassetes/README.md
-/spec_data/responses/*
-!/spec_data/responses/README.md
+/spec/.cookies
+/spec/cassetes/*
+!/spec/cassetes/README.md
 /tmp/
