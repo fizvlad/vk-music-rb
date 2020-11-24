@@ -9,6 +9,8 @@ module VkMusic
     attr_reader :title
     # @return [Integer] duration of track in seconds
     attr_reader :duration
+    # @return [String?] encoded URL which can be manually decoded if client ID is known
+    attr_reader :url_encoded
 
     # Initialize new audio
     # @param id [Integer, nil]
@@ -104,6 +106,6 @@ module VkMusic
 
     protected
 
-    attr_reader :id, :owner_id, :secret1, :secret2, :url_encoded, :url_decoded, :client_id
+    attr_reader :id, :owner_id, :secret1, :secret2, :url_decoded, :client_id
   end
 end
