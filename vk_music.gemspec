@@ -10,9 +10,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Fizvlad']
   spec.email         = ['fizvlad@mail.ru']
 
-  spec.summary       = 'Provides interface to work with VK music via HTTP requests'
-  spec.description   = 'Library to work with audios on popular Russian social network vk.com. VK disabled their ' \
-                       'public API for audios, so it is now necessary to use parsers instead.'
+  spec.summary       = 'A library to work with audios on popular Russian social network'
+  spec.description   = 'A library to work with audios on popular Russian social network'
   spec.homepage      = 'https://github.com/fizvlad/vk-music-rb'
   spec.license       = 'MIT'
 
