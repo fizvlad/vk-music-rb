@@ -1,18 +1,32 @@
-require "cgi"
-require "logger"
-require "mechanize"
-require "execjs"
-require "json"
+# frozen_string_literal: true
 
-require_relative "vk_music/version"
-require_relative "vk_music/constants"
-require_relative "vk_music/exceptions"
-require_relative "vk_music/utility"
-require_relative "vk_music/link_decoder"
-require_relative "vk_music/audio"
-require_relative "vk_music/playlist"
-require_relative "vk_music/client"
+require 'execjs'
+require 'mechanize'
+require 'json'
+require 'logger'
+require 'forwardable'
 
-##
-# Main module.
-module VkMusic; end
+# Main module
+module VkMusic
+  @@log = Logger.new($stdout)
+
+  # Logger of library classes
+  # @return [Logger]
+  def self.log
+    @@log
+  end
+
+  # Replace logger
+  # @param logger [Logger]
+  def self.log=(logger)
+    @@log = logger
+  end
+end
+
+require_relative 'vk_music/version'
+require_relative 'vk_music/utility'
+require_relative 'vk_music/request'
+require_relative 'vk_music/web_parser'
+require_relative 'vk_music/client'
+require_relative 'vk_music/audio'
+require_relative 'vk_music/playlist'

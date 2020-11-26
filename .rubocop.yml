@@ -1,0 +1,56 @@
+# The behavior of RuboCop can be controlled via the .rubocop.yml
+# configuration file. It makes it possible to enable/disable
+# certain cops (checks) and to alter their behavior if they accept
+# any parameters. The file can be placed either in your home
+# directory or in some project directory.
+#
+# RuboCop will start looking for the configuration file in the directory
+# where the inspected file is and continue its way up to the root directory.
+#
+# See https://docs.rubocop.org/rubocop/configuration
+
+AllCops:
+  TargetRubyVersion: 2.7
+  EnabledByDefault: true
+
+Layout/FirstMethodParameterLineBreak:
+  Enabled: false
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: false
+Layout/MultilineMethodArgumentLineBreaks:
+  Enabled: false
+Layout/EndOfLine:
+  Enabled: false
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+Layout/FirstHashElementIndentation:
+  Enabled: false
+Layout/MultilineAssignmentLayout:
+  EnforcedStyle: same_line
+Layout/CaseIndentation:
+  EnforcedStyle: end
+Lint/ConstantResolution:
+  Enabled: false
+Metrics/ParameterLists:
+  Enabled: false
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*_spec.rb'
+Style/MethodCallWithArgsParentheses:
+  Enabled: false
+Style/Copyright:
+  Enabled: false
+Style/ClassVars:
+  Enabled: false
+Style/MissingElse:
+  Enabled: false
+Style/StringHashKeys:
+  Enabled: false
+Style/ImplicitRuntimeError:
+  Enabled: false
+Style/NumericLiterals:
+  Enabled: false
+Style/DisableCopsWithinSourceCodeDirective:
+  Enabled: false
+Layout/MultilineHashKeyLineBreaks:
+  Enabled: false

@@ -1,25 +1,15 @@
-require "bundler/gem_tasks"
-require "rake/testtask"
+# frozen_string_literal: true
 
-task :test do
-  puts "Running tests require login credetionals (NOTICE: they won't be hidden in anyway)"
-  
-  print "Login:    "
-  username = STDIN.gets.chomp
-  
-  print "Password: "
-  password = STDIN.gets.chomp
-  puts
-  
-  print "Path to SSL certificate (leave empty if there is no troubles with SSL): "
-  ssl_cert_path = STDIN.gets.chomp
-  puts
-  ENV["SSL_CERT_FILE"] = ssl_cert_path unless ssl_cert_path.empty?
-  
-  Dir[ "test/test_*.rb" ].each do |file|
-    puts "\n\nRunning #{file}:"
-    ruby "-w #{file} '#{username}' '#{password}'"
-  end
+require 'bundler/gem_tasks'
+require 'rspec/core/rake_task'
+require 'yard'
+
+RSpec::Core::RakeTask.new(:spec)
+
+YARD::Rake::YardocTask.new do |t|
+  t.files   = ['lib/**/*.rb']
+  t.options = ['--any', '--extra', '--opts']
+  t.stats_options = ['--list-undoc']
 end
 
-task :default => :test
+task default: %i[spec yard]

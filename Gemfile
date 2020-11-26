@@ -1,10 +1,38 @@
-source "https://rubygems.org"
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
 
 # Specify your gem's dependencies in vk_music.gemspec
 gemspec
 
-gem "logger", "~> 1.4"
+group :test, :development do
+  # Debugging console
+  gem 'pry'
 
-gem "mechanize", "~> 2.7"
+  # Another debugging console
+  gem 'byebug'
 
-gem "pry", "~> 0.12.2"
+  # The thing, forcing you to write good code
+  gem 'rubocop', require: false
+
+  # Rake tasks
+  gem 'rake', require: false
+
+  # Testing
+  gem 'rspec', require: false
+
+  # Docs
+  gem 'yard', require: false
+
+  # .env support
+  gem 'dotenv'
+
+  # Save web requests for fast and reliable testing
+  gem 'vcr'
+
+  # Stub web requests
+  gem 'webmock'
+
+  # Test coverage
+  gem 'simplecov', require: false, group: :test
+end

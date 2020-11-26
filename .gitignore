@@ -1,8 +1,14 @@
+/.env
+/.byebug_history
 /.bundle/
+/.legacy/
 /.yardoc
 /_yardoc/
 /coverage/
 /doc/
 /pkg/
 /spec/reports/
+/spec/.cookies
+/spec/cassetes/*
+!/spec/cassetes/README.md
 /tmp/
