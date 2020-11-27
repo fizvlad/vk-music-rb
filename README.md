@@ -1,3 +1,5 @@
+![Gem](https://img.shields.io/gem/v/vk_music) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fizvlad/vk-music-rb/Ruby) ![Lines of code](https://img.shields.io/tokei/lines/github/fizvlad/vk-music-rb) ![Gem](https://img.shields.io/gem/dtv/vk_music)
+
 # VkMusic
 
 *vk_music* gem is a library to work with audios on popular Russian social network
