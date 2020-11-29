@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vk_music (4.0.0)
+    vk_music (4.0.1)
       execjs (~> 2.7)
       json (~> 2.3)
       logger (~> 1.4)
@@ -45,8 +45,6 @@ GEM
     net-http-digest_auth (1.4.1)
     net-http-persistent (2.9.4)
     nokogiri (1.10.10)
-      mini_portile2 (~> 2.4.0)
-    nokogiri (1.10.10-x64-mingw32)
       mini_portile2 (~> 2.4.0)
     ntlm-http (0.1.1)
     parallel (1.19.2)
@@ -92,7 +90,6 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)
-    unf_ext (0.0.7.7-x64-mingw32)
     unicode-display_width (1.7.0)
     vcr (6.0.0)
     webmock (3.9.5)
