@@ -166,6 +166,17 @@ RSpec.describe VkMusic::Client, :vcr do
         expect(result.title).to eq('Музыка Святослава Комиссарова')
       end
 
+      context 'when audios page' do
+        let(:url) { 'https://vk.com/audios8024985' }
+
+        it :aggregate_failures do
+          expect(result).to be_a(VkMusic::Playlist)
+          expect(result.size).to be >= 2000
+          expect(result.real_size).to be >= 2000
+          expect(result.title).to eq('Музыка Святослава Комиссарова')
+        end
+      end
+
       context 'when user with closed profile' do
         let(:url) { 'https://vk.com/id15' }
 
@@ -191,6 +202,17 @@ RSpec.describe VkMusic::Client, :vcr do
         expect(result.size).to be >= 2000
         expect(result.real_size).to be >= 2000
         expect(result.title).to eq('Музыка сообщества #mashup')
+      end
+
+      context 'when audios page' do
+        let(:url) { 'https://vk.com/audios-39786657' }
+
+        it :aggregate_failures do
+          expect(result).to be_a(VkMusic::Playlist)
+          expect(result.size).to be >= 2000
+          expect(result.real_size).to be >= 2000
+          expect(result.title).to eq('Музыка сообщества #mashup')
+        end
       end
 
       context 'when closed group' do

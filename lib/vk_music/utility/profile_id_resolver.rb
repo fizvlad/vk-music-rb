@@ -8,6 +8,10 @@ module VkMusic
       VK_PATH = %r{(?:https?://)?(?:vk\.com/)?([^/?&]+)}.freeze
       public_constant :VK_PATH
 
+      # audios list page
+      AUDIOS_PATH = /audios(-?\d+)/.freeze
+      public_constant :AUDIOS_PATH
+
       # vk.com user path regex
       USER_PATH = /id(\d+)/.freeze
       public_constant :USER_PATH
@@ -37,6 +41,9 @@ module VkMusic
         private
 
         def direct_match(path)
+          audios_match = path.match(AUDIOS_PATH)
+          return Integer(audios_match.captures.first, 10) if audios_match
+
           user_match = path.match(USER_PATH)
           return Integer(user_match.captures.first, 10) if user_match
 
