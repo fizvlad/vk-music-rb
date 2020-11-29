@@ -134,6 +134,12 @@ RSpec.describe VkMusic::Utility::DataTypeGuesser do
 
       it { expect(result).to eq(:audios) }
     end
+
+    context 'when audios page' do
+      let(:data) { 'https://www.vk.com/audios123456' }
+
+      it { expect(result).to eq(:audios) }
+    end
   end
 
   context 'when search' do
