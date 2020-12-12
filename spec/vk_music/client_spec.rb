@@ -263,7 +263,7 @@ RSpec.describe VkMusic::Client, :vcr do
 
       it :aggregate_failures do
         expect(result).to be_a(VkMusic::Playlist)
-        expect(result.size).to eq(100)
+        expect(result.size).to be >= 80
         expect(result.title).to eq('Аудиозаписи со стены #mashup')
       end
 
@@ -272,7 +272,7 @@ RSpec.describe VkMusic::Client, :vcr do
 
         it :aggregate_failures do
           expect(result).to be_a(VkMusic::Playlist)
-          expect(result.size).to eq(100)
+          expect(result.size).to be >= 80
           expect(result.title).to eq('Аудиозаписи со стены #mashup')
         end
       end
