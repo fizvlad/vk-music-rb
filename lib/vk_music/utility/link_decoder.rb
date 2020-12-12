@@ -96,7 +96,8 @@ module VkMusic
       # @param client_id [Integer] ID of user which got this link. ID is required for decoding.
       # @return [String?] audio download URL, which can be used only from current IP.
       def self.call(link, client_id)
-        @@js_context.call('vk_unmask_link', link, client_id)
+        VkMusic.log.debug('LinkDecoder') { "Unmasking link #{link} with client id #{client_id}" }
+        @@js_context.call('vk_unmask_link', link.to_s, Integer(client_id, 10))
       rescue StandardError
         VkMusic.log.warn('LinkDecoder') { "Failed to decode link: #{link}" }
         nil
