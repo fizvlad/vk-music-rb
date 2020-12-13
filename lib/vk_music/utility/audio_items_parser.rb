@@ -8,7 +8,7 @@ module VkMusic
       # @param client_id [Integer]
       # @return [Array<Audio>]
       def self.call(node, client_id)
-        node.css('.audio_item.ai_has_btn').map do |elem|
+        node.css('.audio_item.ai_has_btn,.audio_item.audio_item_disabled').map do |elem|
           data = JSON.parse(elem.attribute('data-audio').value)
           Utility::AudioDataParser.call(data, client_id)
         end
