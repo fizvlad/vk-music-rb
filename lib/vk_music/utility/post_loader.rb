@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Load wall audios
-    class PostLoader
+    module PostLoader
       # @param agent [Mechanize]
       # @param client_id [Integer]
       # @param owner_id [Integer]

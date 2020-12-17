@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Load audios from ids
-    class AudiosFromIdsLoader
+    module AudiosFromIdsLoader
       # @param agent [Mechanize]
       # @param ids [Array<String>]
       # @return [Array<Audio>]

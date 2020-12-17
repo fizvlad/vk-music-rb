@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Turn human readable track length to its size in seconds
-    class DurationParser
+    module DurationParser
       # @param str [String] string in format "HH:MM:SS" or something alike (+/d++ Regex selector is used)
       # @return [Integer] amount of seconds
       def self.call(str)

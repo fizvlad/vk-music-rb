@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Read inner of text-childrens of +Nokogiri::XML::Node+ node
-    class PlaylistNodeParser
+    module PlaylistNodeParser
       # @param node [Nokogiri::XML::Node]
       # @return [Playlist]
       def self.call(node)

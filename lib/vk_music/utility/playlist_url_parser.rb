@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Read inner of text-childrens of +Nokogiri::XML::Node+ node
-    class PlaylistUrlParser
+    module PlaylistUrlParser
       # Regular expression to parse playlist link. Oh my, it is so big
       VK_PLAYLIST_URL_POSTFIX = %r{
         .*                                                              # Garbage

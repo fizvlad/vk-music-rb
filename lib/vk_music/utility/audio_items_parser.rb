@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Parse {Audio} from +Nokogiri::XML::Node+
-    class AudioItemsParser
+    module AudioItemsParser
       # @param node [Nokogiri::XML::Node]
       # @param client_id [Integer]
       # @return [Array<Audio>]

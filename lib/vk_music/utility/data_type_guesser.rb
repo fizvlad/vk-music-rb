@@ -6,7 +6,7 @@ require_relative 'post_url_parser'
 module VkMusic
   module Utility
     # Guess type of method to use based on string data
-    class DataTypeGuesser
+    module DataTypeGuesser
       # End of playlist URL
       PLAYLIST_POSTFIX = PlaylistUrlParser::VK_PLAYLIST_URL_POSTFIX
       public_constant :PLAYLIST_POSTFIX

@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Get user or group id from url
-    class ProfileIdResolver
+    module ProfileIdResolver
       # vk.com url regex
       VK_PATH = %r{(?:https?://)?(?:vk\.com/)?([^/?&]+)}.freeze
       public_constant :VK_PATH

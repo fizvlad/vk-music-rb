@@ -5,7 +5,7 @@ require_relative 'profile_id_resolver'
 module VkMusic
   module Utility
     # Get user or group id from url
-    class LastProfilePostLoader
+    module LastProfilePostLoader
       # vk.com url regex
       VK_PATH = ProfileIdResolver::VK_PATH
       private_constant :VK_PATH

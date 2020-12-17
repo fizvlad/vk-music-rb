@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Load ids from array of data
-    class AudiosIdsGetter
+    module AudiosIdsGetter
       # @param args [Array<Audio, (owner_id, audio_id, secret_1, secret_2),
       #   "#{owner_id}_#{id}_#{secret_1}_#{secret_2}">]
       # @return [Array<String>] array of uniq full ids
