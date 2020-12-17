@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Load playlist audios
-    class PlaylistLoader
+    module PlaylistLoader
       # @param agent [Mechanize]
       # @param client_id [Integer]
       # @param owner_id [Integer]

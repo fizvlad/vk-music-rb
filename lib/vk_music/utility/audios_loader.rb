@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Load user or group audios
-    class AudiosLoader
+    module AudiosLoader
       class << self
         # @param agent [Mechanize]
         # @param client_id [Integer]

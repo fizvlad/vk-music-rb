@@ -3,11 +3,11 @@
 module VkMusic
   module Utility
     # Read inner of text-childrens of +Nokogiri::XML::Node+ node
-    class NodeTextChildrenReader
+    module NodeTextChildrenReader
       # @param node [Nokogiri::XML::Node]
       # @return [String]
       def self.call(node)
-        node.children.select(&:text?).map(&:text).join('').strip
+        node.children.select(&:text?).map(&:text).join.strip
       end
     end
   end

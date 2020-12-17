@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Load sections into playlist
-    class PlaylistSectionLoader
+    module PlaylistSectionLoader
       # @param agent [Mechanize]
       # @param client_id [Integer]
       # @param owner_id [Integer]

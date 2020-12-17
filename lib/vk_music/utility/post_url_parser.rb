@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Load wall audios
-    class PostUrlParser
+    module PostUrlParser
       # Regex for post URL
       POST_POSTFIX = /.*wall(-?\d+)_(\d+)/.freeze
       public_constant :POST_POSTFIX

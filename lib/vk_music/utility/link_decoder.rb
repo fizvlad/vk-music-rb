@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Link decoding utilities
-    class LinkDecoder
+    module LinkDecoder
       # JS code which creates function to unmask audio URL.
       JS_CODE = <<~HEREDOC
         function vk_unmask_link(link, vk_id) {

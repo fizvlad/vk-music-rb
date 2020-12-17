@@ -3,7 +3,7 @@
 module VkMusic
   module Utility
     # Parse {Audio} from +Array+ of audio data
-    class AudioDataParser
+    module AudioDataParser
       class << self
         # @param data [Array]
         # @param client_id [Integer]
