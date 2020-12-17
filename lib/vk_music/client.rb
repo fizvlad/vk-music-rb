@@ -51,12 +51,6 @@ module VkMusic
       false
     end
 
-    # Unmask old VK music link
-    # @param limk [String]
-    def unmask_link(link)
-      VkMusic::LinkDecoder.unmask_link(link, @id)
-    end
-
     # Search for audio or playlist
     #
     # Possible values of +type+ option:

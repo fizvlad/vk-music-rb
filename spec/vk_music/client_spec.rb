@@ -103,6 +103,17 @@ RSpec.describe VkMusic::Client, :vcr do
           expect(result).to be_nil
         end
       end
+
+      context 'when playlist got disabled audios' do
+        let(:url) { 'https://vk.com/music/playlist/-33507639_58254888_0d3aabf63b6a016fc2' }
+
+        it :aggregate_failures do
+          expect(result).to be_a(VkMusic::Playlist)
+          expect(result.size).to eq(15)
+          expect(result.real_size).to eq(15)
+          expect(result.map(&:to_s).uniq.size).to eq(15)
+        end
+      end
     end
 
     context 'when album' do
@@ -263,7 +274,7 @@ RSpec.describe VkMusic::Client, :vcr do
 
       it :aggregate_failures do
         expect(result).to be_a(VkMusic::Playlist)
-        expect(result.size).to eq(100)
+        expect(result.size).to be >= 80
         expect(result.title).to eq('Аудиозаписи со стены #mashup')
       end
 
@@ -272,7 +283,7 @@ RSpec.describe VkMusic::Client, :vcr do
 
         it :aggregate_failures do
           expect(result).to be_a(VkMusic::Playlist)
-          expect(result.size).to eq(100)
+          expect(result.size).to be >= 80
           expect(result.title).to eq('Аудиозаписи со стены #mashup')
         end
       end
@@ -406,6 +417,18 @@ RSpec.describe VkMusic::Client, :vcr do
         expect(result.size).to eq(6)
         expect(result).to all(be_a(VkMusic::Audio))
         expect(result).to all(be_url_available)
+      end
+
+      context 'playlist with unavailable audios and array of strings is provided' do
+        let(:url) { 'https://vk.com/music/playlist/-33507639_58254888_0d3aabf63b6a016fc2' }
+        let(:audios) { instance.playlist(url: url).audios.map(&:full_id) }
+
+        it :aggregate_failures do
+          expect(result).to be_a(Array)
+          expect(result.size).to eq(15)
+          expect(result).to include(nil)
+          expect(result.compact.size).to eq(13)
+        end
       end
     end
 
