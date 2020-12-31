@@ -464,6 +464,18 @@ RSpec.describe VkMusic::Client, :vcr do
         expect(result.first).to be_url_available
       end
     end
+
+    context 'when only unavailable audios' do
+      let(:url) { 'https://vk.com/music/playlist/-33507639_58254888_0d3aabf63b6a016fc2' }
+      let(:audios) { instance.playlist(url: url).audios.reject(&:url_accessable?) }
+
+      it :aggregate_failures do
+        expect(result).to be_a(Array)
+        expect(result.size).to eq(2)
+        expect(result.first).not_to be_url_available
+        expect(result.last).not_to be_url_available
+      end
+    end
   end
 
   describe '#update_urls' do
