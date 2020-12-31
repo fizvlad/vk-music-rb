@@ -96,4 +96,66 @@ RSpec.describe VkMusic::Audio, :vcr do
       it { expect(instance.url).to be_a(String) }
     end
   end
+
+  describe '#id_matches?' do
+    let(:result) { audio.id_matches?(arg) }
+    let(:audio) { described_class.new(id: 1, owner_id: 2) }
+    let(:arg) { described_class.new(id: 1, owner_id: 2) }
+
+    it { expect(result).to be(true) }
+
+    context 'when another audio' do
+      let(:arg) { described_class.new(id: 9, owner_id: 9) }
+
+      it { expect(result).to be(false) }
+    end
+
+    context 'when secrets have changed' do
+      let(:arg) { described_class.new(id: 1, owner_id: 2, secret1: 'a', secret2: 'b') }
+
+      it { expect(result).to be(true) }
+    end
+
+    context 'when blocked audio' do
+      let(:arg) { described_class.new(id: nil, owner_id: nil) }
+
+      it { expect(result).to be(false) }
+    end
+
+    context 'when data is an array' do
+      let(:arg) { [1, 2, '', ''] }
+
+      it { expect(result).to be(true) }
+
+      context 'when another data' do
+        let(:arg) { [9, 9, '', ''] }
+
+        it { expect(result).to be(false) }
+      end
+    end
+
+    context 'when data is a string' do
+      let(:arg) { '2_1_a_b' }
+
+      it { expect(result).to be(true) }
+
+      context 'when secrets have changed' do
+        let(:arg) { '2_1_aaaaaa_bbbbbb' }
+
+        it { expect(result).to be(true) }
+      end
+
+      context 'when another data' do
+        let(:arg) { '9_9_a_b' }
+
+        it { expect(result).to be(false) }
+      end
+
+      context 'when empty string' do
+        let(:arg) { '' }
+
+        it { expect(result).to be(false) }
+      end
+    end
+  end
 end
