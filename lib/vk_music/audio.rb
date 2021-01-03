@@ -90,13 +90,14 @@ module VkMusic
     # @param [Audio, Array(owner_id, audio_id, secret1, secret2), String]
     # @return [Boolean] id-based comparison
     def id_matches?(data)
-      data_id = case data
-      when Array then data.join('_')
-      when Audio then data.full_id
-      when String then data.strip
+      data_owner_id, data_id = case data
+      when Audio then [data.owner_id, data.id]
+      when Array then data.first(2).reverse.map(&:to_i)
+      when String then data.split('_').first(2).map(&:to_i)
+      else return false
       end
 
-      full_id == data_id
+      owner_id == data_owner_id && id == data_id
     end
 
     # @return [String] pretty-printed audio name
