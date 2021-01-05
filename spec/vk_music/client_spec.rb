@@ -391,6 +391,41 @@ RSpec.describe VkMusic::Client, :vcr do
     end
   end
 
+  describe '#artist' do
+    let(:url) { '' }
+    let(:result) { instance.artist(url: url) }
+
+    context 'when artist page' do
+      let(:url) { 'https://vk.com/artist/komsomolsk' }
+
+      it { expect(result).not_to be_empty }
+    end
+
+    context 'when with ref' do
+      let(:url) { 'https://vk.com/artist/poroxerdtsa?ref=artist_related' }
+
+      it { expect(result).not_to be_empty }
+    end
+
+    context 'when feed' do
+      let(:url) { 'https://vk.com/feed' }
+
+      it { expect(result).to be_empty }
+    end
+
+    context 'when artist do not exist' do
+      let(:url) { 'https://vk.com/artist/1' }
+
+      it { expect(result).to be_empty }
+    end
+
+    context 'when gibberish' do
+      let(:url) { 'asfasfafa' }
+
+      it { expect(result).to be_empty }
+    end
+  end
+
   describe '#get_urls' do
     let(:audios) { [] }
     let(:result) { instance.get_urls(audios) }

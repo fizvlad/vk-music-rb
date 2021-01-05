@@ -155,4 +155,18 @@ RSpec.describe VkMusic::Utility::DataTypeGuesser do
       it { expect(result).to eq(:find) }
     end
   end
+
+  context 'when artist' do
+    context 'when artist url' do
+      let(:data) { 'https://vk.com/artist/komsomolsk' }
+
+      it { expect(result).to eq(:artist) }
+    end
+
+    context 'when top audios' do
+      let(:data) { 'https://m.vk.com/artist/komsomolsk/top_audios' }
+
+      it { expect(result).to eq(:artist) }
+    end
+  end
 end
