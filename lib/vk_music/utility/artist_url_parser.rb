@@ -1,0 +1,21 @@
+# frozen_string_literal: true
+
+module VkMusic
+  module Utility
+    # Artist URL parser
+    module ArtistUrlParser
+      # Regex for artist URL
+      ARTIST_POSTFIX = %r{.*artist/([\w.\-~]+)}.freeze
+      public_constant :ARTIST_POSTFIX
+
+      # Get artist name based in provided URL
+      # @param url [String]
+      # @return [String?]
+      def self.call(url)
+        url.match(ARTIST_POSTFIX)&.captures&.first
+      rescue StandardError
+        nil
+      end
+    end
+  end
+end
