@@ -8,7 +8,8 @@ module VkMusic
       ARTIST_POSTFIX = %r{.*artist/([\w.\-~]+)}.freeze
       public_constant :ARTIST_POSTFIX
 
-      # Get artist name based in provided URL
+      # Get artist name based on provided URL
+
       # @param url [String]
       # @return [String?]
       def self.call(url)
