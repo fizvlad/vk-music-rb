@@ -81,6 +81,14 @@ You can load up to 10 audios attached to some post. Those audios will be returne
 audios = client.post(url: "link")
 ```
 
+### Artist audios
+
+You can get up to 50 top audios of particular artist:
+
+```ruby
+audios = client.artist(url: "link")
+```
+
 ### Getting audio URL
 
 To get audio URL you should go through following chain:
