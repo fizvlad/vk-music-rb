@@ -125,7 +125,7 @@ module VkMusic
       Utility::WallLoader.call(agent, id, owner_id, post_id)
     end
 
-    # Get audios attached to post. Specify either +url+ or +(owner_id,post_id)+.
+    # Get audios attached to post. Specify either +url+ or +(owner_id,post_id)+
     # @param url [String]
     # @param owner_id [Integer]
     # @param post_id [Integer]
@@ -136,6 +136,18 @@ module VkMusic
       return [] if owner_id.nil? || post_id.nil?
 
       Utility::PostLoader.call(agent, id, owner_id, post_id)
+    end
+
+    # Artist top audios. Specify either +url+ or +name+ of the artist
+    # @param url [String]
+    # @param name [String]
+    # @return [Array<Audio>] array of audios attached to post
+    def artist(url: nil, name: nil)
+      name = Utility::ArtistUrlParser.call(url) if url
+
+      return [] if name.nil? || name.empty?
+
+      Utility::ArtistLoader.call(agent, id, name)
     end
 
     # Get audios with download URLs by their IDs and secrets
