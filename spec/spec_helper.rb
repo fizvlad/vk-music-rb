@@ -19,6 +19,10 @@ VCR.configure do |config|
     # Ignore requests to web clients testing service
     request.uri.include?('postman-echo.com')
   end
+  config.after_http_request(:real?) do |_request, _response|
+    # Sleep sometime between spec requests
+    sleep 3
+  end
 end
 
 require_relative 'login_helper'
