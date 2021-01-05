@@ -11,6 +11,10 @@ module VkMusic
       PLAYLIST_POSTFIX = PlaylistUrlParser::VK_PLAYLIST_URL_POSTFIX
       public_constant :PLAYLIST_POSTFIX
 
+      # Artist URL postfix
+      ARTIST_POSTFIX = ArtistUrlParser::ARTIST_POSTFIX
+      public_constant :ARTIST_POSTFIX
+
       # End of post URL
       POST_POSTFIX = PostUrlParser::POST_POSTFIX
       public_constant :POST_POSTFIX
@@ -32,6 +36,7 @@ module VkMusic
       def self.call(data)
         case data
         when PLAYLIST_POSTFIX then :playlist
+        when ARTIST_POSTFIX then :artist
         when POST_POSTFIX then :post
         when WALL_POSTFIX then :wall
         when AUDIOS_POSTFIX, PROFILE_URL then :audios
