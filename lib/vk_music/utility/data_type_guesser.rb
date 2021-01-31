@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'playlist_url_parser'
+require_relative 'artist_url_parser'
 require_relative 'post_url_parser'
 
 module VkMusic
