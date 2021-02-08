@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vk_music (4.1.1)
+    vk_music (4.1.2)
       execjs (~> 2.7)
       json (~> 2.3)
       logger (~> 1.4)
@@ -42,11 +42,9 @@ GEM
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2020.1104)
-    mini_portile2 (2.5.0)
     net-http-digest_auth (1.4.1)
     net-http-persistent (2.9.4)
-    nokogiri (1.11.1)
-      mini_portile2 (~> 2.5.0)
+    nokogiri (1.11.1-x86_64-linux)
       racc (~> 1.4)
     ntlm-http (0.1.1)
     parallel (1.20.1)
