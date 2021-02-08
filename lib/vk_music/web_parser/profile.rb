@@ -12,9 +12,13 @@ module VkMusic
       POST_ANCHOR_NAME_REGEX = /post(-?\d+)_(\d+)/.freeze
       private_constant :POST_ANCHOR_NAME_REGEX
 
+      # CSS selector for link in basis
+      BASIS_LINK_SELECTOR = '.basisProfile a,.basisGroup a,.BasisProfile a,.BasisGroup a'
+      private_constant :BASIS_LINK_SELECTOR
+
       # Profile id
       def id
-        link = node.link_with(href: ID_CONTAINING_HREF, css: '.basisProfile a,.basisGroup a')
+        link = node.link_with(href: ID_CONTAINING_HREF, css: BASIS_LINK_SELECTOR)
         return unless link
 
         Integer(link.href.match(ID_CONTAINING_HREF).captures.first, 10)
