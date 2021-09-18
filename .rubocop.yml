@@ -60,3 +60,5 @@ Layout/SingleLineBlockChain:
 Style/TopLevelMethodDefinition:
   Exclude:
     - 'spec/login_helper.rb'
+Lint/NumberConversion:
+  Enabled: false
