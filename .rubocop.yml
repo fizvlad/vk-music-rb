@@ -54,3 +54,9 @@ Style/DisableCopsWithinSourceCodeDirective:
   Enabled: false
 Layout/MultilineHashKeyLineBreaks:
   Enabled: false
+Layout/SingleLineBlockChain:
+  Exclude:
+    - 'spec/**/*_spec.rb'
+Style/TopLevelMethodDefinition:
+  Exclude:
+    - 'spec/login_helper.rb'
