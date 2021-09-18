@@ -174,7 +174,7 @@ RSpec.describe VkMusic::Client, :vcr do
         expect(result).to be_a(VkMusic::Playlist)
         expect(result.size).to be >= 2000
         expect(result.real_size).to be >= 2000
-        expect(result.title).to eq('Музыка Святослава Комиссарова')
+        expect(result.title).to eq('музыка Святослава Комиссарова')
       end
 
       context 'when audios page' do
@@ -184,7 +184,7 @@ RSpec.describe VkMusic::Client, :vcr do
           expect(result).to be_a(VkMusic::Playlist)
           expect(result.size).to be >= 2000
           expect(result.real_size).to be >= 2000
-          expect(result.title).to eq('Музыка Святослава Комиссарова')
+          expect(result.title).to eq('музыка Святослава Комиссарова')
         end
       end
 
@@ -275,7 +275,7 @@ RSpec.describe VkMusic::Client, :vcr do
       it :aggregate_failures do
         expect(result).to be_a(VkMusic::Playlist)
         expect(result.size).to be >= 80
-        expect(result.title).to eq('Аудиозаписи со стены #mashup')
+        expect(result.title).to eq('музыка со стены #mashup')
       end
 
       context 'when owner_id specified' do
@@ -284,7 +284,7 @@ RSpec.describe VkMusic::Client, :vcr do
         it :aggregate_failures do
           expect(result).to be_a(VkMusic::Playlist)
           expect(result.size).to be >= 80
-          expect(result.title).to eq('Аудиозаписи со стены #mashup')
+          expect(result.title).to eq('музыка со стены #mashup')
         end
       end
 
@@ -294,7 +294,7 @@ RSpec.describe VkMusic::Client, :vcr do
         it :aggregate_failures do
           expect(result).to be_a(VkMusic::Playlist)
           expect(result.size).to eq(100)
-          expect(result.title).to eq('Аудиозаписи со стены #mashup')
+          expect(result.title).to eq('музыка со стены #mashup')
         end
       end
 
@@ -304,7 +304,7 @@ RSpec.describe VkMusic::Client, :vcr do
         it :aggregate_failures do
           expect(result).to be_a(VkMusic::Playlist)
           expect(result.size).to eq(100)
-          expect(result.title).to eq('Аудиозаписи со стены #mashup')
+          expect(result.title).to eq('музыка со стены #mashup')
         end
       end
     end

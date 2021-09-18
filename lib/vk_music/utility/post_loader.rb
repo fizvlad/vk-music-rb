@@ -16,7 +16,9 @@ module VkMusic
 
         wall_audios = WallLoader.call(agent, client_id, owner_id, post_id).audios
 
-        urlles_audios.map { |urlles| wall_audios.find { |audio| audio.like?(urlles) } }.compact
+        urlles_audios
+          .map { |urlles| wall_audios.find { |audio| audio.like?(urlles) } }
+          .compact
       end
     end
   end
