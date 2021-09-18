@@ -16,3 +16,17 @@ YARD::Rake::YardocTask.new do |t|
 end
 
 task default: %i[rubocop spec yard]
+
+namespace :clear do
+  task :cassetes do
+    require 'fileutils'
+
+    FileUtils.rm_r Dir.glob('spec/cassetes/*/')
+  end
+
+  task :cookies do
+    require 'fileutils'
+
+    FileUtils.rm('spec/.cookies')
+  end
+end
