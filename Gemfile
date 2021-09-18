@@ -11,6 +11,8 @@ group :test, :development do
 
   # The thing, forcing you to write good code
   gem 'rubocop', '~> 1.21', require: false
+  # Guidelines for writing RSpec tests
+  gem 'rubocop-rspec', '~> 2.4', require: false
 
   # Rake tasks
   gem 'rake', '~> 13.0', require: false
