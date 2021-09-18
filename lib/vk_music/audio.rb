@@ -92,8 +92,8 @@ module VkMusic
     def id_matches?(data)
       data_owner_id, data_id = case data
       when Audio then [data.owner_id, data.id]
-      when Array then data.first(2).reverse.map(&:to_i)
-      when String then data.split('_').first(2).map(&:to_i)
+      when Array then data.first(2).reverse.map { |i| Integer(i, 10) }
+      when String then data.split('_').first(2).map { |i| Integer(i, 10) }
       else return false
       end
 
