@@ -13,7 +13,7 @@ Dotenv.load
 # Path to file where development cookies will be stored
 AGENT_COOKIES_PATH = '.cookies'
 
-agent = VkMusic::Utility::Authorizer.call(AGENT_COOKIES_PATH)
+agent = VkMusic::Utility::Authorizer.call(ENV['VK_LOGIN'], ENV['VK_PASSWORD'], AGENT_COOKIES_PATH)
 @client = VkMusic::Client.new(agent: agent)
 
 IRB.start

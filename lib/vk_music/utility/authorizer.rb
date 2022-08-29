@@ -7,12 +7,12 @@ module VkMusic
       class << self
         # @param cookie_path [string]
         # @return [Mechanize] logged in Mechanize client
-        def call(cookie_path)
+        def call(login, password, cookie_path)
           agent = Mechanize.new
           if File.exist?(cookie_path)
             load_cookie_jar(agent.cookie_jar, cookie_path)
           else
-            login_agent(agent)
+            login_agent(agent, login, password)
           end
           agent.cookie_jar.save(cookie_path, session: true)
           agent
@@ -34,10 +34,10 @@ module VkMusic
         end
 
         # Logs in provided agent
-        def login_agent(agent)
-          login = VkMusic::Request::Login.new
-          login.call(agent)
-          login.send_form(ENV['VK_LOGIN'], ENV['VK_PASSWORD'], agent)
+        def login_agent(agent, login, password)
+          login_request = VkMusic::Request::Login.new
+          login_request.call(agent)
+          login_request.send_form(login, password, agent)
         end
       end
     end
