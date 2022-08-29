@@ -3,16 +3,17 @@
 
 require 'bundler/setup'
 require 'vk_music'
-require 'pry'
+require 'irb'
 require 'dotenv'
 Dotenv.load
 
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.
 
-if ENV['VK_LOGIN'] && ENV['VK_PASSWORD']
-  client = VkMusic::Client.new(login: ENV['VK_LOGIN'], password: ENV['VK_PASSWORD'])
-  puts "You now can access client##{client.id}"
-end
+# Path to file where development cookies will be stored
+AGENT_COOKIES_PATH = '.cookies'
 
-Pry.start(client || Object.new)
+agent = VkMusic::Utility::Authorizer.call(AGENT_COOKIES_PATH)
+@client = VkMusic::Client.new(agent: agent)
+
+IRB.start
