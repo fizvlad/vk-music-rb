@@ -2,6 +2,6 @@
 
 module VkMusic
   # Library version.
-  VERSION = '4.1.4'
+  VERSION = '4.1.5'
   public_constant :VERSION
 end
