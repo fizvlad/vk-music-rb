@@ -35,9 +35,9 @@ module VkMusic
 
         # Logs in provided agent
         def login_agent(agent, login, password)
-          login = VkMusic::Request::Login.new
-          login.call(agent)
-          login.send_form(login, password, agent)
+          login_request = VkMusic::Request::Login.new
+          login_request.call(agent)
+          login_request.send_form(login, password, agent)
         end
       end
     end
