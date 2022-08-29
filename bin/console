@@ -3,7 +3,7 @@
 
 require 'bundler/setup'
 require 'vk_music'
-require 'pry'
+require 'irb'
 require 'dotenv'
 Dotenv.load
 
@@ -15,4 +15,4 @@ if ENV['VK_LOGIN'] && ENV['VK_PASSWORD']
   puts "You now can access client##{client.id}"
 end
 
-Pry.start(client || Object.new)
+IRB.start(client || Object.new)
