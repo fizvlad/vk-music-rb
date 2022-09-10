@@ -19,10 +19,10 @@ task default: %i[rubocop spec yard]
 
 namespace :clean do
   desc 'Remove generated cassettes'
-  task :cassetes do
+  task :cassettes do
     require 'fileutils'
 
-    FileUtils.rm_r Dir.glob('spec/cassetes/*/')
+    FileUtils.rm_r Dir.glob('spec/cassettes/*/')
   end
 
   desc 'Remove generated cookies'
