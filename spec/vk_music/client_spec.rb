@@ -12,7 +12,7 @@ RSpec.describe VkMusic::Client, :vcr do
     end
 
     context 'when password incorrect' do
-      let(:instance) { VkMusic::Client.new(login: '+79991234567', password: 'ae') }
+      let(:instance) { described_class.new(login: '+79991234567', password: 'ae') }
 
       it { expect { instance }.to raise_error(RuntimeError) }
     end
@@ -250,7 +250,7 @@ RSpec.describe VkMusic::Client, :vcr do
     end
 
     context 'when feed' do
-      let(:url) { 'https://vk.com/a' }
+      let(:url) { 'https://vk.com/feed' }
 
       it { expect(result).to be_nil }
     end
@@ -347,14 +347,15 @@ RSpec.describe VkMusic::Client, :vcr do
     context 'when reply' do
       let(:url) { 'https://vk.com/wall-39786657_399073' }
 
-      it 'returnes audios from post', :aggregate_failures do
+      it 'returns audios from post', :aggregate_failures do
         expect(result).to be_a(Array)
         expect(result.size).to eq(1)
-        expect(result.first).to be_a(VkMusic::Audio)
-        expect(result.first.artist).to eq('sektorjazza')
-        expect(result.first.title).to eq('супертрек из брата 2 forever young сергей бодров 1997-2002 r.i.p.')
-        expect(result.first.duration).to eq(253)
-        expect(result.first).to be_url_accessable
+        expect(result.first).to be_a(VkMusic::Audio).and(be_url_accessable)
+        expect(result.first).to have_attributes(
+          artist: 'sektorjazza',
+          title: 'супертрек из брата 2 forever young сергей бодров 1997-2002 r.i.p.',
+          duration: 253
+        )
       end
     end
 
@@ -420,7 +421,7 @@ RSpec.describe VkMusic::Client, :vcr do
     end
 
     context 'when gibberish' do
-      let(:url) { 'asfasfafa' }
+      let(:url) { 'bla_bla' }
 
       it { expect(result).to be_empty }
     end
@@ -454,7 +455,7 @@ RSpec.describe VkMusic::Client, :vcr do
         expect(result).to all(be_url_available)
       end
 
-      context 'playlist with unavailable audios and array of strings is provided' do
+      context 'with unavailable audios and array of strings is provided' do
         let(:url) { 'https://vk.com/music/playlist/-33507639_58254888_0d3aabf63b6a016fc2' }
         let(:audios) { instance.playlist(url:).audios.map(&:full_id) }
 
