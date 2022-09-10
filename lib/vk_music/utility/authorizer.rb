@@ -5,16 +5,16 @@ module VkMusic
     # Creates authorized client based of cookies file or ENV variables
     module Authorizer
       class << self
-        # @param cookie_path [string]
+        # @param cookie_path [String?]
         # @return [Mechanize] logged in Mechanize client
-        def call(login, password, cookie_path)
+        def call(login, password, cookie_path = nil)
           agent = Mechanize.new
-          if File.exist?(cookie_path)
+          if cookie_path && File.exist?(cookie_path)
             load_cookie_jar(agent.cookie_jar, cookie_path)
           else
             login_agent(agent, login, password)
           end
-          agent.cookie_jar.save(cookie_path, session: true)
+          agent.cookie_jar.save(cookie_path, session: true) if cookie_path
           agent
         end
 
