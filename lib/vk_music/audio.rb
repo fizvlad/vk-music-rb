@@ -23,9 +23,18 @@ module VkMusic
     # @param url_encoded [String, nil]
     # @param url [String, nil] decoded URL
     # @param client_id [Integer, nil]
-    def initialize(id: nil, owner_id: nil, secret1: nil, secret2: nil,
-                   artist: '', title: '', duration: 0,
-                   url_encoded: nil, url: nil, client_id: nil)
+    def initialize(
+      id: nil,
+      owner_id: nil,
+      secret1: nil,
+      secret2: nil,
+      artist: '',
+      title: '',
+      duration: 0,
+      url_encoded: nil,
+      url: nil,
+      client_id: nil
+    )
       @id = id
       @owner_id = owner_id
       @secret1 = secret1

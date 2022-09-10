@@ -7,7 +7,7 @@ RSpec.describe VkMusic::Audio, :vcr do
     {
       id: 123, owner_id: 456, secret1: secret, secret2: secret,
       artist: 'artist', title: 'title', duration: 120,
-      url_encoded: url_encoded, url: url, client_id: 1
+      url_encoded:, url:, client_id: 1
     }
   end
   let(:secret) { 'text' }

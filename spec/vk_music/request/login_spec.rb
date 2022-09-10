@@ -16,8 +16,8 @@ RSpec.describe VkMusic::Request::Login, :vcr do
   it { expect(result).to be(false) }
 
   context 'with correct login and password' do
-    let(:login) { ENV['VK_LOGIN'] }
-    let(:password) { ENV['VK_PASSWORD'] }
+    let(:login) { ENV.fetch('VK_LOGIN', nil) }
+    let(:password) { ENV.fetch('VK_PASSWORD', nil) }
 
     it { expect(result).to be(true) }
   end

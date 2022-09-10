@@ -21,7 +21,7 @@ RSpec.describe VkMusic::Client, :vcr do
   describe '#find' do
     let(:query) { '' }
     let(:type) { :audio }
-    let(:result) { instance.find(query, type: type) }
+    let(:result) { instance.find(query, type:) }
 
     context 'when searching for audios' do
       let(:type) { :audio }
@@ -84,7 +84,7 @@ RSpec.describe VkMusic::Client, :vcr do
   describe '#playlist' do
     let(:url) { '' }
     let(:up_to) { 10_000 }
-    let(:result) { instance.playlist(url: url, up_to: up_to) }
+    let(:result) { instance.playlist(url:, up_to:) }
 
     context 'when playlist' do
       let(:url) { 'https://vk.com/music/playlist/19198851_39318804_6c2b34085c37213dfb' }
@@ -165,7 +165,7 @@ RSpec.describe VkMusic::Client, :vcr do
   describe '#audios' do
     let(:url) { '' }
     let(:up_to) { 10_000 }
-    let(:result) { instance.audios(url: url, up_to: up_to) }
+    let(:result) { instance.audios(url:, up_to:) }
 
     context 'when user' do
       let(:url) { 'https://vk.com/id8024985' }
@@ -259,7 +259,7 @@ RSpec.describe VkMusic::Client, :vcr do
   describe '#wall' do
     let(:url) { '' }
     let(:up_to) { 100 }
-    let(:result) { instance.wall(url: url) }
+    let(:result) { instance.wall(url:) }
 
     context 'when user with empty wall' do
       let(:url) { 'https://vk.com/id1' }
@@ -328,7 +328,7 @@ RSpec.describe VkMusic::Client, :vcr do
 
   describe '#post' do
     let(:url) { '' }
-    let(:result) { instance.post(url: url) }
+    let(:result) { instance.post(url:) }
 
     context 'when post with audio' do
       let(:url) { 'https://vk.com/wall-39786657_399071' }
@@ -393,7 +393,7 @@ RSpec.describe VkMusic::Client, :vcr do
 
   describe '#artist' do
     let(:url) { '' }
-    let(:result) { instance.artist(url: url) }
+    let(:result) { instance.artist(url:) }
 
     context 'when artist page' do
       let(:url) { 'https://vk.com/artist/komsomolsk' }
@@ -445,7 +445,7 @@ RSpec.describe VkMusic::Client, :vcr do
 
     context 'when from playlist' do
       let(:url) { 'https://vk.com/music/playlist/19198851_39318804_6c2b34085c37213dfb' }
-      let(:audios) { instance.playlist(url: url).audios }
+      let(:audios) { instance.playlist(url:).audios }
 
       it :aggregate_failures do
         expect(result).to be_a(Array)
@@ -456,7 +456,7 @@ RSpec.describe VkMusic::Client, :vcr do
 
       context 'playlist with unavailable audios and array of strings is provided' do
         let(:url) { 'https://vk.com/music/playlist/-33507639_58254888_0d3aabf63b6a016fc2' }
-        let(:audios) { instance.playlist(url: url).audios.map(&:full_id) }
+        let(:audios) { instance.playlist(url:).audios.map(&:full_id) }
 
         it :aggregate_failures do
           expect(result).to be_a(Array)
@@ -502,7 +502,7 @@ RSpec.describe VkMusic::Client, :vcr do
 
     context 'when only unavailable audios' do
       let(:url) { 'https://vk.com/music/playlist/-33507639_58254888_0d3aabf63b6a016fc2' }
-      let(:audios) { instance.playlist(url: url).audios.reject(&:url_accessable?) }
+      let(:audios) { instance.playlist(url:).audios.reject(&:url_accessable?) }
 
       it :aggregate_failures do
         expect(result).to be_a(Array)

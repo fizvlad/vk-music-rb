@@ -15,7 +15,7 @@ module VkMusic
           "#{VK_ROOT}/audio",
           {
             act: 'load_section', type: 'wall', utf8: true,
-            owner_id: owner_id, post_id: post_id, wall_type: 'own'
+            owner_id:, post_id:, wall_type: 'own'
           },
           'GET',
           {}

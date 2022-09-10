@@ -5,7 +5,7 @@ module VkMusic
     # Artist URL parser
     module ArtistUrlParser
       # Regex for artist URL
-      ARTIST_POSTFIX = %r{.*artist/([\w.\-~]+)}.freeze
+      ARTIST_POSTFIX = %r{.*artist/([\w.\-~]+)}
       public_constant :ARTIST_POSTFIX
 
       # Get artist name based on provided URL

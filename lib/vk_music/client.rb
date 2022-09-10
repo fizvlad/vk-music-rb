@@ -83,8 +83,13 @@ module VkMusic
     # @param up_to [Integer] maximum amount of audios to load. If 0, no audios
     #   would be loaded (plain information about playlist)
     # @return [Playlist?]
-    def playlist(url: nil, owner_id: nil, playlist_id: nil, access_hash: nil,
-                 up_to: MAXIMUM_PLAYLIST_SIZE)
+    def playlist(
+      url: nil,
+      owner_id: nil,
+      playlist_id: nil,
+      access_hash: nil,
+      up_to: MAXIMUM_PLAYLIST_SIZE
+    )
       owner_id, playlist_id, access_hash = Utility::PlaylistUrlParser.call(url) if url
       return if owner_id.nil? || playlist_id.nil?
 
@@ -115,9 +120,9 @@ module VkMusic
       owner_id, post_id = Utility::PostUrlParser.call(url) if url
       if post_id.nil?
         if url
-          owner_id, post_id = Utility::LastProfilePostLoader.call(agent, url: url)
+          owner_id, post_id = Utility::LastProfilePostLoader.call(agent, url:)
         elsif owner_id
-          owner_id, post_id = Utility::LastProfilePostLoader.call(agent, owner_id: owner_id)
+          owner_id, post_id = Utility::LastProfilePostLoader.call(agent, owner_id:)
         end
       end
       return if owner_id.nil? || post_id.nil?

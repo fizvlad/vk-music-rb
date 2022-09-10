@@ -5,11 +5,11 @@ module VkMusic
     # Profile page parser
     class Profile < Base
       # Regex for href which contains id of profile
-      ID_CONTAINING_HREF = /(?:audios|photo|write|owner_id=|friends\?id=)(-?\d+)/.freeze
+      ID_CONTAINING_HREF = /(?:audios|photo|write|owner_id=|friends\?id=)(-?\d+)/
       private_constant :ID_CONTAINING_HREF
 
       # Regex for ID of .wall_item anchor
-      POST_ANCHOR_NAME_REGEX = /post(-?\d+)_(\d+)/.freeze
+      POST_ANCHOR_NAME_REGEX = /post(-?\d+)_(\d+)/
       private_constant :POST_ANCHOR_NAME_REGEX
 
       # CSS selector for link in basis

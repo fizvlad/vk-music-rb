@@ -13,7 +13,7 @@ module VkMusic
         @client_id = client_id
         super(
           "#{VK_ROOT}/audio",
-          { act: "audio_playlist#{owner_id}_#{playlist_id}", access_hash: access_hash },
+          { act: "audio_playlist#{owner_id}_#{playlist_id}", access_hash: },
           'GET',
           {}
         )

@@ -15,8 +15,8 @@ module VkMusic
         super(
           "#{VK_ROOT}/audio",
           {
-            act: 'load_section', type: 'playlist', offset: offset, utf8: true,
-            owner_id: owner_id, playlist_id: playlist_id, access_hash: access_hash.to_s
+            act: 'load_section', type: 'playlist', offset:, utf8: true,
+            owner_id:, playlist_id:, access_hash: access_hash.to_s
           },
           'GET',
           {}
