@@ -9,7 +9,7 @@ module VkMusic
         # @param path [string]
         def call(jar, path)
           data = File.read(path)
-          data.start_with?('{') ? load_cookie_jar_json(jar, data) : load_cookie_jar_mechanize(jar)
+          data.start_with?('{') ? load_cookie_jar_json(jar, data) : load_cookie_jar_mechanize(jar, path)
         end
 
         private
@@ -23,9 +23,9 @@ module VkMusic
         end
 
         # Loads cookies from Mechanize file
-        def load_cookie_jar_mechanize(jar)
+        def load_cookie_jar_mechanize(jar, path)
           VkMusic.log.info('cookie_reader') { 'Loading Mechanize cookies' }
-          jar.load(AGENT_COOKIES_PATH)
+          jar.load(path)
         end
       end
     end
