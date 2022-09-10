@@ -32,7 +32,7 @@ RSpec.describe VkMusic::Request::Base do
     let(:data) { { postarg1: 'postval1', postarg2: nil, postarg3: '', postarr: [1, 2, 3] } }
     let(:headers) { { 'x-requested-with' => 'XMLHttpRequest' } }
 
-    it do
+    it :aggregate_failures do
       expect(result).to be_a(Mechanize::File)
       expect(parsed_result['form']).to eq({
         'postarg1' => 'postval1',

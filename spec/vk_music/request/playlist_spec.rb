@@ -7,7 +7,6 @@ RSpec.describe VkMusic::Request::Playlist, :vcr do
   let(:instance) { described_class.new(-137903314, 248, nil, client.id) }
   let(:owner_id) { -137903314 }
   let(:playlist_id) { 248 }
-  let(:owner_id) { nil }
 
   it :aggregate_failures do
     instance.call(client.agent)
