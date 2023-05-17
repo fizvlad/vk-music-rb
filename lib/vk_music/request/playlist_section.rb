@@ -18,8 +18,8 @@ module VkMusic
             act: 'load_section', type: 'playlist', offset:, utf8: true,
             owner_id:, playlist_id:, access_hash: access_hash.to_s
           },
-          'GET',
-          {}
+          'POST',
+          { 'content-type' => 'application/x-www-form-urlencoded', 'x-requested-with' => 'XMLHttpRequest' }
         )
       end
 

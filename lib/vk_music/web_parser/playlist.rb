@@ -6,6 +6,8 @@ module VkMusic
     class Playlist < Base
       # @return [Array<Audio>]
       def audios
+        return [] if node.nil?
+
         Utility::AudioItemsParser.call(node, @client_id)
       end
 
