@@ -42,6 +42,8 @@ Lint/ConstantResolution:
   Enabled: false
 Lint/NumberConversion:
   Enabled: false
+Metrics/ClassLength:
+  Max: 150
 Metrics/ParameterLists:
   Enabled: false
 Metrics/BlockLength:
