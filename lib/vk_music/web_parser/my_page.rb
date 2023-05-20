@@ -11,8 +11,7 @@ module VkMusic
 
       # User name
       def name
-        link = node.at_css('.ip_user_link .op_owner')
-        link.attribute('data-name').value
+        node.at_css('.ip_user_link .op_owner')&.attribute('data-name')&.value || 'Unknown User'
       end
     end
   end

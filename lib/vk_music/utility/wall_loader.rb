@@ -16,7 +16,7 @@ module VkMusic
         audios = page.audios
         return if audios.nil? || audios.empty?
 
-        Playlist.new(audios, id: 0, owner_id: owner_id, access_hash: '',
+        Playlist.new(audios, id: 0, owner_id:, access_hash: '',
                              title: page.title, subtitle: page.subtitle,
                              real_size: audios.size)
       end

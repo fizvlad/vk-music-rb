@@ -10,6 +10,6 @@
 /pkg/
 /spec/reports/
 /spec/.cookies
-/spec/cassetes/*
-!/spec/cassetes/README.md
+/spec/cassettes/*
+!/spec/cassettes/README.md
 /tmp/

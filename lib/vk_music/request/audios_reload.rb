@@ -10,10 +10,10 @@ module VkMusic
       def initialize(ids, client_id)
         @client_id = client_id
         super(
-          "#{VK_ROOT}/audio",
-          { act: 'reload_audio', ids: ids.join(','), utf8: true },
-          'GET',
-          {}
+          "#{VK_ROOT}/audio?act=reload_audios",
+          { audio_ids: ids.join(',') },
+          'POST',
+          { 'content-type' => 'application/x-www-form-urlencoded', 'x-requested-with' => 'XMLHttpRequest' }
         )
       end
 

@@ -19,7 +19,7 @@ module VkMusic
 
           load_till_up_to(audios, agent, client_id, owner_id, up_to)
 
-          Playlist.new(audios, id: -1, owner_id: owner_id, access_hash: '',
+          Playlist.new(audios, id: -1, owner_id:, access_hash: '',
                                title: page.title, subtitle: page.subtitle, real_size: page.real_size)
         end
 

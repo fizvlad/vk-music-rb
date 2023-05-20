@@ -9,8 +9,12 @@
 #
 # See https://docs.rubocop.org/rubocop/configuration
 
+require:
+  - rubocop-rake
+  - rubocop-rspec
+
 AllCops:
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.1
   EnabledByDefault: true
 
 Layout/FirstMethodParameterLineBreak:
@@ -29,8 +33,17 @@ Layout/MultilineAssignmentLayout:
   EnforcedStyle: same_line
 Layout/CaseIndentation:
   EnforcedStyle: end
+Layout/MultilineHashKeyLineBreaks:
+  Enabled: false
+Layout/SingleLineBlockChain:
+  Exclude:
+    - 'spec/**/*_spec.rb'
 Lint/ConstantResolution:
   Enabled: false
+Lint/NumberConversion:
+  Enabled: false
+Metrics/ClassLength:
+  Max: 150
 Metrics/ParameterLists:
   Enabled: false
 Metrics/BlockLength:
@@ -52,13 +65,16 @@ Style/NumericLiterals:
   Enabled: false
 Style/DisableCopsWithinSourceCodeDirective:
   Enabled: false
-Layout/MultilineHashKeyLineBreaks:
-  Enabled: false
-Layout/SingleLineBlockChain:
-  Exclude:
-    - 'spec/**/*_spec.rb'
 Style/TopLevelMethodDefinition:
   Exclude:
     - 'spec/login_helper.rb'
-Lint/NumberConversion:
+RSpec/AlignLeftLetBrace:
   Enabled: false
+RSpec/AlignRightLetBrace:
+  Enabled: false
+RSpec/NestedGroups:
+  Max: 5
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+RSpec/ExampleLength:
+  Max: 10

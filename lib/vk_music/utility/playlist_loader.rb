@@ -22,7 +22,7 @@ module VkMusic
         rest = PlaylistSectionLoader.call(agent, client_id, owner_id, playlist_id, access_hash,
                                           audios.size, up_to - audios.size)
         audios.concat(rest)
-        Playlist.new(audios, id: playlist_id, owner_id: owner_id, access_hash: access_hash,
+        Playlist.new(audios, id: playlist_id, owner_id:, access_hash:,
                              title: page.title, subtitle: page.subtitle, real_size: page.real_size)
       end
     end

@@ -5,19 +5,19 @@ module VkMusic
     # Get user or group id from url
     module ProfileIdResolver
       # vk.com url regex
-      VK_PATH = %r{(?:https?://)?(?:vk\.com/)?([^/?&]+)}.freeze
+      VK_PATH = %r{(?:https?://)?(?:vk\.com/)?([^/?&]+)}
       public_constant :VK_PATH
 
       # audios list page
-      AUDIOS_PATH = /audios(-?\d+)/.freeze
+      AUDIOS_PATH = /audios(-?\d+)/
       public_constant :AUDIOS_PATH
 
       # vk.com user path regex
-      USER_PATH = /id(\d+)/.freeze
+      USER_PATH = /id(\d+)/
       public_constant :USER_PATH
 
       # vk.com user club regex
-      CLUB_PATH = /(?:club|group|public|event)(\d+)/.freeze
+      CLUB_PATH = /(?:club|group|public|event)(\d+)/
       public_constant :CLUB_PATH
 
       class << self

@@ -10,7 +10,7 @@ module VkMusic
         (?:audio_playlist|album/|playlist/)                             # Start of ids
         (-?\d+)_(\d+)                                                   # Ids themself
         (?:(?:(?:.*(?=&access_hash=)&access_hash=)|/|%2F|_)([\da-z]+))? # Access hash
-      }x.freeze
+      }x
       public_constant :VK_PLAYLIST_URL_POSTFIX
 
       # @param url [String]

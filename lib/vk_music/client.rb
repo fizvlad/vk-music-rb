@@ -4,11 +4,12 @@ module VkMusic
   # VK client
   class Client
     # Default user agent to use
-    DEFAULT_USERAGENT = 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) ' \
-                        'AppleWebKit/537.36 (KHTML, like Gecko) ' \
-                        'Chrome/86.0.4240.111 Mobile Safari/537.36'
-    public_constant :DEFAULT_USERAGENT
-    # Mximum size of VK playlist
+    DEFAULT_USER_AGENT =
+      'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) ' \
+      'Chrome/86.0.4240.111 Mobile Safari/537.36'
+    public_constant :DEFAULT_USER_AGENT
+
+    # Maximum size of VK playlist
     MAXIMUM_PLAYLIST_SIZE = 10_000
     public_constant :MAXIMUM_PLAYLIST_SIZE
 
@@ -23,7 +24,7 @@ module VkMusic
     # @param password [String, nil]
     # @param user_agent [String]
     # @param agent [Mechanize?] if specified, provided agent will be used
-    def initialize(login: nil, password: nil, user_agent: DEFAULT_USERAGENT, agent: nil)
+    def initialize(login: nil, password: nil, user_agent: DEFAULT_USER_AGENT, agent: nil)
       @login = login
       @password = password
       @agent = agent
@@ -83,8 +84,13 @@ module VkMusic
     # @param up_to [Integer] maximum amount of audios to load. If 0, no audios
     #   would be loaded (plain information about playlist)
     # @return [Playlist?]
-    def playlist(url: nil, owner_id: nil, playlist_id: nil, access_hash: nil,
-                 up_to: MAXIMUM_PLAYLIST_SIZE)
+    def playlist(
+      url: nil,
+      owner_id: nil,
+      playlist_id: nil,
+      access_hash: nil,
+      up_to: MAXIMUM_PLAYLIST_SIZE
+    )
       owner_id, playlist_id, access_hash = Utility::PlaylistUrlParser.call(url) if url
       return if owner_id.nil? || playlist_id.nil?
 
@@ -115,9 +121,9 @@ module VkMusic
       owner_id, post_id = Utility::PostUrlParser.call(url) if url
       if post_id.nil?
         if url
-          owner_id, post_id = Utility::LastProfilePostLoader.call(agent, url: url)
+          owner_id, post_id = Utility::LastProfilePostLoader.call(agent, url:)
         elsif owner_id
-          owner_id, post_id = Utility::LastProfilePostLoader.call(agent, owner_id: owner_id)
+          owner_id, post_id = Utility::LastProfilePostLoader.call(agent, owner_id:)
         end
       end
       return if owner_id.nil? || post_id.nil?
@@ -161,7 +167,7 @@ module VkMusic
       audios = Utility::AudiosFromIdsLoader.call(agent, ids, id)
 
       args.map do |el|
-        # NOTE: can not load unaccessable audio, so just returning it
+        # NOTE: can not load unaccessible audio, so just returning it
         next el if el.is_a?(Audio) && !el.url_accessable?
 
         audios.find { |a| a.id_matches?(el) }

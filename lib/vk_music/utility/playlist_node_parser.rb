@@ -11,7 +11,7 @@ module VkMusic
         owner_id, id, access_hash = PlaylistUrlParser.call(url)
 
         Playlist.new([],
-                     id: id, owner_id: owner_id, access_hash: access_hash,
+                     id:, owner_id:, access_hash:,
                      title: node.at_css('.audioPlaylists__itemTitle').content,
                      subtitle: node.at_css('.audioPlaylists__itemSubtitle').content,
                      real_size: nil)

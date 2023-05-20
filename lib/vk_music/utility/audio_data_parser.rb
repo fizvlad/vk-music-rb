@@ -16,7 +16,7 @@ module VkMusic
                     secret1: url_hash, secret2: url_hash,
                     artist: CGI.unescapeHTML(data[4]), title: CGI.unescapeHTML(data[3]),
                     duration: data[5],
-                    url_encoded: url_encoded, url: nil, client_id: client_id)
+                    url_encoded:, url: nil, client_id:)
         end
 
         private

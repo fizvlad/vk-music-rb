@@ -21,15 +21,15 @@ module VkMusic
       public_constant :POST_POSTFIX
 
       # End of wall URL
-      WALL_POSTFIX = /.*wall(-?\d+)/.freeze
+      WALL_POSTFIX = /.*wall(-?\d+)/
       public_constant :WALL_POSTFIX
 
       # End of profile audios URL
-      AUDIOS_POSTFIX = /.*audios(-?\d+)/.freeze
+      AUDIOS_POSTFIX = /.*audios(-?\d+)/
       public_constant :AUDIOS_POSTFIX
 
       # Full profile URL regex
-      PROFILE_URL = %r{(?:https?://)?(?:vk\.com/)([^/?&]+)}.freeze
+      PROFILE_URL = %r{(?:https?://)?(?:vk\.com/)([^/?&]+)}
       public_constant :PROFILE_URL
 
       # @param data [String]

@@ -5,7 +5,7 @@ module VkMusic
     # Load wall audios
     module PostUrlParser
       # Regex for post URL
-      POST_POSTFIX = /.*wall(-?\d+)_(\d+)/.freeze
+      POST_POSTFIX = /.*wall(-?\d+)_(\d+)/
       public_constant :POST_POSTFIX
 
       # @param url [String]

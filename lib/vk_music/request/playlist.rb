@@ -13,9 +13,9 @@ module VkMusic
         @client_id = client_id
         super(
           "#{VK_ROOT}/audio",
-          { act: "audio_playlist#{owner_id}_#{playlist_id}", access_hash: access_hash },
-          'GET',
-          {}
+          { act: "audio_playlist#{owner_id}_#{playlist_id}", access_hash: },
+          'POST',
+          { 'content-type' => 'application/x-www-form-urlencoded', 'x-requested-with' => 'XMLHttpRequest' }
         )
       end
 
@@ -24,7 +24,8 @@ module VkMusic
       private
 
       def after_call
-        @parser = WebParser::Playlist.new(@response.body)
+        html = JSON.parse(@response.body)['html']
+        @parser = WebParser::Playlist.new(html)
       end
     end
   end

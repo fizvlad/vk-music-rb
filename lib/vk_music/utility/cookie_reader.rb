@@ -6,10 +6,13 @@ module VkMusic
     module CookieReader
       class << self
         # @param jar [HTTP::CookieJar]
-        # @param path [string]
-        def call(jar, path)
-          data = File.read(path)
-          data.start_with?('{') ? load_cookie_jar_json(jar, data) : load_cookie_jar_mechanize(jar)
+        # @param data [string]
+        def call(jar, data)
+          return load_cookie_jar_json(jar, data) if data.start_with?('{')
+
+          return load_cookie_jar_mechanize(jar, data) if data.start_with?('---')
+
+          load_cookie_jar_string(jar, data)
         end
 
         private
@@ -23,9 +26,22 @@ module VkMusic
         end
 
         # Loads cookies from Mechanize file
-        def load_cookie_jar_mechanize(jar)
+        def load_cookie_jar_mechanize(jar, data)
           VkMusic.log.info('cookie_reader') { 'Loading Mechanize cookies' }
-          jar.load(AGENT_COOKIES_PATH)
+          file = Tempfile.new
+          file.write(data)
+          file.rewind
+          jar.load(file)
+          file.unlink
+        end
+
+        # Loads cookies from string
+        def load_cookie_jar_string(jar, data)
+          VkMusic.log.info('cookie_reader') { 'Loading String cookies' }
+          data.split(';').each do |part|
+            k, v = part.strip.split('=', 2)
+            jar.add(URI('https://m.vk.com'), HTTP::Cookie.new(k, v))
+          end
         end
       end
     end
