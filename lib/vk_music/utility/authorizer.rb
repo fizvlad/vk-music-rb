@@ -28,7 +28,8 @@ module VkMusic
         # @param jar [HTTP::CookieJar]
         # @param path [string]
         def load_cookie_jar(jar, path)
-          VkMusic::Utility::CookieReader.call(jar, path)
+          data = File.read(path)
+          VkMusic::Utility::CookieReader.call(jar, data)
         rescue StandardError => e
           VkMusic.log.error('authorizer') { "Failed to parse saved cookies: #{e}:\m#{e.full_message}" }
         end
